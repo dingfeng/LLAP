@@ -17,6 +17,5 @@ class FileServer(socketserver.BaseRequestHandler):
                         break
                     file.write(rdata)
 
-
 s1 = socketserver.ThreadingTCPServer(("0.0.0.0", 9999), FileServer)
 s1.serve_forever()
