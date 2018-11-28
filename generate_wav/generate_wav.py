@@ -4,16 +4,17 @@
 import numpy as np
 import scipy.io.wavfile as wavfile
 import scipy.fftpack as fftp
+import matplotlib.pyplot as plt
 
 
 def main():
-    baseF = 17000
-    deltaF = 350
-    fn = 16
-    fs = 192000
-    duration = 5 * 60
+    baseF = 17000+175
+    deltaF = 700
+    fn = 8
+    fs = 48000
+    duration = 2 * 60
     fslist = []
-    currentF = baseF + deltaF // 2
+    currentF = baseF
     fslist.append(currentF)
     for i in range(fn - 1):
         currentF += deltaF
@@ -21,11 +22,10 @@ def main():
     data = np.zeros(fs * duration)
     times = np.linspace(0, duration, fs * duration, False)
     for fstmp in fslist:
-        fdata = np.cos(2 * np.pi * fstmp * times)
+        fdata = np.cos(2 * np.pi * fstmp * times) * np.sqrt(2)
         data += fdata
-
+    data = data / 16
     wavfile.write('sound.wav', int(fs), data.astype(np.float32))
-
 
 
 if __name__ == '__main__':
