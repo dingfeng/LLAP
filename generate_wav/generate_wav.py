@@ -8,9 +8,9 @@ import matplotlib.pyplot as plt
 
 
 def main():
-    baseF = 17000+175
+    baseF = 20000
     deltaF = 700
-    fn = 8
+    fn = 1
     fs = 48000
     duration = 2 * 60
     fslist = []
@@ -22,10 +22,18 @@ def main():
     data = np.zeros(fs * duration)
     times = np.linspace(0, duration, fs * duration, False)
     for fstmp in fslist:
-        fdata = np.cos(2 * np.pi * fstmp * times) * np.sqrt(2)
+        fdata = np.cos(2 * np.pi * fstmp * times) #* np.sqrt(2)
         data += fdata
-    data = data / 16
-    wavfile.write('sound.wav', int(fs), data.astype(np.float32))
+    # data = data / 16
+    # xf = np.arange(len(data)) / len(data) * 48000
+    # yf = fftp.fft(data, len(data))
+    # yf = np.abs(yf)
+    # # for i in range(20):
+    # #     yf[np.argmax(yf)] = 0
+    # plt.plot(xf, yf)
+    # plt.show()
+    data=data*32767
+    wavfile.write('sound.wav', int(fs), data.astype(np.int16))
 
 
 if __name__ == '__main__':

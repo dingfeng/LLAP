@@ -20,7 +20,7 @@ def main():
 
 
 def getData():
-    filepath = '../server/2/temp/distance/dingfeng/1.pcm'
+    filepath = '../server/2/temp/distance/dingfeng/dingfeng.pcm'
     data = np.memmap(filepath, dtype='h', mode='r')
     f=17000 + 175
     downI = move_average(getI(data, f))

@@ -47,7 +47,7 @@ plt.grid()
 T = 5.0             # seconds
 n = int(T * fs)     # total number of samples
 t = np.linspace(0, T, n, endpoint=False)
-# "Noisy" data.  We want to recover the 1.2 Hz signal from this.
+# "Noisy" data.  We want to recover the dingfeng.2 Hz signal from this.
 data = np.sin(1.2*2*np.pi*t) + 1.5*np.cos(9*2*np.pi*t) \
         + 0.5*np.sin(12.0*2*np.pi*t)
 
