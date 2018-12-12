@@ -10,11 +10,11 @@ import matplotlib.pyplot as plt
 
 
 def main():
-    dingfeng_dir = '../dataset/cutted/dingfeng/'
+    dingfeng_dir = '../dataset/volume3/cutted/dingfeng/'
     dingfeng_data = collect_feature(dingfeng_dir)
-    anna_dir = '../dataset/cutted/anna/'
+    anna_dir = '../dataset/volume3/cutted/anna/'
     anna_data = collect_feature(anna_dir)
-    dingfeng2_dir = '../dataset/cutted/dingfeng2/'
+    dingfeng2_dir = '../dataset/volume3/cutted/dingfeng2/'
     dingfeng2_data = collect_feature(dingfeng2_dir)
     dist_map = np.zeros((len(anna_data) + len(dingfeng2_data), len(dingfeng_data)))
     # for i in range(len(dingfeng_data)):

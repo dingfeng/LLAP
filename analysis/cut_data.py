@@ -12,8 +12,8 @@ freq = 20000
 
 
 def main():
-    source_dir='../dataset/raw/dingfeng2'
-    dest_dir='../dataset/cutted/dingfeng2'
+    source_dir='../dataset/volume3/raw/dingfeng2'
+    dest_dir='../dataset/volume3/cutted/dingfeng2'
     cut_dir(source_dir, dest_dir)
 
 
@@ -66,18 +66,10 @@ def move_average(data):
         result[i] = np.mean(data[i, :])
     return result
 
-def butter_lowpass(cutoff, fs, order=5):
-    nyq = 0.5 * fs
-    normal_cutoff = cutoff / nyq
-    b, a = butter(order, normal_cutoff, btype='low', analog=False)
-    return b, a
-
-
-def butter_lowpass_filter(data, cutoff, fs, order=5):
-    b, a = butter_lowpass(cutoff, fs, order=order)
-    y = lfilter(b, a, data)
-    return y
+def test():
+    cut('../server/2018-12-12-10-54-33/temp/handwriting/dingfeng/3.pcm','../server/2018-12-12-10-54-33/temp/handwriting/dingfeng/1.pcm')
 
 
 if __name__ == '__main__':
-    main()
+    # main()
+    test()
