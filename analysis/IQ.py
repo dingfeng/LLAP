@@ -19,14 +19,14 @@ def main():
 
 
 def getData():
-    filepath = '../server/2018-12-10-23-13-08/temp/recognition/dingfeng/1.pcm'
+    filepath = '../dataset/raw/dingfeng/2.pcm'
     data = np.memmap(filepath, dtype=np.float32, mode='r')
     # data = butter_bandpass_filter(data, 18000, 22000, fs)
     # data = data[130000:]
     f = 20000
     # downI = move_average()
     I = getI(data, f)
-    I = butter_lowpass_filter(I, 20, fs)
+    I = move_average(I)
     # I=move_average(I)
     # I=move_average(I)
     Q = getQ(data, f)
@@ -35,7 +35,7 @@ def getData():
     # butter_bandpass_filter()
     start_point = 0
     I = I[start_point:]
-    Q = butter_lowpass_filter(Q, 20, fs)
+    Q = move_average(Q)
     Q = Q[start_point:]
     # data=Q
     # Q=butter_lowpass_filter(Q,200,fs)
@@ -62,7 +62,7 @@ def getData():
     # print(np.mean(diff))
     # plt.plot(diff)
     # plt.show()
-    # plt.plot(Q)
+    plt.plot(Q)
     # plt.subplot(313)
     # plt.plot(I, Q)
     # decomposition = seasonal_decompose(data, freq=3006, two_sided=False)
@@ -70,7 +70,7 @@ def getData():
     # plt.show()
     # getPhase1(I,Q)
     # plt.plot(I)
-    # plt.show()
+    plt.show()
     # downI = downI[35 + 30:][0:200]
     # downI = removeDC(downI)
     # downQ = move_average(getQ(data, f))
