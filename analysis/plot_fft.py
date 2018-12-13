@@ -22,8 +22,8 @@ def filter(data):
     return butter_bandpass_filter(data,17000,23800,48000,order=3)
 
 def main():
-    filepath = '../server/dingfeng/temp/distance/dingfeng/3.pcm'
-    data = np.memmap(filepath, dtype='h', mode='r')
+    filepath = '../dataset/data20-10/raw/dingfeng/1.pcm'
+    data = np.memmap(filepath, dtype=np.float32, mode='r')
     data=filter(data)
     xf = np.arange(len(data)) / len(data) * 48000
     yf = fftp.fft(data, len(data))
