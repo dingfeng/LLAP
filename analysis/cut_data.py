@@ -6,14 +6,14 @@ from scipy.signal import butter, lfilter, find_peaks_cwt
 import matplotlib.pyplot as plt
 import pickle
 import os
-
+from statsmodels.tsa.seasonal import seasonal_decompose
 fs = 48000
 freq = 20000
 
 
 def main():
-    source_dir='../dataset/data20-10/raw/anna'
-    dest_dir='../dataset/data20-10/cutted/anna'
+    source_dir='../dataset/data20-10/raw/zhuyan'
+    dest_dir='../dataset/data20-10/cutted/zhuyan'
     cut_dir(source_dir, dest_dir)
 
 
@@ -28,36 +28,44 @@ def cut_dir(source_dir, dest_dir):
 
 def cut(source_path, dest_path):
     data = np.memmap(source_path, dtype=np.float32, mode='r')
-    I = getI(data, freq)
+    cutted_Is=[]
+    cutted_Qs=[]
+    # for i in range(1,4):
+    #     biase=np.pi/2 * i
+    I = getI(data, freq,0)
     I = move_average(I)
-    Q = getQ(data, freq)
-    Q = move_average(Q)
+    decompositionI = seasonal_decompose(I, freq=10, two_sided=False)
+    I = decompositionI.trend
     fig=plt.figure()
     plt.title(source_path)
-    plt.subplot(211)
     plt.plot(I)
-    plt.subplot(212)
-    plt.plot(Q)
     points = plt.ginput(5, timeout=0)
     points_len=len(points)
     print('point length {}'.format(points_len))
     if(points_len == 0):
         return
     cutted_I = I[int(points[0][0]):int(points[1][0])]
-    cutted_Q = Q[int(points[0][0]):int(points[1][0])]
+    cutted_Is.append(cutted_I)
     plt.close(fig)
-    pickle.dump({'I': cutted_I, 'Q': cutted_Q}, open(dest_path, 'wb'))
+    for i in range(1,8):
+        I = getI(data, freq, 0)
+        I = move_average(I)
+        decompositionI = seasonal_decompose(I, freq=10, two_sided=False)
+        I=decompositionI.trend
+        cutted_I = I[int(points[0][0]):int(points[1][0])]
+        cutted_Is.append(cutted_I)
+    pickle.dump({'I': cutted_Is}, open(dest_path, 'wb'))
 
 
-def getI(data, f):
+def getI(data, f,biase):
     times = np.arange(0, len(data)) * 1 / fs
-    mulCos = np.cos(2 * np.pi * f * times) * data
+    mulCos = np.cos(2 * np.pi * f * times+biase) * data
     return mulCos
 
 
-def getQ(data, f):
+def getQ(data, f,biase):
     times = np.arange(0, len(data)) * 1 / fs
-    mulSin = -np.sin(2 * np.pi * f * times) * data
+    mulSin = -np.sin(2 * np.pi * f * times+biase) * data
     return mulSin
 
 def move_average(data):

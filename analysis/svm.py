@@ -7,50 +7,82 @@ from scipy.fftpack import dct
 from sklearn.decomposition import PCA
 from sklearn.svm import SVC
 from dtw import dtw
+from scipy.linalg import norm
+
 
 def main():
     data = readdata()
-    chenhao_data = data['zhaorun']
-    dengyufeng_data = data['dingfeng']
-    dataset = []
-    labels = []
+    chenhao_data = data['zhangqian']
+    dengyufeng_data = data['zhuyan']
+    chenhao_dataset = []
+    dengyufeng_dataset = []
     for i in range(len(chenhao_data)):
         I = chenhao_data[i]['I']
-        Q = chenhao_data[i]['Q']
-        feature = get_feature(I, Q)
-        dataset.append(feature)
-        labels.append(1)
+        chenhao_dataset.append(I)
     for i in range(len(dengyufeng_data)):
         I = dengyufeng_data[i]['I']
-        Q = dengyufeng_data[i]['Q']
-        feature = get_feature(I, Q)
-        dataset.append(feature)
-        labels.append(0)
+        dengyufeng_dataset.append(I)
+    chenhao_dataset=shuffle(chenhao_dataset)
+    dengyufeng_dataset=shuffle(dengyufeng_dataset)
+    template_count = 10
+    chenhao_template = chenhao_dataset[:template_count]
+    dengyufeng_template = dengyufeng_dataset[:template_count]
+    right_count = 0
+    for i in range(template_count, len(chenhao_dataset)):
+        minDistance1 = 10000
+        for j in range(template_count):
+            distance = get_distance_inlist(chenhao_template[j], chenhao_dataset[i])
+            if distance < minDistance1:
+                minDistance1 = distance
+        minDistance2 = 10000
+        for j in range(template_count):
+            distance = get_distance_inlist(dengyufeng_template[j], chenhao_dataset[i])
+            if distance < minDistance2:
+                minDistance2 = distance
+        print('min1 min2 {} {} '.format(minDistance1,minDistance2))
+        if minDistance1 < minDistance2:
+            right_count += 1
+            print('right')
+        else:
+            print('wrong')
+    print('accuracy {}'.format(right_count/(len(chenhao_dataset)-template_count)))
 
-    # indexes = np.arange(len(labels))
-    # np.random.shuffle(indexes)
-    # dataset = np.asarray(dataset)
-    # labels = np.asarray(labels)
-    # dataset = dataset[indexes]
-    # labels = labels[indexes]
-    # print('labels len {}'.format(len(labels)))
-    # svc = SVC(gamma='auto')
-    # svc.fit(dataset[:20], labels[:20])
-    # score=svc.score(dataset[20:],labels[20:])
-    # print(labels[22:])
-    # print(score)
     pass
 
 
-def get_feature(I, Q):
-    # data =
-    I = normalize(I)
-    Q = normalize(Q)
-    # pca = PCA(n_components=1)
-    # data=np.asarray([I, Q]).T
-    # pca.fit(data)
-    # compressed_data = pca.transform(data).flatten()
-    return np.concatenate((dct(I)[:40], dct(Q)[:40]))
+def shuffle(data):
+    indexes = np.arange(len(data))
+    np.random.shuffle(indexes)
+    result=[]
+    for index in indexes:
+        result.append(data[index])
+    return result
+
+
+def get_distance_inlist(actionlist0, actionlist1):
+    min_distance = 10000
+    dctlist0 = []
+    for i in range(len(actionlist0)):
+        data = actionlist0[i]
+        data=normalize(data)
+        dctlist0.append(dct(data)[:40])
+    dctlist1 = []
+    for i in range(len(actionlist1)):
+        data = actionlist1[i]
+        data=normalize(data)
+        dctlist1.append(dct(data)[:40])
+    for i in range(len(dctlist0)):
+        for j in range(len(dctlist1)):
+            distance = get_distance(dctlist0[i], dctlist1[j])
+            if distance < min_distance:
+                min_distance = distance
+    return min_distance
+
+def get_distance(data0, data1):
+    data0 = data0.reshape(-1, 1)
+    data1 = data1.reshape(-1, 1)
+    dist, cost, acc, path = dtw(data0, data1, dist=lambda x, y: norm(x - y, ord=1))
+    return dist
 
 
 def readdata():
