@@ -13,7 +13,7 @@ from scipy.linalg import norm
 def main():
     data = readdata()
     chenhao_data = data['zhangqian']
-    dengyufeng_data = data['zhuyan']
+    dengyufeng_data = data['chenhao']
     chenhao_dataset = []
     dengyufeng_dataset = []
     for i in range(len(chenhao_data)):
