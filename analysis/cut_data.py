@@ -12,8 +12,8 @@ freq = 20000
 
 
 def main():
-    source_dir='../dataset/data20-10/raw/zhuyan'
-    dest_dir='../dataset/data20-10/cutted/zhuyan'
+    source_dir='../dataset/data20-10/raw/yuyinggang'
+    dest_dir='../dataset/data20-10/cutted/yuyinggang'
     cut_dir(source_dir, dest_dir)
 
 
@@ -35,6 +35,8 @@ def cut(source_path, dest_path):
     I = getI(data, freq,0)
     I = move_average(I)
     decompositionI = seasonal_decompose(I, freq=10, two_sided=False)
+    # decompositionI.plot()
+    plt.show()
     I = decompositionI.trend
     fig=plt.figure()
     plt.title(source_path)
@@ -47,8 +49,8 @@ def cut(source_path, dest_path):
     cutted_I = I[int(points[0][0]):int(points[1][0])]
     cutted_Is.append(cutted_I)
     plt.close(fig)
-    for i in range(1,8):
-        I = getI(data, freq, 0)
+    for i in range(1,16):
+        I = getI(data, freq, i*np.pi/8)
         I = move_average(I)
         decompositionI = seasonal_decompose(I, freq=10, two_sided=False)
         I=decompositionI.trend
@@ -83,6 +85,8 @@ def butter_lowpass(cutoff, fs, order=5):
     normal_cutoff = cutoff / nyq
     b, a = butter(order, normal_cutoff, btype='low', analog=False)
     return b, a
+
+# def removeTrend(data):
 
 
 def butter_lowpass_filter(data, cutoff, fs, order=5):
