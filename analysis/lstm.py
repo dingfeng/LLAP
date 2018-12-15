@@ -3,7 +3,7 @@
 # author: FD
 import os
 from keras import Sequential
-from keras.layers import LSTM, Masking, Dense,Conv1D,MaxPooling1D,GlobalAveragePooling1D,Dropout
+from keras.layers import LSTM, Masking, Dense,Conv1D,MaxPooling1D,GlobalAveragePooling1D,Dropout,Flatten
 from keras.utils import to_categorical
 import numpy as np
 
@@ -35,7 +35,12 @@ def get_model():
     model.add(MaxPooling1D(3))
     model.add(Conv1D(160, 10, activation='relu'))
     model.add(Conv1D(160, 10, activation='relu'))
-    model.add(GlobalAveragePooling1D())
+    model.add(MaxPooling1D(3))
+    model.add(Conv1D(32, 7, activation='relu'))
+    model.add(MaxPooling1D(3))
+    model.add(Flatten())
+    model.add(Dropout(0.2))
+    model.add(Dense(64, activation='relu'))
     model.add(Dropout(0.5))
     model.add(Dense(11, activation='softmax'))
     # print(model.summary())
@@ -67,6 +72,8 @@ def get_data():
             filepath = os.path.join(label_path, filename)
             onedata = np.load(open(filepath, 'rb'))['I']
             for data in onedata:
+                data=data-np.roll(data,1)
+                data=data[1:]
                 data = normalize(data)
                 if data.shape[0] > max_len:
                     max_len = data.shape[0]
@@ -82,6 +89,8 @@ def get_data():
             filepath = os.path.join(label_path, filename)
             onedata = np.load(open(filepath, 'rb'))['I']
             for data in onedata:
+                data = data - np.roll(data, 1)
+                data = data[1:]
                 data = normalize(data)
                 if data.shape[0] > max_len:
                     max_len = data.shape[0]
