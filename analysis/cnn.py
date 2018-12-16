@@ -33,9 +33,6 @@ def get_model():
     model.add(Conv1D(100, 10, activation='relu', input_shape=(1700, 1)))
     model.add(Conv1D(100, 10, activation='relu'))
     model.add(MaxPooling1D(3))
-    model.add(Conv1D(160, 10, activation='relu'))
-    model.add(Conv1D(160, 10, activation='relu'))
-    model.add(MaxPooling1D(3))
     model.add(Conv1D(32, 7, activation='relu'))
     model.add(GlobalAveragePooling1D())
     model.add(Dropout(0.2))
@@ -58,7 +55,7 @@ def get_data():
     label_names = []
     max_len = 0
     dirs=os.listdir(dir_path)
-    dirs=['dingfeng','zhangqian']
+    dirs=['zhuyan','zhangqian']
     for label_name in dirs:
         label_names.append(label_name)
         label_path = os.path.join(dir_path, label_name)
@@ -66,7 +63,7 @@ def get_data():
         filenames_len = len(filenames)
         indexes = np.arange(filenames_len)
         np.random.shuffle(indexes)
-        train_size = 15
+        train_size = 10
         for i in range(train_size):
             index = indexes[i]
             filename = filenames[index]
@@ -85,23 +82,24 @@ def get_data():
                 # data.resize(3000, 1)
                 train_data.append(data)
                 train_labels.append(count)
-            for i in range(train_size, len(indexes)):
-                index = indexes[i]
-                filename = filenames[index]
-                filepath = os.path.join(label_path, filename)
-                onedata = np.load(open(filepath, 'rb'))['I']
-                for data in onedata:
-                    data = data - np.roll(data, 1)
-                    data = data[1:]
-                    data = data - np.roll(data, 1)
-                    data = data[1:]
-                    data = normalize(data)
-                    if data.shape[0] > max_len:
-                        max_len = data.shape[0]
-                    data.resize(1700, 1)
-                    # data.resize(3000, 1)
-                    test_data.append(data)
-                    test_labels.append(count)
+        for i in range(train_size, len(indexes)):
+            print(i)
+            index = indexes[i]
+            filename = filenames[index]
+            filepath = os.path.join(label_path, filename)
+            onedata = np.load(open(filepath, 'rb'))['I']
+            for data in onedata:
+                data = data - np.roll(data, 1)
+                data = data[1:]
+                data = data - np.roll(data, 1)
+                data = data[1:]
+                data = normalize(data)
+                if data.shape[0] > max_len:
+                    max_len = data.shape[0]
+                data.resize(1700, 1)
+                # data.resize(3000, 1)
+                test_data.append(data)
+                test_labels.append(count)
         count+=1
     print("labelnames {}".format(label_names))
     train_data = np.asarray(train_data)
