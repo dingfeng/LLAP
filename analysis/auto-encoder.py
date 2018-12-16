@@ -16,7 +16,7 @@ def main():
 def train():
     train_data, train_labels, test_data, test_labels = get_data()
     autoencoder = get_model()
-    autoencoder.fit(train_data, train_data, epochs=200, batch_size=128,
+    autoencoder.fit(train_data, train_data, epochs=50, batch_size=128,
                     shuffle=True, validation_data=(test_data, test_data), verbose=1)
     autoencoder.save_weights('auto_encoder.h5')
     pass
@@ -25,20 +25,16 @@ def train():
 def get_model():
     input_img = Input(shape=(1700, 1))
     x = Conv1D(32, 3, activation='relu', padding='same', name='conv1')(input_img)
-    x = MaxPooling1D(2, border_mode='same', name='maxpool1')(x)
+    x = MaxPooling1D(2, padding='same', name='maxpool1')(x)
     x = Conv1D(16, 3, activation='relu', padding='same', name='conv2')(x)
     x = MaxPooling1D(2, padding='same', name='maxpool2')(x)
     x = Conv1D(16, 3, activation='relu', padding='same', name='conv3')(x)
     x = MaxPooling1D(2, padding='same', name='maxpool3')(x)
-    x = Conv1D(8, 3, activation='relu', padding='same', name='conv4')(x)
-    x = MaxPooling1D(2, padding='same', name='maxpool4')(x)
     x = Conv1D(1, 3, activation='relu', padding='same', name='conv5')(x)
     encoder = MaxPooling1D(2, padding='same', name='maxpool5')(x)
     x = Conv1D(1, 3, activation='relu', padding='same')(encoder)
     x = UpSampling1D(2)(x)
-    x = Conv1D(8, 3, activation='relu', padding='same')(x)
-    x = UpSampling1D(2)(x)
-    x = Conv1D(16, 3, activation='relu', padding='valid')(x)
+    x = Conv1D(16, 3, activation='relu', padding='same')(x)
     x = UpSampling1D(2)(x)
     x = Conv1D(16, 3, activation='relu', padding='valid')(x)
     x = UpSampling1D(2)(x)
