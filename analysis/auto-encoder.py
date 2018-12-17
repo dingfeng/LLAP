@@ -24,21 +24,21 @@ def train():
 
 def get_model():
     input_img = Input(shape=(1800, 1))
-    x = Conv1D(16, 5, activation='relu', padding='same', name='conv1')(input_img)
+    x = Conv1D(32, 5, activation='relu', padding='same', name='conv1')(input_img)
     x = MaxPooling1D(3, padding='same', name='maxpool1')(x)
-    x = Conv1D(8, 5, activation='relu', padding='same', name='conv2')(x)
+    x = Conv1D(16, 5, activation='relu', padding='same', name='conv2')(x)
     x = MaxPooling1D(3, padding='same', name='maxpool2')(x)
-    x = Conv1D(4, 5, activation='relu', padding='same', name='conv3')(x)
+    x = Conv1D(8, 5, activation='relu', padding='same', name='conv3')(x)
     x = MaxPooling1D(3, padding='same', name='maxpool3')(x)
     x = Conv1D(1, 5, activation='relu', padding='same', name='conv4')(x)
     encoder = MaxPooling1D(3, padding='same', name='maxpool4')(x)
     x = Conv1D(1, 5, activation='relu', padding='same')(encoder)
     x = UpSampling1D(3)(x)
-    x = Conv1D(4, 5, activation='relu', padding='same')(x)
-    x = UpSampling1D(3)(x)
-    x = Conv1D(8, 5, activation='relu', padding='valid')(x)
+    x = Conv1D(8, 5, activation='relu', padding='same')(x)
     x = UpSampling1D(3)(x)
     x = Conv1D(16, 5, activation='relu', padding='valid')(x)
+    x = UpSampling1D(3)(x)
+    x = Conv1D(32, 5, activation='relu', padding='valid')(x)
     x = UpSampling1D(3)(x)
     decoded = Conv1D(1, 16, activation='sigmoid', padding='valid')(x)
     autoencoder = Model(input_img, decoded)
@@ -73,8 +73,8 @@ def get_data():
             for data in onedata:
                 data = data - np.roll(data, 1)
                 data = data[1:]
-                data = data - np.roll(data, 1)
-                data = data[1:]
+                # data = data - np.roll(data, 1)
+                # data = data[1:]
                 data = normalize(data)
                 if data.shape[0] > max_len:
                     max_len = data.shape[0]
@@ -93,8 +93,8 @@ def get_data():
             for data in onedata:
                 data = data - np.roll(data, 1)
                 data = data[1:]
-                data = data - np.roll(data, 1)
-                data = data[1:]
+                # data = data - np.roll(data, 1)
+                # data = data[1:]
                 data = normalize(data)
                 if data.shape[0] > max_len:
                     max_len = data.shape[0]
