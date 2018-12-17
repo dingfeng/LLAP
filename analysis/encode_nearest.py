@@ -6,32 +6,70 @@ import numpy as np
 from scipy.linalg import norm
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
+from sklearn.svm import SVC
+from sklearn.preprocessing import StandardScaler,MinMaxScaler
 
 
 def main():
     data0 = get_data('../dataset/data20-10/max_variance_cutted_features/dengyufeng/')
     data1 = get_data('../dataset/data20-10/max_variance_cutted_features/yuyinggang/')
-    template_count = 5
-    template0 = data0[:template_count]
-    template1 = data1[:template_count]
-    data0 = data0[template_count:]
-    data1 = data1[template_count]
-    count = 0
-    # print('shape of template 0 {}'.format(template0[0].shape))
-    # template0 = get_template_by_cluster(template0, 4)
-    # template1 = get_template_by_cluster(template1, 4)
+    labels = []
+    dataset = []
     for data in data0:
-        distance0 = get_distance(template0, data)
-        distance1 = get_distance(template1, data)
-        print('distance0 {} distance1 {}'.format(distance0, distance1))
-        if (distance0 < distance1):
-            print('right')
-            count += 1
-        else:
-            print('wrong')
-    print('count {} / total {} accuracy   {}'.format(count, len(data0), count / len(data0)))
+        dataset.append(data)
+        labels.append(0)
+    for data in data1:
+        dataset.append(data)
+        labels.append(1)
+    # dataset = np.asarray(dataset)
+    # dataset = dataset.reshape(-1, 54)
+    template_count = 20
+    indexes = np.arange(len(dataset))
+    np.random.shuffle(indexes)
+    newdataset = []
+    newlabels = []
+    for index in indexes:
+        newdataset.append(dataset[index])
+        newlabels.append(labels[index])
+    train_data = newdataset[:template_count]
+    train_label = newlabels[:template_count]
+    test_data = newdataset[template_count:]
+    test_label = newlabels[template_count:]
+    other_train_data=get_other_train_data()
+    train_data+=other_train_data
+    train_data = np.asarray(train_data).reshape(-1, 23)
+    test_data = np.asarray(test_data).reshape(-1, 23)
+    clf = SVC(gamma='auto',kernel='linear', class_weight='balanced', max_iter=100)
+    new_train_labels = []
+    for label in train_label:
+        new_train_labels.append(label)
+        new_train_labels.append(label)
+    for i in range(len(other_train_data)):
+        new_train_labels.append(1)
+        new_train_labels.append(1)
+    new_test_labels = []
+    for label in test_label:
+        new_test_labels.append(label)
+        new_test_labels.append(label)
+    scaler = StandardScaler()
+    scaler.fit(train_data)
+    train_data = scaler.transform(train_data)
+    test_data = scaler.transform(test_data)
+    clf.fit(train_data, new_train_labels)
+    score = clf.score(test_data, new_test_labels)
+    print(new_test_labels)
+    print(score)
     pass
 
+
+def get_other_train_data():
+    result = []
+    labels = ['anna',  'xuhuatao', 'zhuyan','dingfeng','zhangqian','chenhao','yingjunhao','huangsi']
+    for label in labels:
+        data = get_data('../dataset/data20-10/max_variance_cutted_features/' + label)
+        for item in data:
+            result.append(item)
+    return result
 
 def test_forge():
     data0 = get_data('../dataset/data20-10/features/dingfeng/')
@@ -85,7 +123,6 @@ def get_distance(data0, data1):
                 distance = norm(template.flatten() - compared.flatten(), ord=2)
                 if distance < min_distance:
                     min_distance = distance
-
     return min_distance
 
 
