@@ -49,7 +49,6 @@ def main():
 
     pass
 
-
 def shuffle(data):
     indexes = np.arange(len(data))
     np.random.shuffle(indexes)
