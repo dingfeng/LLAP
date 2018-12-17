@@ -19,7 +19,7 @@ def main():
 
 
 def getData():
-    filepath = '../dataset/raw/dingfeng/2.pcm'
+    filepath = '../dataset/raw/dingfeng/1.pcm'
     data = np.memmap(filepath, dtype=np.float32, mode='r')
     # data = butter_bandpass_filter(data, 18000, 22000, fs)
     # data = data[130000:]

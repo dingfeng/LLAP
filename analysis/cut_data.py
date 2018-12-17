@@ -95,7 +95,7 @@ def butter_lowpass_filter(data, cutoff, fs, order=5):
     return y
 
 def test():
-    cut('../server/2018-12-12-20-00-31/temp/handwriting/dingfeng/2.pcm','../server/2018-12-12-20-00-31/temp/handwriting/dingfeng/1.pcm')
+    cut('../server/2018-12-12-20-00-31/temp/handwriting/dingfeng/1.pcm','../server/2018-12-12-20-00-31/temp/handwriting/dingfeng/1.pcm')
 
 
 if __name__ == '__main__':

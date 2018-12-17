@@ -55,7 +55,7 @@ def get_data():
     label_names = []
     max_len = 0
     dirs=os.listdir(dir_path)
-    dirs=['zhuyan','zhangqian']
+    dirs=['zhuyan','dingfeng-zhangqian']
     for label_name in dirs:
         label_names.append(label_name)
         label_path = os.path.join(dir_path, label_name)

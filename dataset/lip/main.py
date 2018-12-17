@@ -15,7 +15,7 @@ def main():
 
 
 def save_fig(count):
-    source_path = 'zhangqian/' + str(count) + ".pcm"
+    source_path = 'dingfeng-zhangqian/' + str(count) + ".pcm"
     data=np.memmap(source_path,dtype=np.float32,mode='r')
     I = getI(data, freq)
     I = move_average(I)
