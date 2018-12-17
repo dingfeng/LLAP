@@ -11,8 +11,8 @@ from sklearn.preprocessing import StandardScaler,MinMaxScaler
 
 
 def main():
-    data0 = get_data('../dataset/data20-10/max_variance_cutted_features/dengyufeng/')
-    data1 = get_data('../dataset/data20-10/max_variance_cutted_features/yuyinggang/')
+    data0 = get_data('../dataset/data20-10/max_variance_cutted_features/huangsi/')
+    data1 = get_data('../dataset/data20-10/max_variance_cutted_features/zhuyan/')
     labels = []
     dataset = []
     for data in data0:
@@ -39,7 +39,7 @@ def main():
     train_data+=other_train_data
     train_data = np.asarray(train_data).reshape(-1, 23)
     test_data = np.asarray(test_data).reshape(-1, 23)
-    clf = SVC(gamma='auto',kernel='linear', class_weight='balanced', max_iter=100)
+    clf = SVC(gamma='auto',kernel='linear', class_weight='balanced', max_iter=50)
     new_train_labels = []
     for label in train_label:
         new_train_labels.append(label)
@@ -64,12 +64,12 @@ def main():
 
 def get_other_train_data():
     result = []
-    labels = ['anna',  'xuhuatao', 'zhuyan','dingfeng','zhangqian','chenhao','yingjunhao','huangsi']
+    labels = ['anna',  'xuhuatao', 'dingfeng','zhangqian','chenhao']
     for label in labels:
         data = get_data('../dataset/data20-10/max_variance_cutted_features/' + label)
         for item in data:
             result.append(item)
-    return result
+    return []
 
 def test_forge():
     data0 = get_data('../dataset/data20-10/features/dingfeng/')

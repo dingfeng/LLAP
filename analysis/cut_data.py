@@ -36,8 +36,14 @@ def cut(source_path, dest_path):
     I = move_average(I)
     decompositionI = seasonal_decompose(I, freq=10, two_sided=False)
     # decompositionI.plot()
-    plt.show()
+    # plt.show()
     I = decompositionI.trend
+    Q=getQ(data,freq,0)
+    Q = move_average(Q)
+    decompositionQ = seasonal_decompose(Q, freq=10, two_sided=False)
+    Q = decompositionQ.trend
+    plt.plot(I,Q)
+    plt.show()
     fig=plt.figure()
     plt.title(source_path)
     plt.plot(I)
@@ -49,15 +55,21 @@ def cut(source_path, dest_path):
     cutted_I = I[int(points[0][0]):int(points[1][0])]
     cutted_Is.append(cutted_I)
     plt.close(fig)
-    for i in range(1,16):
-        I = getI(data, freq, i*np.pi/8)
+    for i in range(1,32):
+        I = getI(data, freq, i*np.pi/32)
         I = move_average(I)
         decompositionI = seasonal_decompose(I, freq=10, two_sided=False)
         I=decompositionI.trend
         cutted_I = I[int(points[0][0]):int(points[1][0])]
         cutted_Is.append(cutted_I)
-    pickle.dump({'I': cutted_Is}, open(dest_path, 'wb'))
-
+    # pickle.dump({'I': cutted_Is}, open(dest_path, 'wb'))
+    vars=[]
+    for cutted_I in cutted_Is:
+        var=np.var(cutted_I)
+        vars.append(var)
+    plt.figure()
+    plt.plot(vars)
+    plt.show()
 
 def getI(data, f,biase):
     times = np.arange(0, len(data)) * 1 / fs
