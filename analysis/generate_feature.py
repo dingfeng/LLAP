@@ -9,7 +9,6 @@ import pickle
 
 
 def main():
-
     convert()
     pass
 
@@ -25,13 +24,13 @@ def get_model():
     x = Conv1D(1, 3, activation='relu', padding='same', name='conv5')(x)
     encoder = MaxPooling1D(2, padding='same', name='maxpool5')(x)
     autoencoder = Model(input_img, encoder)
-    autoencoder.load_weights('auto_encoder.h5', by_name=True)
+    autoencoder.load_weights('auto_encoder_variance.h5', by_name=True)
     autoencoder.summary()
     return autoencoder
 
 
 def convert():
-    dir_path = '../dataset/data20-10-mimic/cutted/'
+    dir_path = '../dataset/data20-10/max_variance_cutted/'
     label_names = []
     dirs = os.listdir(dir_path)
     model = get_model()
@@ -41,7 +40,7 @@ def convert():
         filenames = os.listdir(label_path)
         for filename in filenames:
             source = os.path.join(dir_path, label_name, filename)
-            dest_dir = os.path.join('../dataset/data20-10/features', label_name)
+            dest_dir = os.path.join('../dataset/data20-10/max_variance_cutted_features', label_name)
             if not os.path.exists(dest_dir):
                 os.makedirs(dest_dir)
             dest = os.path.join(dest_dir, filename)
@@ -51,7 +50,7 @@ def convert():
 
 
 def data_to_feature(source, dest, model):
-    onedata = np.load(open(source, 'rb'))['I']
+    onedata = np.load(open(source, 'rb'))
     feature_list = []
     for data in onedata:
         data = data - np.roll(data, 1)
