@@ -14,15 +14,15 @@ def main():
 
 
 def get_model():
-    input_img = Input(shape=(1700, 1))
-    x = Conv1D(32, 3, activation='relu', padding='same', name='conv1')(input_img)
-    x = MaxPooling1D(2, padding='same', name='maxpool1')(x)
-    x = Conv1D(16, 3, activation='relu', padding='same', name='conv2')(x)
-    x = MaxPooling1D(2, padding='same', name='maxpool2')(x)
-    x = Conv1D(16, 3, activation='relu', padding='same', name='conv3')(x)
-    x = MaxPooling1D(2, padding='same', name='maxpool3')(x)
-    x = Conv1D(1, 3, activation='relu', padding='same', name='conv5')(x)
-    encoder = MaxPooling1D(2, padding='same', name='maxpool5')(x)
+    input_img = Input(shape=(1800, 1))
+    x = Conv1D(16, 5, activation='relu', padding='same', name='conv1')(input_img)
+    x = MaxPooling1D(3, padding='same', name='maxpool1')(x)
+    x = Conv1D(8, 5, activation='relu', padding='same', name='conv2')(x)
+    x = MaxPooling1D(3, padding='same', name='maxpool2')(x)
+    x = Conv1D(4, 5, activation='relu', padding='same', name='conv3')(x)
+    x = MaxPooling1D(3, padding='same', name='maxpool3')(x)
+    x = Conv1D(1, 5, activation='relu', padding='same', name='conv4')(x)
+    encoder = MaxPooling1D(3, padding='same', name='maxpool4')(x)
     autoencoder = Model(input_img, encoder)
     autoencoder.load_weights('auto_encoder_variance.h5', by_name=True)
     autoencoder.summary()
@@ -58,9 +58,10 @@ def data_to_feature(source, dest, model):
         data = data - np.roll(data, 1)
         data = data[1:]
         data = normalize(data)
-        data.resize(1700, 1)
-        data=data.reshape((1,1700,1))
-        feature = model.predict(data)
+        next_data = np.zeros(1800)
+        next_data[50:len(data) + 50] = data[:]
+        next_data = next_data.reshape(1,1800, 1)
+        feature = model.predict(next_data)
         feature_list.append(feature)
     print(feature_list)
     pickle.dump(feature_list, open(dest, 'wb'))

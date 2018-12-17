@@ -23,24 +23,24 @@ def train():
 
 
 def get_model():
-    input_img = Input(shape=(1700, 1))
-    x = Conv1D(32, 3, activation='relu', padding='same', name='conv1')(input_img)
-    x = MaxPooling1D(2, padding='same', name='maxpool1')(x)
-    x = Conv1D(16, 3, activation='relu', padding='same', name='conv2')(x)
-    x = MaxPooling1D(2, padding='same', name='maxpool2')(x)
-    x = Conv1D(16, 3, activation='relu', padding='same', name='conv3')(x)
-    x = MaxPooling1D(2, padding='same', name='maxpool3')(x)
-    x = Conv1D(1, 3, activation='relu', padding='same', name='conv5')(x)
-    encoder = MaxPooling1D(2, padding='same', name='maxpool5')(x)
-    x = Conv1D(1, 3, activation='relu', padding='same')(encoder)
-    x = UpSampling1D(2)(x)
-    x = Conv1D(16, 3, activation='relu', padding='same')(x)
-    x = UpSampling1D(2)(x)
-    x = Conv1D(16, 3, activation='relu', padding='valid')(x)
-    x = UpSampling1D(2)(x)
-    x = Conv1D(32, 3, activation='relu', padding='valid')(x)
-    x = UpSampling1D(2)(x)
-    decoded = Conv1D(1, 5, activation='sigmoid', padding='same')(x)
+    input_img = Input(shape=(1800, 1))
+    x = Conv1D(16, 5, activation='relu', padding='same', name='conv1')(input_img)
+    x = MaxPooling1D(3, padding='same', name='maxpool1')(x)
+    x = Conv1D(8, 5, activation='relu', padding='same', name='conv2')(x)
+    x = MaxPooling1D(3, padding='same', name='maxpool2')(x)
+    x = Conv1D(4, 5, activation='relu', padding='same', name='conv3')(x)
+    x = MaxPooling1D(3, padding='same', name='maxpool3')(x)
+    x = Conv1D(1, 5, activation='relu', padding='same', name='conv4')(x)
+    encoder = MaxPooling1D(3, padding='same', name='maxpool4')(x)
+    x = Conv1D(1, 5, activation='relu', padding='same')(encoder)
+    x = UpSampling1D(3)(x)
+    x = Conv1D(4, 5, activation='relu', padding='same')(x)
+    x = UpSampling1D(3)(x)
+    x = Conv1D(8, 5, activation='relu', padding='valid')(x)
+    x = UpSampling1D(3)(x)
+    x = Conv1D(16, 5, activation='relu', padding='valid')(x)
+    x = UpSampling1D(3)(x)
+    decoded = Conv1D(1, 16, activation='sigmoid', padding='valid')(x)
     autoencoder = Model(input_img, decoded)
     autoencoder.compile(optimizer='adadelta', loss='mean_squared_error')
     autoencoder.summary()
@@ -78,10 +78,11 @@ def get_data():
                 data = normalize(data)
                 if data.shape[0] > max_len:
                     max_len = data.shape[0]
-                data.resize(1700, 1)
-
+                next_data = np.zeros(1800)
+                next_data[50:len(data) + 50] = data[:]
                 # data.resize(3000, 1)
-                train_data.append(data)
+                next_data=next_data.reshape(1800,1)
+                train_data.append(next_data)
                 train_labels.append(count)
         for i in range(train_size, len(indexes)):
             print(i)
@@ -97,9 +98,11 @@ def get_data():
                 data = normalize(data)
                 if data.shape[0] > max_len:
                     max_len = data.shape[0]
-                data.resize(1700, 1)
+                next_data = np.zeros(1800)
+                next_data[50:len(data)+50] = data[:]
+                next_data = next_data.reshape(1800, 1)
                 # data.resize(3000, 1)
-                test_data.append(data)
+                test_data.append(next_data)
                 test_labels.append(count)
         count += 1
     print("labelnames {}".format(label_names))

@@ -9,17 +9,17 @@ from sklearn.cluster import KMeans
 
 
 def main():
-    data0 = get_data('../dataset/data20-10/features/yuyinggang/')
-    data1 = get_data('../dataset/data20-10/features/dengyufeng/')
-    template_count = 12
+    data0 = get_data('../dataset/data20-10/max_variance_cutted_features/dengyufeng/')
+    data1 = get_data('../dataset/data20-10/max_variance_cutted_features/yuyinggang/')
+    template_count = 5
     template0 = data0[:template_count]
     template1 = data1[:template_count]
     data0 = data0[template_count:]
     data1 = data1[template_count]
     count = 0
     # print('shape of template 0 {}'.format(template0[0].shape))
-    template0 = get_template_by_cluster(template0, 22)
-    template1 = get_template_by_cluster(template1, 22)
+    # template0 = get_template_by_cluster(template0, 4)
+    # template1 = get_template_by_cluster(template1, 4)
     for data in data0:
         distance0 = get_distance(template0, data)
         distance1 = get_distance(template1, data)
@@ -79,12 +79,12 @@ def get_distance_list_data(template, data):
 def get_distance(data0, data1):
     min_distance = 10000
     # for data in data0:
-    for template in data0:
-        for i in range(1):
-            compared = data1[i]
-            distance = norm(template.flatten() - compared.flatten(), ord=2)
-            if distance < min_distance:
-                min_distance = distance
+    for templates in data0:
+        for template in templates:
+            for compared in data1:
+                distance = norm(template.flatten() - compared.flatten(), ord=2)
+                if distance < min_distance:
+                    min_distance = distance
 
     return min_distance
 
