@@ -16,9 +16,9 @@ def main():
 def train():
     train_data, train_labels, test_data, test_labels = get_data()
     autoencoder = get_model()
-    autoencoder.fit(train_data, train_data, epochs=50, batch_size=128,
+    autoencoder.fit(train_data, train_data, epochs=100, batch_size=128,
                     shuffle=True, validation_data=(test_data, test_data), verbose=1)
-    autoencoder.save_weights('auto_encoder.h5')
+    autoencoder.save_weights('auto_encoder_variance.h5')
     pass
 
 
@@ -48,7 +48,7 @@ def get_model():
 
 
 def get_data():
-    dir_path = '../dataset/data20-10/cutted/'
+    dir_path = '../dataset/data20-10/max_variance_cutted/'
     train_data = []
     train_labels = []
     test_data = []
@@ -69,7 +69,7 @@ def get_data():
             index = indexes[i]
             filename = filenames[index]
             filepath = os.path.join(label_path, filename)
-            onedata = np.load(open(filepath, 'rb'))['I']
+            onedata = np.load(open(filepath, 'rb'))
             for data in onedata:
                 data = data - np.roll(data, 1)
                 data = data[1:]
@@ -88,7 +88,7 @@ def get_data():
             index = indexes[i]
             filename = filenames[index]
             filepath = os.path.join(label_path, filename)
-            onedata = np.load(open(filepath, 'rb'))['I']
+            onedata = np.load(open(filepath, 'rb'))
             for data in onedata:
                 data = data - np.roll(data, 1)
                 data = data[1:]
