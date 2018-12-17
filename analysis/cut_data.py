@@ -12,8 +12,8 @@ freq = 20000
 
 
 def main():
-    source_dir='../dataset/data20-10/raw/yuyinggang'
-    dest_dir='../dataset/data20-10/cutted/yuyinggang'
+    source_dir='../dataset/data20-10-mimic/raw/dingfeng-dengyufeng'
+    dest_dir='../dataset/data20-10-mimic/test/dingfeng-dengyufeng'
     cut_dir(source_dir, dest_dir)
 
 

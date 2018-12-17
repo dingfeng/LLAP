@@ -31,7 +31,7 @@ def get_model():
 
 
 def convert():
-    dir_path = '../dataset/data20-10/cutted/'
+    dir_path = '../dataset/data20-10-mimic/cutted/'
     label_names = []
     dirs = os.listdir(dir_path)
     model = get_model()

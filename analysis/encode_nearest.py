@@ -4,11 +4,12 @@
 import os
 import numpy as np
 from scipy.linalg import norm
+import matplotlib.pyplot as plt
 
 
 def main():
-    data0 = get_data('../dataset/data20-10/features/chenhao/')
-    data1 = get_data('../dataset/data20-10/features/dingfeng/')
+    data0 = get_data('../dataset/data20-10/features/yuyinggang/')
+    data1 = get_data('../dataset/data20-10/features/dengyufeng/')
     template_count = 10
     template0 = data0[:template_count]
     template1 = data1[:template_count]
@@ -24,15 +25,44 @@ def main():
             count += 1
         else:
             print('wrong')
-    print('count {} / total {} accuracy   {}'.format(count,len(data0),count / len(data0)))
+    print('count {} / total {} accuracy   {}'.format(count, len(data0), count / len(data0)))
     pass
 
+
+def test_forge():
+    data0 = get_data('../dataset/data20-10/features/dingfeng/')
+    template_count = 10
+    template = data0[:template_count]
+    mimic_dir_path = '../dataset/data20-10-mimic/features'
+    # filepath_list = []
+    plt.figure()
+    plt.title('euclidean distance')
+    for filename in os.listdir(mimic_dir_path):
+        filepath = os.path.join(mimic_dir_path, filename)
+        distance_list = get_distance_list(template, filepath)
+        plt.scatter(distance_list, [0 for i in range(len(distance_list))], label=filename)
+    real_distance_list=get_distance_list_data(template,data0[template_count:])
+    plt.scatter(real_distance_list,[0 for i in range(len(data0[template_count:]))],label='real distance')
+    plt.legend()
+    plt.show()
+
+
+def get_distance_list(template, filepath):
+    data = get_data(filepath)
+    return get_distance_list_data(template,data)
+
+def get_distance_list_data(template,data):
+    result = []
+    for data0 in data:
+        distance0 = get_distance(template, data0)
+        result.append(distance0)
+    return result
 
 def get_distance(data0, data1):
     min_distance = 10000
     for data in data0:
         for template in data:
-            for i in range(8):
+            for i in range(16):
                 compared = data1[i]
                 distance = norm(template.flatten() - compared.flatten(), ord=2)
                 if distance < min_distance:
@@ -47,7 +77,7 @@ def get_data(dir_path):
         filepath = os.path.join(dir_path, filename)
         data = np.load(open(filepath, 'rb'))
         result.append(data)
-    result=shuffle(result)
+    result = shuffle(result)
     return result
 
 
@@ -62,3 +92,4 @@ def shuffle(data_list):
 
 if __name__ == '__main__':
     main()
+    # test_forge()
