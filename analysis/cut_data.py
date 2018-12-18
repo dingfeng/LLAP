@@ -7,80 +7,79 @@ import matplotlib.pyplot as plt
 import pickle
 import os
 from statsmodels.tsa.seasonal import seasonal_decompose
+from scipy.linalg import norm
 fs = 48000
 freq = 20000
 
 
 def main():
-    source_dir='../dataset/data20-10-mimic/raw/dingfeng-dengyufeng'
-    dest_dir='../dataset/data20-10-mimic/test/dingfeng-dengyufeng'
+    source_dir = '../dataset/data20-10/raw/zhuyan'
+    dest_dir = '../dataset/data20-10/cutted_IQ/zhuyan'
     cut_dir(source_dir, dest_dir)
-
 
 
 def cut_dir(source_dir, dest_dir):
     for filename in os.listdir(source_dir):
         if filename.endswith('pcm'):
             source_path = os.path.join(source_dir, filename)
-            dest_path = os.path.join(dest_dir, ''.join([filename[:-4],'.pkl']))
-            cut(source_path,dest_path)
+            dest_path = os.path.join(dest_dir, ''.join([filename[:-4], '.pkl']))
+            cut(source_path, dest_path)
 
 
 def cut(source_path, dest_path):
     data = np.memmap(source_path, dtype=np.float32, mode='r')
-    cutted_Is=[]
-    cutted_Qs=[]
-    # for i in range(1,4):
-    #     biase=np.pi/2 * i
-    I = getI(data, freq,0)
-    I = move_average(I)
-    decompositionI = seasonal_decompose(I, freq=10, two_sided=False)
-    # decompositionI.plot()
-    # plt.show()
-    I = decompositionI.trend
-    Q=getQ(data,freq,0)
-    Q = move_average(Q)
-    decompositionQ = seasonal_decompose(Q, freq=10, two_sided=False)
-    Q = decompositionQ.trend
-    plt.plot(I,Q)
-    plt.show()
-    fig=plt.figure()
-    plt.title(source_path)
-    plt.plot(I)
-    points = plt.ginput(5, timeout=0)
-    points_len=len(points)
-    print('point length {}'.format(points_len))
-    if(points_len == 0):
-        return
-    cutted_I = I[int(points[0][0]):int(points[1][0])]
-    cutted_Is.append(cutted_I)
-    plt.close(fig)
-    for i in range(1,32):
-        I = getI(data, freq, i*np.pi/32)
+    points = None
+    toSaveObj = []
+    for i in range(64):
+        I = getI(data, freq, i * np.pi / 32)
         I = move_average(I)
         decompositionI = seasonal_decompose(I, freq=10, two_sided=False)
-        I=decompositionI.trend
+        I = decompositionI.trend
+        Q = getQ(data, freq, i * np.pi / 32)
+        Q = move_average(Q)
+        decompositionQ = seasonal_decompose(Q, freq=10, two_sided=False)
+        Q = decompositionQ.trend
+        if i == 0:
+            fig = plt.figure()
+            plt.subplot(211)
+            plt.plot(I)
+            plt.subplot(212)
+            plt.plot(Q)
+            points = plt.ginput(5, timeout=0)
+            points_len = len(points)
+            print('point length {}'.format(points_len))
+            if (points_len == 0):
+                plt.close(fig)
+                return
+            plt.close(fig)
         cutted_I = I[int(points[0][0]):int(points[1][0])]
-        cutted_Is.append(cutted_I)
-    # pickle.dump({'I': cutted_Is}, open(dest_path, 'wb'))
-    vars=[]
-    for cutted_I in cutted_Is:
-        var=np.var(cutted_I)
-        vars.append(var)
+        cutted_Q = Q[int(points[0][0]):int(points[1][0])]
+        cutted_IQ = np.asarray([cutted_I, cutted_Q]).T
+        toSaveObj.append(cutted_IQ)
+    # pickle.dump(toSaveObj, open(dest_path, 'wb'))
     plt.figure()
-    plt.plot(vars)
+    for index,obj in enumerate(toSaveObj):
+        if index > 10:
+            break
+        obj = obj - np.roll(data, 1)
+        obj = obj[1:]
+        obj = norm(obj, ord=2, axis=1)
+        # data = normalize(data)
+        plt.subplot(10,1,index)
+        plt.plot(obj)
     plt.show()
 
-def getI(data, f,biase):
+def getI(data, f, biase):
     times = np.arange(0, len(data)) * 1 / fs
-    mulCos = np.cos(2 * np.pi * f * times+biase) * data
+    mulCos = np.cos(2 * np.pi * f * times + biase) * data
     return mulCos
 
 
-def getQ(data, f,biase):
+def getQ(data, f, biase):
     times = np.arange(0, len(data)) * 1 / fs
-    mulSin = -np.sin(2 * np.pi * f * times+biase) * data
+    mulSin = -np.sin(2 * np.pi * f * times + biase) * data
     return mulSin
+
 
 def move_average(data):
     win_size = 300
@@ -92,13 +91,12 @@ def move_average(data):
         result[i] = np.mean(data[i, :])
     return result
 
+
 def butter_lowpass(cutoff, fs, order=5):
     nyq = 0.5 * fs
     normal_cutoff = cutoff / nyq
     b, a = butter(order, normal_cutoff, btype='low', analog=False)
     return b, a
-
-# def removeTrend(data):
 
 
 def butter_lowpass_filter(data, cutoff, fs, order=5):
@@ -106,12 +104,12 @@ def butter_lowpass_filter(data, cutoff, fs, order=5):
     y = lfilter(b, a, data)
     return y
 
+
 def test():
-    cut('../server/2018-12-12-20-00-31/temp/handwriting/dingfeng/1.pcm','../server/2018-12-12-20-00-31/temp/handwriting/dingfeng/1.pcm')
+    cut('../server/2018-12-12-20-00-31/temp/handwriting/dingfeng/1.pcm',
+        '../server/2018-12-12-20-00-31/temp/handwriting/dingfeng/1.pcm')
 
 
 if __name__ == '__main__':
     main()
     # test()
-
-
