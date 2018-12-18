@@ -13,8 +13,8 @@ freq = 20000
 
 
 def main():
-    source_dir = '../dataset/data20-10/raw/zhuyan'
-    dest_dir = '../dataset/data20-10/cutted_IQ/zhuyan'
+    source_dir = '../dataset/data20-10/raw/huangsi'
+    dest_dir = '../dataset/data20-10/cutted_IQ/huangsi'
     cut_dir(source_dir, dest_dir)
 
 
@@ -59,13 +59,16 @@ def cut(source_path, dest_path):
     # pickle.dump(toSaveObj, open(dest_path, 'wb'))
     plt.figure()
     for index,obj in enumerate(toSaveObj):
-        if index > 10:
+        if index >= 8:
             break
-        obj = obj - np.roll(data, 1)
+        obj = obj - np.roll(obj, 1)
         obj = obj[1:]
         obj = norm(obj, ord=2, axis=1)
+        obj = obj - np.roll(obj, 1)
+        obj = obj[1:]
+        obj = np.abs(obj)
         # data = normalize(data)
-        plt.subplot(10,1,index)
+        plt.subplot(8,1,index+1)
         plt.plot(obj)
     plt.show()
 

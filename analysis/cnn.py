@@ -24,7 +24,7 @@ def train():
     one_hot_train_labels = one_hot_train_labels[indexes]
     one_hot_test_labels = to_categorical(test_labels)
     model = get_model()
-    model.fit(train_data, one_hot_train_labels, batch_size=100, validation_data=(test_data, one_hot_test_labels),
+    model.fit(train_data, one_hot_train_labels, batch_size=11, validation_data=(test_data, one_hot_test_labels),
               epochs=1000)
 
     pass
@@ -32,20 +32,14 @@ def train():
 
 def get_model():
     model = Sequential()
-    model.add(Conv1D(128, 3, activation='relu', input_shape=(1700, 1)))
-    model.add(MaxPooling1D(2))
-    model.add(Conv1D(64, 3, activation='relu'))
-    model.add(MaxPooling1D(2))
-    model.add(Conv1D(64, 3, activation='relu'))
-    model.add(MaxPooling1D(2))
-    model.add(Conv1D(32, 3, activation='relu'))
-    model.add(MaxPooling1D(2))
+    model.add(Conv1D(64, 10, activation='relu', input_shape=(1700, 1)))
+    model.add(MaxPooling1D(3))
+    model.add(Conv1D(32, 5, activation='relu'))
+    model.add(MaxPooling1D(3))
+    model.add(Conv1D(32, 5, activation='relu'))
+    model.add(MaxPooling1D(3))
     model.add(Flatten())
-    model.add(Dropout(0.5))
-    model.add(Dense(32, activation='relu', kernel_regularizer=regularizers.l2(0.001)))
-    model.add(Dropout(0.5))
-    model.add(Dense(16, activation='relu', kernel_regularizer=regularizers.l2(0.001)))
-    model.add(Dropout(0.5))
+    model.add(Dense(50, activation='relu'))
     model.add(Dense(11, activation='softmax'))
     # print(model.summary())
     model.compile(loss='categorical_crossentropy',
@@ -71,52 +65,50 @@ def get_data():
         filenames_len = len(filenames)
         indexes = np.arange(filenames_len)
         np.random.shuffle(indexes)
-        train_size = 17
+        train_size = 15
         for i in range(train_size):
             index = indexes[i]
             filename = filenames[index]
             filepath = os.path.join(label_path, filename)
             onedata = np.load(open(filepath, 'rb'))
-            for data in onedata:
-                data = data - np.roll(data, 1)
-                data = data[1:]
-                data = norm(data, ord=2, axis=1)
-                data = data - np.roll(data, 1)
-                data[0] = 0
-                data = data - np.roll(data, 1)
-                data[0] = 0
-                data = np.abs(data)
-                data = normalize(data)
-                if data.shape[0] > max_len:
-                    max_len = data.shape[0]
-                data = data.reshape(-1, 1)
-                data = np.vstack(
-                    (np.zeros((50, 1)), data, np.zeros((1700 - data.shape[0] - 50, 1))))
-                train_data.append(data)
-                train_labels.append(count)
+            data = onedata[0]
+            data = data - np.roll(data, 1)
+            data = data[1:]
+            data = norm(data, ord=2, axis=1)
+            data = data - np.roll(data, 1)
+            data = data[1:]
+            data = data - np.roll(data, 1)
+            data = data[1:]
+            data = np.abs(data)
+            if data.shape[0] > max_len:
+                max_len = data.shape[0]
+            data = data.reshape(-1, 1)
+            data = np.vstack(
+                (np.zeros((50, 1)), data, np.zeros((1700 - data.shape[0] - 50, 1))))
+            train_data.append(data)
+            train_labels.append(count)
         for i in range(train_size, len(indexes)):
             index = indexes[i]
             filename = filenames[index]
             filepath = os.path.join(label_path, filename)
             onedata = np.load(open(filepath, 'rb'))
-            for data in onedata:
-                data = data - np.roll(data, 1)
-                data = data[1:]
-                data = norm(data, ord=2, axis=1)
-                data = data - np.roll(data, 1)
-                data[0] = 0
-                data = data - np.roll(data, 1)
-                data[0] = 0
-                data=np.abs(data)
-                data = normalize(data)
-                if data.shape[0] > max_len:
-                    max_len = data.shape[0]
-                data = data.reshape(-1, 1)
-                data = np.vstack(
-                    (np.zeros((50, 1)), data, np.zeros((1700 - data.shape[0] - 50, 1))))
-                # data.resize(3000, 1)
-                test_data.append(data)
-                test_labels.append(count)
+            data = onedata[0]
+            data = data - np.roll(data, 1)
+            data = data[1:]
+            data = norm(data, ord=2, axis=1)
+            data = data - np.roll(data, 1)
+            data = data[1:]
+            data = data - np.roll(data, 1)
+            data = data[1:]
+            data = np.abs(data)
+            if data.shape[0] > max_len:
+                max_len = data.shape[0]
+            data = data.reshape(-1, 1)
+            data = np.vstack(
+                (np.zeros((50, 1)), data, np.zeros((1700 - data.shape[0] - 50, 1))))
+            # data.resize(3000, 1)
+            test_data.append(data)
+            test_labels.append(count)
         count += 1
     print("labelnames {}".format(label_names))
     train_data = np.asarray(train_data)
