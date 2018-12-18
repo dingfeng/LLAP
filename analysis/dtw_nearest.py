@@ -16,7 +16,7 @@ from sklearn.preprocessing import StandardScaler, MinMaxScaler
 
 
 def main():
-    data0 = get_data('../dataset/data20-10/cutted_IQ/dingfeng/')
+    data0 = get_data('../dataset/data20-10/cutted_IQ/zhaorun/')
     data1 = get_data('../dataset/data20-10/cutted_IQ/huangsi/')
     template_count = 10
     template0 = data0[:template_count]
