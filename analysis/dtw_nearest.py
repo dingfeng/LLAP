@@ -10,46 +10,23 @@ from sklearn.svm import SVC
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from dtw import dtw
 from scipy.spatial.distance import euclidean
-from fastdtw import fastdtw
-from scipy.fftpack import dct,fft
+from scipy.fftpack import dct, fft
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
+import time
+from scipy.stats import pearsonr
+
+start_freq = 0
+end_freq = 35
 
 
 def main():
-    data0 = get_data('../dataset/data20-10/cutted_IQ/zhuyan/')
-    data1 = get_data('../dataset/data20-10/cutted_IQ/huangsi/')
+    data0 = get_data('../dataset/data20-10/cutted_IQ/anna/')
+    data1 = get_data('../dataset/data20-10/cutted_IQ/yingjunhao/')
     template_count = 10
     template0 = data0[:template_count]
     template1 = data1[:template_count]
     compares = data0[template_count:]
     count = 0
-
-    # ss0 = MinMaxScaler()
-    # ssData = data0[0]
-    # for i in range(1,len(data0)):
-    #     ssData=np.vstack((ssData,data0[i]))
-    # ss0.fit(ssData)
-
-    # start_freq=0
-    # end_freq=35
-    # ss1 = MinMaxScaler()
-    # ssData = data0[0]
-    # for i in range(1, len(data1)):
-    #     ssData = np.vstack((ssData, data1[i]))
-    # ss1.fit(ssData)
-    # dct_template0 = []
-    # for template in template0:
-    #     dct_template0.append(np.abs(fft(template,axis=0)[start_freq:end_freq]))
-        # plt.subplot(211)
-        # plt.plot(template)
-        # plt.subplot(212)
-        # plt.plot(dct(template, axis=0).flatten())
-        # plt.show()
-    # dct_template1 = []
-    # for template in template1:
-    #     dct_template1.append(np.abs(fft(template,axis=0)[start_freq:end_freq]))
-
-
     for compared in compares:
         min_distance0 = get_distance_to_template(template0, compared)
         min_distance1 = get_distance_to_template(template1, compared)
@@ -65,7 +42,8 @@ def main():
 def get_distance_to_template(templates, data):
     min_distance = 10000
     for template in templates:
-        distance = get_distance(template, data)  # get_distance(template, data)
+        for template_feature in template:
+            distance = get_distance(template_feature, data[0])  # get_distance(template, data)
         min_distance = min(min_distance, distance)
     return min_distance
 
@@ -74,20 +52,24 @@ def get_data(dir_path):
     result = []
     for filename in os.listdir(dir_path):
         filepath = os.path.join(dir_path, filename)
-        data = np.load(open(filepath, 'rb'))[0]
-        data = data - np.roll(data, 1)
-        data = data[1:]
-        data = norm(data, ord=2, axis=1)
-        # data = data - np.roll(data, 1)
-        # data = data[1:]
-        # data = np.abs(data)
-        # plt.plot(data)
-        # plt.show()
-        data = data.reshape(-1, 1)
-        ss1 = MinMaxScaler()
-        ss1.fit(data)
-        data = ss1.transform(data)
-        result.append(data)
+        datas = np.load(open(filepath, 'rb'))
+        label_data = []
+        for data in datas:
+            data = data - np.roll(data, 1)
+            data = data[1:]
+            data = norm(data, ord=2, axis=1)
+            # data = data - np.roll(data, 1)
+            # data = data[1:]
+            # data = data - np.roll(data, 1)
+            # data = data[1:]
+            # data = np.abs(data)
+            data = reshape_data(data)
+            ss1 = MinMaxScaler()
+            ss1.fit(data)
+            data = ss1.transform(data)
+            feature = dct(data, axis=0)[start_freq:end_freq]
+            label_data.append(feature)
+        result.append(label_data)
     result = shuffle(result)
     return result
 
@@ -102,14 +84,21 @@ def shuffle(data_list):
 
 
 def get_distance(feature0, feature1):
-    dist, cost, acc, path = dtw(feature0, feature1, dist=lambda x, y: norm(x - y, ord=1))
+    # dist, cost, acc, path = dtw(feature0, feature1, dist=lambda x, y: norm(x - y, ord=1))
     # print('dtw')
-    return dist
+    return norm(feature0-feature1,ord=2)  # pearsonr(feature0,feature1)[0]
 
 
-def get_fast_distance(feature0, feature1):
-    distance, path = fastdtw(feature0, feature1)
-    return distance
+def reshape_data(data):
+    data = normalize(data)
+    next_data = np.zeros(1800)
+    next_data[50:len(data) + 50] = data[:]
+    next_data = next_data.reshape(1800, 1)
+    return next_data
+
+
+def normalize(data):
+    return (data - np.min(data)) / (np.max(data) - np.min(data))
 
 
 if __name__ == '__main__':
