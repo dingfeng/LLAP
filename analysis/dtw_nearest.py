@@ -11,12 +11,12 @@ from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from dtw import dtw
 from scipy.spatial.distance import euclidean
 from fastdtw import fastdtw
-from scipy.fftpack import dct
+from scipy.fftpack import dct,fft
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 
 
 def main():
-    data0 = get_data('../dataset/data20-10/cutted_IQ/zhaorun/')
+    data0 = get_data('../dataset/data20-10/cutted_IQ/zhuyan/')
     data1 = get_data('../dataset/data20-10/cutted_IQ/huangsi/')
     template_count = 10
     template0 = data0[:template_count]
@@ -24,27 +24,35 @@ def main():
     compares = data0[template_count:]
     count = 0
 
-    ss0 = MinMaxScaler()
-    ssData = data0[0]
-    for i in range(1,len(data0)):
-        ssData=np.vstack((ssData,data0[i]))
-    ss0.fit(ssData)
+    # ss0 = MinMaxScaler()
+    # ssData = data0[0]
+    # for i in range(1,len(data0)):
+    #     ssData=np.vstack((ssData,data0[i]))
+    # ss0.fit(ssData)
 
-    ss1 = MinMaxScaler()
-    ssData = data0[0]
-    for i in range(1, len(data1)):
-        ssData = np.vstack((ssData, data1[i]))
-    ss1.fit(ssData)
-    dct_template0 = []
-    for template in template0:
-        dct_template0.append(dct(ss0.transform(template))[:40])
-    dct_template1 = []
-    for template in template1:
-        dct_template1.append(dct(ss1.transform(template))[:40])
+    # start_freq=0
+    # end_freq=35
+    # ss1 = MinMaxScaler()
+    # ssData = data0[0]
+    # for i in range(1, len(data1)):
+    #     ssData = np.vstack((ssData, data1[i]))
+    # ss1.fit(ssData)
+    # dct_template0 = []
+    # for template in template0:
+    #     dct_template0.append(np.abs(fft(template,axis=0)[start_freq:end_freq]))
+        # plt.subplot(211)
+        # plt.plot(template)
+        # plt.subplot(212)
+        # plt.plot(dct(template, axis=0).flatten())
+        # plt.show()
+    # dct_template1 = []
+    # for template in template1:
+    #     dct_template1.append(np.abs(fft(template,axis=0)[start_freq:end_freq]))
+
 
     for compared in compares:
-        min_distance0 = get_distance_to_template(dct_template0, dct(ss0.transform(compared))[:40])
-        min_distance1 = get_distance_to_template(dct_template1, ss1.transform(compared)[:40])
+        min_distance0 = get_distance_to_template(template0, compared)
+        min_distance1 = get_distance_to_template(template1, compared)
         print('min_distance-0 {} min_distance-1 {}'.format(min_distance0, min_distance1))
         if min_distance0 < min_distance1:
             print('right')
@@ -70,12 +78,15 @@ def get_data(dir_path):
         data = data - np.roll(data, 1)
         data = data[1:]
         data = norm(data, ord=2, axis=1)
-        data = data - np.roll(data, 1)
-        data = data[1:]
-        data = data - np.roll(data, 1)
-        data = data[1:]
+        # data = data - np.roll(data, 1)
+        # data = data[1:]
         # data = np.abs(data)
+        # plt.plot(data)
+        # plt.show()
         data = data.reshape(-1, 1)
+        ss1 = MinMaxScaler()
+        ss1.fit(data)
+        data = ss1.transform(data)
         result.append(data)
     result = shuffle(result)
     return result
