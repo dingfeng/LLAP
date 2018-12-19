@@ -6,6 +6,7 @@ from keras.models import Model
 from keras import backend as K
 import numpy as np
 import os
+from scipy.linalg import norm
 
 
 def main():
@@ -16,9 +17,9 @@ def main():
 def train():
     train_data, train_labels, test_data, test_labels = get_data()
     autoencoder = get_model()
-    autoencoder.fit(train_data, train_data, epochs=100, batch_size=128,
+    autoencoder.fit(train_data, train_data, epochs=5, batch_size=128,
                     shuffle=True, validation_data=(test_data, test_data), verbose=1)
-    autoencoder.save_weights('auto_encoder_variance.h5')
+    autoencoder.save_weights('auto_encoder_IQ.h5')
     pass
 
 
@@ -48,7 +49,7 @@ def get_model():
 
 
 def get_data():
-    dir_path = '../dataset/data20-10/max_variance_cutted/'
+    dir_path = '../dataset/data20-10/cutted_IQ/'
     train_data = []
     train_labels = []
     test_data = []
@@ -71,39 +72,22 @@ def get_data():
             filepath = os.path.join(label_path, filename)
             onedata = np.load(open(filepath, 'rb'))
             for data in onedata:
-                data = data - np.roll(data, 1)
-                data = data[1:]
-                # data = data - np.roll(data, 1)
-                # data = data[1:]
-                data = normalize(data)
-                if data.shape[0] > max_len:
-                    max_len = data.shape[0]
-                next_data = np.zeros(1800)
-                next_data[50:len(data) + 50] = data[:]
-                # data.resize(3000, 1)
-                next_data=next_data.reshape(1800,1)
-                train_data.append(next_data)
-                train_labels.append(count)
+                next_data0,next_data1,next_data2 = get_feature_datas(data)
+                train_data.append(next_data0)
+                train_data.append(next_data1)
+                train_data.append(next_data2)
+                # train_labels.append(count)
         for i in range(train_size, len(indexes)):
-            print(i)
             index = indexes[i]
             filename = filenames[index]
             filepath = os.path.join(label_path, filename)
             onedata = np.load(open(filepath, 'rb'))
             for data in onedata:
-                data = data - np.roll(data, 1)
-                data = data[1:]
-                # data = data - np.roll(data, 1)
-                # data = data[1:]
-                data = normalize(data)
-                if data.shape[0] > max_len:
-                    max_len = data.shape[0]
-                next_data = np.zeros(1800)
-                next_data[50:len(data)+50] = data[:]
-                next_data = next_data.reshape(1800, 1)
-                # data.resize(3000, 1)
-                test_data.append(next_data)
-                test_labels.append(count)
+                next_data0, next_data1, next_data2 = get_feature_datas(data)
+                test_data.append(next_data0)
+                test_data.append(next_data1)
+                test_data.append(next_data2)
+                # test_labels.append(count)
         count += 1
     print("labelnames {}".format(label_names))
     train_data = np.asarray(train_data)
@@ -112,6 +96,27 @@ def get_data():
     test_labels = np.asarray(test_labels)
     print('max_len {}'.format(max_len))
     return train_data, train_labels, test_data, test_labels
+
+
+def get_feature_datas(data):
+    data = data - np.roll(data, 1)
+    data = data[1:]
+    data0 = norm(data, ord=2, axis=1)
+    data1 = data0 - np.roll(data0, 1)
+    data1 = data1[1:]
+    data2 = data1 - np.roll(data1, 1)
+    data2 = data2[1:]
+    return reshape_data(data0), reshape_data(data1), reshape_data(data2)
+
+
+def reshape_data(data):
+    data = normalize(data)
+    # if data.shape[0] > max_len:
+    #     max_len = data.shape[0]
+    next_data = np.zeros(1800)
+    next_data[50:len(data) + 50] = data[:]
+    next_data = next_data.reshape(1800, 1)
+    return next_data
 
 
 def normalize(data):

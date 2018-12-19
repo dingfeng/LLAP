@@ -59,7 +59,7 @@ def cut(source_path, dest_path):
     # pickle.dump(toSaveObj, open(dest_path, 'wb'))
     plt.figure()
     for index,obj in enumerate(toSaveObj):
-        if index >= 8:
+        if index >= 63:
             break
         obj = obj - np.roll(obj, 1)
         obj = obj[1:]
@@ -68,7 +68,7 @@ def cut(source_path, dest_path):
         obj = obj[1:]
         obj = np.abs(obj)
         # data = normalize(data)
-        plt.subplot(8,1,index+1)
+        plt.subplot(63,1,index+1)
         plt.plot(obj)
     plt.show()
 
