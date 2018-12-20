@@ -9,7 +9,7 @@ import threading
 class FileServer(socketserver.BaseRequestHandler):
     def handle(self):
         filename = time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime(time.time()))
-        # print('connected from:', self.client_address)
+        print('connected from zip file:', self.client_address)
         with self.request:
             with open(filename + ".zip", 'wb') as file:
                 while True:
@@ -17,6 +17,7 @@ class FileServer(socketserver.BaseRequestHandler):
                     if (len(rdata) == 0):
                         break
                     file.write(rdata)
+        print('receive successfully!')
 
 
 threading.Thread(
