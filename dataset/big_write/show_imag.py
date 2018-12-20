@@ -9,6 +9,8 @@ import os
 from statsmodels.tsa.seasonal import seasonal_decompose
 from scipy.linalg import norm
 import pandas
+from analysis.utils import plot_fft
+
 
 fs = 48000
 freq = 20000
@@ -25,14 +27,19 @@ def main():
 
 def generate_photo(file_path, image_name):
     data = np.memmap(file_path, dtype=np.float32, mode='r')
-    # for i in range(16):
-    #     image_name = str(i) + ".png"
     I = getI(data, freq, 0)
     I = move_average(I)
-    decompositionI = seasonal_decompose(I, freq=10, two_sided=False)
-    I = decompositionI.trend[10:]
     Q = getQ(data, freq, 0)
     Q = move_average(Q)
+    # plt.plot(I)
+    # plt.show()
+    # plt.plot(Q)
+    # plt.show()
+    decompositionI = seasonal_decompose(I, freq=10, two_sided=False)
+    # decompositionI.plot()
+    # plt.show()
+    I = decompositionI.trend[10:]
+
     decompositionQ = seasonal_decompose(Q, freq=10, two_sided=False)
     Q = decompositionQ.trend[10:]
     IQ = np.asarray([I, Q]).T
@@ -41,12 +48,6 @@ def generate_photo(file_path, image_name):
     IQ = norm(IQ, ord=2, axis=1)
     IQ = IQ - np.roll(IQ, 1)
     IQ = IQ[1:]
-
-    # ps.rolling(window=5,min_periods=2)
-    # plt.subplot(311)
-    # plt.plot(I)
-    # plt.subplot(211)
-
     start_pos, end_pos = get_bounds(IQ)
     plt.figure()
     plt.scatter([i for i in range(len(IQ))], IQ)
@@ -61,24 +62,24 @@ def get_bounds(data):
     ps = pandas.Series(data=data)
     var = ps.rolling(window=7).var()
     var[:6] = 0
-    threshold = 1e-8
+    threshold = 0.5e-8
     search_start = 60
     # find the start pos of series
     start_pos = None
     for i in range(search_start, len(var)):
         if var[i] > threshold:
             start_pos = i
-            start_pos -= 20
+            start_pos -= 60
             break
     #find the end pos of series
     end_pos = None
     for i in range(len(var)):
         end_pos=len(var)-1-i
         if var[end_pos] > threshold:
-            end_pos += 20
+            end_pos += 40
             break
-    plt.figure()
-    plt.plot(var)
+    # plt.figure()
+    # plt.plot(var)
     return start_pos, end_pos
 
 
