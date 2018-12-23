@@ -6,11 +6,23 @@ import os
 import numpy as np
 import keras
 from keras.models import Sequential
-from keras.layers import LSTM, Dense, Dropout, Masking
+from keras.layers import LSTM, Dense, Dropout, Masking,Bidirectional,Flatten,Conv1D,MaxPooling1D,BatchNormalization
 from keras.optimizers import RMSprop
 from keras.utils import to_categorical
 from keras.callbacks import ModelCheckpoint
 from analysis2.LossHistory import LossHistory
+import os
+import tensorflow as tf
+import keras.backend.tensorflow_backend as KTF
+
+# 指定第一块GPU可用
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
+config = tf.ConfigProto()
+config.gpu_options.allow_growth=True   #不全部占满显存, 按需分配
+sess = tf.Session(config=config)
+
+KTF.set_session(sess)
 
 max_sequence_len = 1000
 
@@ -18,17 +30,17 @@ max_sequence_len = 1000
 def main():
     train_data, train_label, test_data, test_label = get_all_data()
     train_data = sequence.pad_sequences(train_data, maxlen=max_sequence_len, padding='post', value=-2, dtype=np.float64)
-    train_data = train_data.reshape((-1, max_sequence_len, 1))
+    train_data = train_data.reshape((-1, max_sequence_len//10, 10))
     train_label_one_hot = to_categorical(train_label)
     test_data = sequence.pad_sequences(test_data, maxlen=max_sequence_len, padding='post', value=-2, dtype=np.float64)
-    test_data = test_data.reshape((-1, max_sequence_len, 1))
+    test_data = test_data.reshape((-1, max_sequence_len//10, 10))
     test_label_one_hot = to_categorical(test_label)
 
     checkpointer = ModelCheckpoint(filepath="keras_rnn.hdf5", verbose=1, save_best_only=True, )
     history = LossHistory()
     model = get_model()
-    result = model.fit(train_data, train_label_one_hot, batch_size=10,
-                       nb_epoch=500, verbose=1, validation_data=(test_data, test_label_one_hot),
+    result = model.fit(train_data, train_label_one_hot, batch_size=50,
+                       epochs=500, verbose=1, validation_data=(test_data, test_label_one_hot),
                        callbacks=[checkpointer, history])
     model.save('keras_rnn_epochend.hdf5')
     return
@@ -36,14 +48,16 @@ def main():
 
 def get_model():
     model = Sequential()
-    model.add(Masking(mask_value=-2, input_shape=(max_sequence_len,1)))
-    model.add(LSTM(128, dropout=0.2, recurrent_dropout=0.2))
-    model.add(Dense(32, activation='relu'))
+    model.add(Masking(mask_value=-2, input_shape=(max_sequence_len//10,10)))
+    model.add(LSTM(128,dropout=0.1,recurrent_dropout=0.1, return_sequences=True))
+    model.add(LSTM(128,dropout=0.1,recurrent_dropout=0.1))
+    model.add(BatchNormalization())
+    model.add(Dense(64, activation='relu'))
     model.add(Dropout(0.2))
     model.add(Dense(len(label2num), activation='softmax'))
     model.summary()
     model.compile(loss='categorical_crossentropy',
-                  optimizer=RMSprop(),
+                  optimizer='adam',
                   metrics=['accuracy'])
     print(model.summary())
     return model
@@ -81,17 +95,17 @@ def get_all_data():
 
     train_data, indexes = shuffle(train_data)
     train_label = np.asarray(train_label)[indexes].tolist()
-    max_value = 0
-    for data in train_data:
-        max_value = max(np.max(np.abs(data)), max_value)
-        seq_max_len = max(len(data), seq_max_len)
-    for data in test_data:
-        max_value = max(np.max(np.abs(data)), max_value)
-        seq_max_len = max(len(data), seq_max_len)
+    # max_value = 0
+    # for data in train_data:
+    #     max_value = max(np.max(np.abs(data)), max_value)
+    #     seq_max_len = max(len(data), seq_max_len)
+    # for data in test_data:
+    #     max_value = max(np.max(np.abs(data)), max_value)
+    #     seq_max_len = max(len(data), seq_max_len)
     for i in range(len(train_data)):
-        train_data[i] = train_data[i] / max_value
+        train_data[i] = train_data[i] *1e5
     for i in range(len(test_data)):
-        test_data[i] = test_data[i] / max_value
+        test_data[i] = test_data[i] *1e5
 
     print('seq_max_len {}'.format(seq_max_len))
     return train_data, train_label, test_data, test_label
