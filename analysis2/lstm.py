@@ -24,7 +24,7 @@ sess = tf.Session(config=config)
 
 KTF.set_session(sess)
 
-max_sequence_len = 1000
+max_sequence_len = 1700
 
 
 def main():
@@ -36,24 +36,25 @@ def main():
     test_data = test_data.reshape((-1, max_sequence_len//10, 10))
     test_label_one_hot = to_categorical(test_label)
 
-    checkpointer = ModelCheckpoint(filepath="keras_rnn.hdf5", verbose=1, save_best_only=True, )
+    checkpointer = ModelCheckpoint(filepath="keras_rnn5.hdf5", verbose=1, save_best_only=True, )
     history = LossHistory()
     model = get_model()
     result = model.fit(train_data, train_label_one_hot, batch_size=50,
-                       epochs=500, verbose=1, validation_data=(test_data, test_label_one_hot),
+                       epochs=40, verbose=1, validation_data=(test_data, test_label_one_hot),
                        callbacks=[checkpointer, history])
-    model.save('keras_rnn_epochend.hdf5')
+    print(model.evaluate(test_data,test_label_one_hot,batch_size=50))
+    model.save('keras_rnn_epochend5.hdf5')
     return
 
 
 def get_model():
     model = Sequential()
     model.add(Masking(mask_value=-2, input_shape=(max_sequence_len//10,10)))
-    model.add(LSTM(128,dropout=0.1,recurrent_dropout=0.1, return_sequences=True))
-    model.add(LSTM(128,dropout=0.1,recurrent_dropout=0.1))
+    model.add(LSTM(128,dropout=0.2,recurrent_dropout=0.2, return_sequences=True))
+    model.add(LSTM(128,dropout=0.2,recurrent_dropout=0.2))
     model.add(BatchNormalization())
     model.add(Dense(64, activation='relu'))
-    model.add(Dropout(0.2))
+    model.add(Dropout(0.5))
     model.add(Dense(len(label2num), activation='softmax'))
     model.summary()
     model.compile(loss='categorical_crossentropy',
@@ -63,8 +64,8 @@ def get_model():
     return model
 
 
-label2num = {'dingfeng': 0, 'wangyi': 1, 'yuhuan': 2}
-num2label = {0: 'dingfeng', 1: 'wangyi', 2: 'yuhuan'}
+label2num = {'dingfeng': 0, 'wangyi': 1, 'yuhuan': 2,'dengyufeng':3,'zhangqian':4,'zhaorun':5}
+num2label = {0: 'dingfeng', 1: 'wangyi', 2: 'yuhuan',3:'dengyufeng',4:'zhangqian',5:'zhaorun'}
 
 test_rate = 0.2
 
@@ -95,13 +96,14 @@ def get_all_data():
 
     train_data, indexes = shuffle(train_data)
     train_label = np.asarray(train_label)[indexes].tolist()
-    # max_value = 0
-    # for data in train_data:
-    #     max_value = max(np.max(np.abs(data)), max_value)
-    #     seq_max_len = max(len(data), seq_max_len)
-    # for data in test_data:
-    #     max_value = max(np.max(np.abs(data)), max_value)
-    #     seq_max_len = max(len(data), seq_max_len)
+    max_value = 0
+    for data in train_data:
+        max_value = max(np.max(np.abs(data)), max_value)
+        seq_max_len = max(len(data), seq_max_len)
+    for data in test_data:
+        max_value = max(np.max(np.abs(data)), max_value)
+        seq_max_len = max(len(data), seq_max_len)
+    print('seq max len {}'.format(seq_max_len))
     for i in range(len(train_data)):
         train_data[i] = train_data[i] *1e5
     for i in range(len(test_data)):
