@@ -19,11 +19,13 @@ def main():
 
 
 def getData():
-    filepath = '../dataset/raw/dingfeng/1.pcm'
+    filepath = '../server/2018-12-25-19-57-33/temp/dingfeng/test/1.pcm'
     data = np.memmap(filepath, dtype=np.float32, mode='r')
     # data = butter_bandpass_filter(data, 18000, 22000, fs)
     # data = data[130000:]
-    f = 20000
+    fc=17700+700*5
+    data=butter_bandpass_filter(data,fc-300,fc+300,48000)
+    f = fc
     # downI = move_average()
     I = getI(data, f)
     I = move_average(I)
@@ -62,7 +64,7 @@ def getData():
     # print(np.mean(diff))
     # plt.plot(diff)
     # plt.show()
-    plt.plot(Q)
+    # plt.plot(Q)
     # plt.subplot(313)
     # plt.plot(I, Q)
     # decomposition = seasonal_decompose(data, freq=3006, two_sided=False)
@@ -70,7 +72,7 @@ def getData():
     # plt.show()
     # getPhase1(I,Q)
     # plt.plot(I)
-    plt.show()
+    # plt.show()
     # downI = downI[35 + 30:][0:200]
     # downI = removeDC(downI)
     # downQ = move_average(getQ(data, f))
@@ -84,13 +86,17 @@ def getData():
     # distances=distanceLine(phases,f)
     # plt.plot(distances)
     # plt.plot(downQ,downI)
-    decompositionQ = seasonal_decompose(Q, freq=3006, two_sided=False)
+    decompositionQ = seasonal_decompose(Q, freq=10, two_sided=False)
     trendQ = decompositionQ.trend
-    trendQ=trendQ[3006:]
-    decompositionI = seasonal_decompose(I, freq=3006, two_sided=False)
+    trendQ=trendQ[10:]
+    decompositionI = seasonal_decompose(I, freq=10, two_sided=False)
     trendI = decompositionI.trend
-    trendI=trendI[3006:]
+    trendI=trendI[10:]
+    plt.figure()
+    plt.subplot(211)
     plt.plot(trendQ)
+    plt.subplot(212)
+    plt.plot(trendI)
     # phase = getPhase1(trendI, trendQ)
     # plt.plot(phase)
     plt.show()
