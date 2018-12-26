@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 
 def main():
-    baseF = 17700
+    baseF = 17350
     deltaF = 700
     fn = 8
     fs = 48000
@@ -21,10 +21,10 @@ def main():
         fslist.append(currentF)
     data = np.zeros(fs * duration)
     times = np.linspace(0, duration, fs * duration, False)
-    # weights = np.array([900, 539.9207528706739, 417.1888154034053, 326.1400134853211, 272.4925530641437,
-    #                     360, 420])
-    weights=np.ones((1,fn)).flatten()
-    weights = 1 / (weights)
+    weights = np.array([1996.57178289585, 1130.8621028539283, 695.1034288151462, 663.849980505101, 533.3391836417595,
+                        628.0630697248464, 896.4878967366324,1112.6761164155364])
+    # weights=np.ones((1,fn)).flatten()
+    weights = 1 / weights
     for index, fstmp in enumerate(fslist):
         fdata = weights[index] * np.cos(2 * np.pi * fstmp * times)  # * np.sqrt(2)
         data += fdata

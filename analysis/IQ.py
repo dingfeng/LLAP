@@ -19,11 +19,11 @@ def main():
 
 
 def getData():
-    filepath = '../server/2018-12-25-19-57-33/temp/dingfeng/test/1.pcm'
+    filepath = '../server/2018-12-25-20-41-21/temp/dingfeng/test/1.pcm'
     data = np.memmap(filepath, dtype=np.float32, mode='r')
     # data = butter_bandpass_filter(data, 18000, 22000, fs)
     # data = data[130000:]
-    fc=17700+700*5
+    fc=17350+700*0
     data=butter_bandpass_filter(data,fc-300,fc+300,48000)
     f = fc
     # downI = move_average()
