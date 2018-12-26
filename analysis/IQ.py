@@ -19,7 +19,7 @@ def main():
 
 
 def getData():
-    filepath = '../server/2018-12-25-20-41-21/temp/dingfeng/test/1.pcm'
+    filepath = '../server/2018-12-25-20-41-21/temp/dingfeng/dingfeng/1.pcm'
     data = np.memmap(filepath, dtype=np.float32, mode='r')
     # data = butter_bandpass_filter(data, 18000, 22000, fs)
     # data = data[130000:]

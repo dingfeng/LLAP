@@ -26,7 +26,7 @@ def filter(data):
 
 
 def main():
-    filepath = '../server/2018-12-26-09-58-15/temp/dingfeng/test/1.pcm'
+    filepath = '../server/2018-12-25-20-37-29/temp/dingfeng/test/1.pcm'
     data = np.memmap(filepath, dtype=np.float32, mode='r')
     data = filter(data)
     xf = np.arange(len(data)) / len(data) * 48000
