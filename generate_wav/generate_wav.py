@@ -22,7 +22,7 @@ def main():
     data = np.zeros(fs * duration)
     times = np.linspace(0, duration, fs * duration, False)
     weights = np.array([1996.57178289585, 1130.8621028539283, 695.1034288151462, 663.849980505101, 533.3391836417595,
-                        628.0630697248464, 896.4878967366324,1112.6761164155364])
+                        628.0630697248464, 896.4878967366324, 1112.6761164155364])
     # weights=np.ones((1,fn)).flatten()
     weights = 1 / weights
     for index, fstmp in enumerate(fslist):
