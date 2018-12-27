@@ -8,9 +8,9 @@ import matplotlib.pyplot as plt
 
 
 def main():
-    baseF = 17700
+    baseF = 20000
     deltaF = 700
-    fn = 8
+    fn = 1
     fs = 48000
     duration = 2 * 60
     fclist = []

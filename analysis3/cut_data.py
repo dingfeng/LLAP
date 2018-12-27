@@ -1,0 +1,218 @@
+# -*- coding: UTF-8 -*-
+# filename: cut_data date: 2018/12/26 19:19  
+# author: FD 
+import numpy as np
+from statsmodels.tsa.seasonal import seasonal_decompose
+from scipy.linalg import norm
+import pandas
+from scipy.stats import pearsonr
+from pyclustering.cluster.kmedoids import kmedoids
+import matplotlib.pyplot as plt
+import pickle
+import os
+from scipy.signal import butter, lfilter
+import time
+from analysis.utils import plot_fft
+
+fs = 48000
+freq = 20000
+NUM_CLUSTERS = 5
+freqs = [17350 + i * 700 for i in range(8)]
+I_multipliers = None
+Q_multipliers = None
+filter_half_width = 100  # +-100Hz
+
+
+def init_IQ_multipliers():
+    global I_multipliers
+    global Q_multipliers
+    max_len = 48000 * 15
+    times = np.arange(0, max_len) * 1 / fs
+    line_num = 64
+    I_multipliers = np.zeros((len(freqs), line_num, max_len))
+    Q_multipliers = np.zeros((len(freqs), line_num, max_len))
+    for freq_index, freq in enumerate(freqs):
+        # generate I multipliers
+        for i in range(line_num):
+            bias = i * np.pi / 32
+            mul_cos = np.cos(2 * np.pi * freq * times + bias)
+            I_multipliers[freq_index, i, :] = mul_cos
+        # generate Q multipliers
+        for i in range(line_num):
+            bias = i * np.pi / 32
+            mul_sin = -np.sin(2 * np.pi * freq * times + bias)
+            Q_multipliers[freq_index, i, :] = mul_sin
+
+
+def main():
+    init_IQ_multipliers()
+    cut_dir('../dataset/dingfeng_multi_freq/raw/zhuyan', '../dataset/dingfeng_multi_freq/cutted/zhuyan')
+    return
+
+
+def cut_dir(source_dir, dest_dir):
+    if not os.path.isdir(dest_dir):
+        os.makedirs(dest_dir)
+    for filename in os.listdir(source_dir):
+        if filename.endswith('pcm'):
+            source_path = os.path.join(source_dir, filename)
+            dest_path = os.path.join(dest_dir, ''.join([filename[:-4], '.pkl']))
+            cut_file(source_path, dest_path)
+
+
+def cut_file(source_filepath, dest_filepath):
+    global cluster_count
+    global freqs
+    global fs
+    data = np.memmap(source_filepath, dtype=np.float32, mode='r')
+    data = data[54000:]
+    previous = None
+    previous_added = False
+    previous_time = time.time()
+    final_features = []
+    total_average_time = 0.0
+    total_decompose_time = 0.0
+    total_diff_time = 0.0
+    total_correlation_time = 0.0
+    for freq_index, freq in enumerate(freqs):
+        freq_data = data#butter_lowpass_filter(data,100,fs)#butter_bandpass_filter(data, freq - filter_half_width, freq + filter_half_width, fs)
+        cutted_IQs = []
+        # repeat_time = time.time()
+        for i in range(64):
+            average_time = time.time()
+            I = getI(freq_data, freq_index, i)
+            total_average_time += time.time() - average_time
+            I=butter_lowpass_filter(I,100,fs)[200:]
+            average_time = time.time()
+            I = move_average(I)
+            Q = getQ(freq_data, freq_index, i)
+            total_average_time += time.time() - average_time
+            Q = butter_lowpass_filter(Q, 100, fs)[200:]
+            decompositionQ = seasonal_decompose(Q, freq=3006, two_sided=False)
+            Q = decompositionQ.trend[3007:][::300]
+            plt.plot(Q)
+            plt.show()
+            # average_time = time.time()
+            # Q = move_average(Q)
+            # total_average_time += time.time() - average_time
+            # decompositionI = seasonal_decompose(I, freq=10, two_sided=False)
+            # I = decompositionI.trend[11:]
+            # decompositionQ = seasonal_decompose(Q, freq=10, two_sided=False)
+            # Q = decompositionQ.trend[11:]
+            diff_time = time.time()
+            IQ = np.asarray([I, Q]).T
+            IQ = IQ - np.roll(IQ, 1)
+            IQ = IQ[1:]
+            IQ = norm(IQ, ord=2, axis=1)
+            IQ = IQ - np.roll(IQ, 1)
+            IQ = IQ[1:]
+            cutted_IQ = IQ
+            total_diff_time += time.time() - diff_time
+            correlation_time = time.time()
+            if previous is not None:
+                correlation = get_correlation(cutted_IQ, previous)
+                print(correlation)
+                if correlation > 0.95 and previous is not None:
+                    cutted_IQs.append(cutted_IQ)
+                    if not previous_added:
+                        cutted_IQs.append(previous)
+                        previous_added = True
+                else:
+                    previous_added = False
+            total_correlation_time += time.time() - correlation_time
+            previous = cutted_IQ
+        # print('repeat time {}'.format(time.time() - repeat_time))
+        # 使用方差筛选去除最小的3条曲线
+        vars = []
+        for cutted_IQ in cutted_IQs:
+            vars.append(np.var(cutted_IQ))
+        new_cutted_IQs = []
+        for index in np.argsort(vars)[3:]:
+            new_cutted_IQs.append(cutted_IQs[index])
+        distances_mat = np.zeros((len(new_cutted_IQs), len(new_cutted_IQs)))
+        for i in range(len(new_cutted_IQs)):
+            for j in range(i + 1, len(new_cutted_IQs)):
+                distances_mat[i, j] = distances_mat[j, i] = 1 - get_correlation(new_cutted_IQs[i], new_cutted_IQs[j])
+        indexes = np.arange(len(new_cutted_IQs))
+        np.random.shuffle(indexes)
+        kmedoids_instance = kmedoids(distances_mat, indexes[:NUM_CLUSTERS], data_type='distance_matrix')
+        kmedoids_instance.process()
+        medoids = kmedoids_instance.get_medoids()
+        for medoid in medoids:
+            final_features.append(new_cutted_IQs[medoid])
+    print('total time {}'.format(time.time() - previous_time))
+    print('average {} decompose {} diff {} correlation {}'.format(total_average_time, total_decompose_time,
+                                                                  total_diff_time, total_correlation_time))
+    pickle.dump(final_features, open(dest_filepath, 'wb'))
+
+
+def get_PAM_distance(index0, index1):
+    global distances_mat
+    print('index 0 {} index 1 {}'.format(index0, index1))
+    return distances_mat[index0, index1]
+
+
+def getI(data, freq_index, bias_index):
+    return I_multipliers[freq_index][bias_index][:len(data)] * data
+
+
+def getQ(data, freq_index, bias_index):
+    return Q_multipliers[freq_index][bias_index][:len(data)] * data
+
+
+def get_correlation(data0, data1):
+    short_data = data0
+    long_data = data1
+    if len(long_data) < len(short_data):
+        temp = short_data
+        short_data = long_data
+        long_data = temp
+    lags = [i for i in range(len(long_data) - len(short_data) + 1)]
+    max_pearson = -2
+    short_data_len = len(short_data)
+    for lag in lags:
+        pearson_value = pearsonr(long_data[lag:lag + short_data_len], short_data)[0]
+        max_pearson = max(max_pearson, pearson_value)
+    return max_pearson
+
+
+def move_average(data):
+    win_size = 300
+    new_len = len(data) // win_size
+    data = data[0:new_len * win_size]
+    reshape_time = time.time()
+    data = data.reshape((new_len, win_size))
+    # print('reshape time {}'.format(time.time()-reshape_time))
+    inner_mean_time = time.time()
+    mean_result = np.mean(data, axis=1)
+    # print('inner mean time {}'.format(time.time()-inner_mean_time))
+    return mean_result
+
+
+def butter_bandpass(lowcut, highcut, fs, order=5):
+    nyq = 0.5 * fs
+    low = lowcut / nyq
+    high = highcut / nyq
+    b, a = butter(order, [low, high], btype='band')
+    return b, a
+
+
+def butter_bandpass_filter(data, lowcut, highcut, fs, order=5):
+    b, a = butter_bandpass(lowcut, highcut, fs, order)
+    y = lfilter(b, a, data)
+    return y
+
+def butter_lowpass(cutoff, fs, order=5):
+    nyq = 0.5 * fs
+    normal_cutoff = cutoff / nyq
+    b, a = butter(order, normal_cutoff, btype='low', analog=False)
+    return b, a
+
+
+def butter_lowpass_filter(data, cutoff, fs, order=5):
+    b, a = butter_lowpass(cutoff, fs, order=order)
+    y = lfilter(b, a, data)
+    return y
+
+if __name__ == '__main__':
+    main()
