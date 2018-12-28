@@ -14,6 +14,7 @@ from scipy.signal import butter, lfilter
 import time
 from analysis.utils import plot_fft
 
+
 fs = 48000
 freq = 20000
 NUM_CLUSTERS = 5
@@ -21,6 +22,7 @@ freqs = [17350 + i * 700 for i in range(8)]
 I_multipliers = None
 Q_multipliers = None
 filter_half_width = 100  # +-100Hz
+
 
 
 def init_IQ_multipliers():
@@ -46,11 +48,14 @@ def init_IQ_multipliers():
 
 def main():
     init_IQ_multipliers()
-    cut_dir('../dataset/dingfeng_multi_freq/raw/zhuyan', '../dataset/dingfeng_multi_freq/cutted/zhuyan')
+    cut_dir('../dataset/handwriting-lab-1/raw/dengyufeng', '../dataset/handwriting-lab-1/cutted/dengyufeng')
     return
 
 
+
+
 def cut_dir(source_dir, dest_dir):
+    count = 0
     if not os.path.isdir(dest_dir):
         os.makedirs(dest_dir)
     for filename in os.listdir(source_dir):
@@ -58,7 +63,8 @@ def cut_dir(source_dir, dest_dir):
             source_path = os.path.join(source_dir, filename)
             dest_path = os.path.join(dest_dir, ''.join([filename[:-4], '.pkl']))
             cut_file(source_path, dest_path)
-
+            count+=1
+            print('count {}'.format(count))
 
 def cut_file(source_filepath, dest_filepath):
     global cluster_count
@@ -75,30 +81,18 @@ def cut_file(source_filepath, dest_filepath):
     total_diff_time = 0.0
     total_correlation_time = 0.0
     for freq_index, freq in enumerate(freqs):
-        freq_data = data#butter_lowpass_filter(data,100,fs)#butter_bandpass_filter(data, freq - filter_half_width, freq + filter_half_width, fs)
+        freq_data = data  # butter_lowpass_filter(data,100,fs)#butter_bandpass_filter(data, freq - filter_half_width, freq + filter_half_width, fs)
         cutted_IQs = []
         # repeat_time = time.time()
         for i in range(64):
-            average_time = time.time()
             I = getI(freq_data, freq_index, i)
-            total_average_time += time.time() - average_time
-            I=butter_lowpass_filter(I,100,fs)[200:]
-            average_time = time.time()
-            I = move_average(I)
+            I = butter_lowpass_filter(I, 100, fs)[200:][::300]
+            decompositionI = seasonal_decompose(I, freq=10, two_sided=False)
+            I = decompositionI.trend[11:]
             Q = getQ(freq_data, freq_index, i)
-            total_average_time += time.time() - average_time
-            Q = butter_lowpass_filter(Q, 100, fs)[200:]
-            decompositionQ = seasonal_decompose(Q, freq=3006, two_sided=False)
-            Q = decompositionQ.trend[3007:][::300]
-            plt.plot(Q)
-            plt.show()
-            # average_time = time.time()
-            # Q = move_average(Q)
-            # total_average_time += time.time() - average_time
-            # decompositionI = seasonal_decompose(I, freq=10, two_sided=False)
-            # I = decompositionI.trend[11:]
-            # decompositionQ = seasonal_decompose(Q, freq=10, two_sided=False)
-            # Q = decompositionQ.trend[11:]
+            Q = butter_lowpass_filter(Q, 100, fs)[200:][::300]
+            decompositionQ = seasonal_decompose(Q, freq=10, two_sided=False)
+            Q = decompositionQ.trend[11:]
             diff_time = time.time()
             IQ = np.asarray([I, Q]).T
             IQ = IQ - np.roll(IQ, 1)
@@ -111,7 +105,7 @@ def cut_file(source_filepath, dest_filepath):
             correlation_time = time.time()
             if previous is not None:
                 correlation = get_correlation(cutted_IQ, previous)
-                print(correlation)
+                # print(correlation)
                 if correlation > 0.95 and previous is not None:
                     cutted_IQs.append(cutted_IQ)
                     if not previous_added:
@@ -202,6 +196,7 @@ def butter_bandpass_filter(data, lowcut, highcut, fs, order=5):
     y = lfilter(b, a, data)
     return y
 
+
 def butter_lowpass(cutoff, fs, order=5):
     nyq = 0.5 * fs
     normal_cutoff = cutoff / nyq
@@ -213,6 +208,7 @@ def butter_lowpass_filter(data, cutoff, fs, order=5):
     b, a = butter_lowpass(cutoff, fs, order=order)
     y = lfilter(b, a, data)
     return y
+
 
 if __name__ == '__main__':
     main()

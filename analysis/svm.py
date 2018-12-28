@@ -12,7 +12,7 @@ from sklearn.preprocessing import StandardScaler, MinMaxScaler
 def main():
     data0 = get_data('../dataset/data20-10/cutted_IQ/dingfeng/')
     data1 = get_data('../dataset/data20-10/cutted_IQ/huangsi/')
-    data2 = []#get_data('../dataset/data20-10/cutted_IQ/dingfeng/')+get_data('../dataset/data20-10/cutted_IQ/chenhao/')+get_data('../dataset/data20-10/cutted_IQ/yingjunhao/')+get_data('../dataset/data20-10/cutted_IQ/dengyufeng/')
+    data2 = []#get_data('../dataset/data20-10/cutted_IQ/dingfeng/')+get_data('../dataset/data20-10/cutted_IQ/chenhao/')+get_data('../dataset/data20-10/cutted_IQ/yingjunhao/')+get_data('../dataset/data20-10/cutted_IQ/huangsi/')
     dataset = data0 + data1 + data2
     labels = [0 for i in range(len(data0))] + [1 for i in range(len(data1))] + [1 for i in range(len(data2))]
     dataset, indexes = shuffle(dataset)

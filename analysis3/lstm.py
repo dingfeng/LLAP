@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
-# filename: lstm date: 2018/12/22 21:19  
-# author: FD 
+# filename: lstm date: 2018/12/22 21:19
+# author: FD
 from keras.preprocessing import sequence
 import os
 import numpy as np
@@ -64,14 +64,14 @@ def get_model():
     return model
 
 
-label2num = {'dingfeng': 0, 'wangyi': 1, 'yuhuan': 2,'huangsi':3,'zhangqian':4,'zhaorun':5}
-num2label = {0: 'dingfeng', 1: 'wangyi', 2: 'yuhuan',3:'huangsi',4:'zhangqian',5:'zhaorun'}
+label2num = {'dingfeng': 0, 'wangyi': 1, 'zhuyan': 2}
+num2label = {0: 'dingfeng', 1: 'wangyi', 2: 'zhuyan'}
 
-test_rate = 0.2
+test_rate = 0.9
 
 
 def get_all_data():
-    dir_path = '../dataset/dingfeng_big_write/cutted'
+    dir_path = '../dataset/dingfeng_multi_freq/cutted'
     train_data = []
     train_label = []
     test_data = []
