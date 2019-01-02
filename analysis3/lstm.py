@@ -24,7 +24,7 @@ sess = tf.Session(config=config)
 
 KTF.set_session(sess)
 
-max_sequence_len = 1700
+max_sequence_len = 2500
 
 
 def main():
@@ -64,14 +64,14 @@ def get_model():
     return model
 
 
-label2num = {'dingfeng': 0, 'wangyi': 1, 'zhuyan': 2}
-num2label = {0: 'dingfeng', 1: 'wangyi', 2: 'zhuyan'}
+label2num = {'dingfeng': 0, 'dengyufeng': 1, 'anna': 2,'huangsi':3,'qingpeijie':4}
+num2label = {0: 'dingfeng', 1: 'dengyufeng', 2: 'anna',3:'huangsi',4:'qingpeijie'}
 
-test_rate = 0.9
+test_rate = 0.2
 
 
 def get_all_data():
-    dir_path = '../dataset/dingfeng_multi_freq/cutted'
+    dir_path = '../dataset/handwriting-lab-1/cutted'
     train_data = []
     train_label = []
     test_data = []
