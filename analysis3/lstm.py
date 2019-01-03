@@ -36,7 +36,7 @@ def main():
     test_data = test_data.reshape((-1, max_sequence_len//10, 10))
     test_label_one_hot = to_categorical(test_label)
 
-    checkpointer = ModelCheckpoint(filepath="keras_rnn12.hdf5", verbose=1, save_best_only=True, )
+    checkpointer = ModelCheckpoint(filepath="keras_rnn6.hdf5", verbose=1, save_best_only=True, )
     history = LossHistory()
     model = get_model()
     result = model.fit(train_data, train_label_one_hot, batch_size=50,
@@ -79,6 +79,8 @@ def get_all_data():
     test_label = []
     seq_max_len = -1
     for label in os.listdir(dir_path):
+        if not label2num.keys().__contains__(label):
+            continue
         label_path = os.path.join(dir_path, label)
         filenames = os.listdir(label_path)
         indexes = np.arange(len(filenames))

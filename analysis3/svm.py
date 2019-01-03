@@ -16,67 +16,72 @@ from sklearn import svm
 max_sequence_len = 2500
 label2num = {'huangsi': 3, 'zhuyan': 10, }
 num2label = {3: 'huangsi', 10: 'zhuyan'}
-test_rate = 0.8
+test_rate = 0.5
 
 
 def main():
     global label2num
     global num2label
     global test_rate
-    model = get_model()
-    label2num = {'dengyufeng': 3}
-    num2label = {3: 'dengyufeng'}
-    train_features, test_features = get_train_test_features(model)
+    # model = get_model()
+    label2num = {'yinjunhao': 3}
+    num2label = {3: 'yinjunhao'}
+    train_features, test_features = get_train_test_features()
     clf = svm.OneClassSVM(nu=0.01, kernel="rbf")
     clf.fit(train_features)
     true_predict = clf.predict(test_features)
     true_predict += 1
-    true_predict = true_predict/2
-    true_predict=true_predict.reshape((-1,40))
-    true_predict=np.sum(true_predict,axis=1)//20
+    true_predict = true_predict / 2
+    true_predict = true_predict.reshape((-1, 40))
+    true_predict = np.sum(true_predict, axis=1) // 20
     nozero_count = np.count_nonzero(true_predict)
     print('true_predict shape  {} nozero {} accuracy {}'.format(true_predict.shape, nozero_count,
                                                                 nozero_count / len(true_predict)))
 
-    for label in ['dingfeng', 'dengyufeng', 'anna','huangsi','qingpeijie','xuhuatao','yinjunhao','yuyinggang','zhangqian','zhaorun','zhuyan','jianghao']:
+    # for label in ['dingfeng', 'dengyufeng', 'anna','huangsi','qingpeijie','xuhuatao','yinjunhao','yuyinggang','zhangqian','zhaorun','zhuyan','jianghao']:
+    for label in ['chenhao']:
         print('label {}'.format(label))
         label2num = {label: 6}
         num2label = {6: label}
-        test_rate = 0
-        train_features, test_features = get_train_test_features(model)
-        true_predict = clf.predict(train_features)
+        test_rate = 1
+        train_features, test_features = get_train_test_features()
+        true_predict = clf.predict(test_features)
         true_predict += 1
         true_predict = true_predict / 2
         true_predict = true_predict.reshape((-1, 40))
         true_predict = np.sum(true_predict, axis=1) // 20
         nozero_count = np.count_nonzero(true_predict)
         print('false_predict shape  {} nozero {} accuracy {}'.format(true_predict.shape, nozero_count,
-                                                                 nozero_count / len(true_predict)))
+                                                                     nozero_count / len(true_predict)))
 
 
-def get_train_test_features(model):
+def get_train_test_features():
     global label2num
     global num2label
     train_data, train_label, test_data, test_label = get_all_data()
-    train_data = sequence.pad_sequences(train_data, maxlen=max_sequence_len, padding='post', value=-2, dtype=np.float64)
+    train_data = sequence.pad_sequences(train_data, maxlen=max_sequence_len, padding='post', value=0, dtype=np.float64)
     train_data = train_data.reshape((-1, max_sequence_len // 10, 10))
-    test_data = sequence.pad_sequences(test_data, maxlen=max_sequence_len, padding='post', value=-2, dtype=np.float64)
+    test_data = sequence.pad_sequences(test_data, maxlen=max_sequence_len, padding='post', value=0, dtype=np.float64)
     test_data = test_data.reshape((-1, max_sequence_len // 10, 10))
-    train_features = model.predict(train_data)
-    test_features = model.predict(test_data)
+    train_features = get_features(train_data)
+    test_features = get_features(test_data)
     return train_features, test_features
 
 
-def get_model():
-    model = Sequential()
-    model.add(Masking(mask_value=-2, input_shape=(max_sequence_len // 10, 10)))
-    model.add(LSTM(128, dropout=0, recurrent_dropout=0, return_sequences=True))
-    model.add(LSTM(128, dropout=0, recurrent_dropout=0))
-    model.add(BatchNormalization())
-    model.add(Dense(64, activation='relu'))
-    model.load_weights('keras_rnn12.hdf5', by_name=True)
-    print(model.summary())
-    return model
+def get_features(data):
+    return
+
+
+# def get_model():
+#     model = Sequential()
+#     model.add(Masking(mask_value=-2, input_shape=(max_sequence_len // 10, 10)))
+#     model.add(LSTM(128, dropout=0, recurrent_dropout=0, return_sequences=True))
+#     model.add(LSTM(128, dropout=0, recurrent_dropout=0))
+#     model.add(BatchNormalization())
+#     model.add(Dense(64, activation='relu'))
+#     model.load_weights('keras_rnn12.hdf5', by_name=True)
+#     print(model.summary())
+#     return model
 
 
 def get_all_data():
