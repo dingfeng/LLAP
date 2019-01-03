@@ -11,15 +11,52 @@ from keras.callbacks import ModelCheckpoint
 from keras.preprocessing import sequence
 import os
 from sklearn.svm import SVC
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
+from sklearn import svm
+
 max_sequence_len = 2500
 label2num = {'huangsi': 3, 'zhuyan': 10, }
 num2label = {3: 'huangsi', 10: 'zhuyan'}
-test_rate = 0.5
+test_rate = 0.8
 
 
 def main():
+    global label2num
+    global num2label
+    global test_rate
     model = get_model()
+    label2num = {'dengyufeng': 3}
+    num2label = {3: 'dengyufeng'}
+    train_features, test_features = get_train_test_features(model)
+    clf = svm.OneClassSVM(nu=0.01, kernel="rbf")
+    clf.fit(train_features)
+    true_predict = clf.predict(test_features)
+    true_predict += 1
+    true_predict = true_predict/2
+    true_predict=true_predict.reshape((-1,40))
+    true_predict=np.sum(true_predict,axis=1)//20
+    nozero_count = np.count_nonzero(true_predict)
+    print('true_predict shape  {} nozero {} accuracy {}'.format(true_predict.shape, nozero_count,
+                                                                nozero_count / len(true_predict)))
+
+    for label in ['dingfeng', 'dengyufeng', 'anna','huangsi','qingpeijie','xuhuatao','yinjunhao','yuyinggang','zhangqian','zhaorun','zhuyan','jianghao']:
+        print('label {}'.format(label))
+        label2num = {label: 6}
+        num2label = {6: label}
+        test_rate = 0
+        train_features, test_features = get_train_test_features(model)
+        true_predict = clf.predict(train_features)
+        true_predict += 1
+        true_predict = true_predict / 2
+        true_predict = true_predict.reshape((-1, 40))
+        true_predict = np.sum(true_predict, axis=1) // 20
+        nozero_count = np.count_nonzero(true_predict)
+        print('false_predict shape  {} nozero {} accuracy {}'.format(true_predict.shape, nozero_count,
+                                                                 nozero_count / len(true_predict)))
+
+
+def get_train_test_features(model):
+    global label2num
+    global num2label
     train_data, train_label, test_data, test_label = get_all_data()
     train_data = sequence.pad_sequences(train_data, maxlen=max_sequence_len, padding='post', value=-2, dtype=np.float64)
     train_data = train_data.reshape((-1, max_sequence_len // 10, 10))
@@ -27,10 +64,9 @@ def main():
     test_data = test_data.reshape((-1, max_sequence_len // 10, 10))
     train_features = model.predict(train_data)
     test_features = model.predict(test_data)
-    clf = SVC(gamma='auto', class_weight='balanced', kernel='linear')
-    clf.fit(train_features, train_label)
-    score=clf.score(test_features,test_label)
-    print('score {}'.format(score))
+    return train_features, test_features
+
+
 def get_model():
     model = Sequential()
     model.add(Masking(mask_value=-2, input_shape=(max_sequence_len // 10, 10)))
@@ -44,6 +80,9 @@ def get_model():
 
 
 def get_all_data():
+    global label2num
+    global num2label
+    global test_rate
     dir_path = '../dataset/handwriting-lab-1/cutted'
     train_data = []
     train_label = []

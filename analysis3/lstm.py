@@ -64,9 +64,10 @@ def get_model():
     return model
 
 
-label2num = {'dingfeng': 0, 'dengyufeng': 1, 'anna': 2,'huangsi':3,'qingpeijie':4,'xuhuatao':5,'yinjunhao':6,'yuyinggang':7,'zhangqian':8,'zhaorun':9,'zhuyan':10,'jianghao':11}
-num2label = {0: 'dingfeng', 1: 'dengyufeng', 2: 'anna',3:'huangsi',4:'qingpeijie',5:'xuhuatao',6:'yinjunhao',7:'yuyinggang',8:'zhangqian',9:'zhaorun',10:'zhuyan',11:'jianghao'}
-
+# label2num = {'dingfeng': 0, 'dengyufeng': 1, 'anna': 2,'huangsi':3,'qingpeijie':4,'xuhuatao':5,'yinjunhao':6,'yuyinggang':7,'zhangqian':8,'zhaorun':9,'zhuyan':10,'jianghao':11}
+# num2label = {0: 'dingfeng', 1: 'dengyufeng', 2: 'anna',3:'huangsi',4:'qingpeijie',5:'xuhuatao',6:'yinjunhao',7:'yuyinggang',8:'zhangqian',9:'zhaorun',10:'zhuyan',11:'jianghao'}
+label2num = {'dingfeng': 0, 'dengyufeng': 1, 'anna': 2,'huangsi':3,'qingpeijie':4,'xuhuatao':5}
+num2label = {0: 'dingfeng', 1: 'dengyufeng', 2: 'anna',3:'huangsi',4:'qingpeijie',5:'xuhuatao'}
 test_rate = 0.2
 
 
