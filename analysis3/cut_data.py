@@ -48,7 +48,7 @@ def init_IQ_multipliers():
 
 def main():
     init_IQ_multipliers()
-    cut_dir('../dataset/handwriting-lab-1/raw/zhaorun', '../dataset/handwriting-lab-1/cutted/zhaorun')
+    cut_dir('../dataset/handwriting-lab-1/raw/zhuyan', '../dataset/handwriting-lab-1/cutted/zhuyan')
     return
 
 
