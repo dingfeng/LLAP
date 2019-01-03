@@ -36,7 +36,7 @@ def main():
     test_data = test_data.reshape((-1, max_sequence_len//10, 10))
     test_label_one_hot = to_categorical(test_label)
 
-    checkpointer = ModelCheckpoint(filepath="keras_rnn5.hdf5", verbose=1, save_best_only=True, )
+    checkpointer = ModelCheckpoint(filepath="keras_rnn12.hdf5", verbose=1, save_best_only=True, )
     history = LossHistory()
     model = get_model()
     result = model.fit(train_data, train_label_one_hot, batch_size=50,
