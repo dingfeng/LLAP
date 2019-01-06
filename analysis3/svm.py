@@ -43,7 +43,7 @@ def main():
         print('label {}'.format(label))
         label2num = {label: 6}
         num2label = {6: label}
-        test_rate = 1
+        # test_rate = 1
         train_features, test_features = get_train_test_features(model)
         true_predict = clf.predict(test_features)
         true_predict += 1
@@ -77,7 +77,7 @@ def get_model():
     model.add(LSTM(128, dropout=0, recurrent_dropout=0))
     model.add(BatchNormalization())
     model.add(Dense(64, activation='relu'))
-    model.load_weights('keras_rnn13.hdf5', by_name=True)
+    model.load_weights('keras_rnn14-half-test.hdf5', by_name=True)
     print(model.summary())
     return model
 
@@ -97,8 +97,11 @@ def get_all_data():
             continue
         label_path = os.path.join(dir_path, label)
         filenames = os.listdir(label_path)
-        indexes = np.arange(len(filenames))
-        np.random.shuffle(indexes)
+        filenames.remove('index.pkl')
+        # indexes = np.arange(len(filenames))
+        # np.random.shuffle(indexes)
+        index_path = os.path.join(label_path, 'index.pkl')
+        indexes=np.load(open(index_path,'rb'))
         train_top = int(len(filenames) * (1 - test_rate))
         for i in range(train_top):
             filepath = os.path.join(label_path, filenames[i])

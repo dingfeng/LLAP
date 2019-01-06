@@ -15,6 +15,7 @@ import os
 import tensorflow as tf
 import keras.backend.tensorflow_backend as KTF
 import pickle
+from keras import regularizers
 # 指定第一块GPU可用
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
@@ -39,8 +40,8 @@ def main():
     checkpointer = ModelCheckpoint(filepath="keras_rnn14-half-test.hdf5", verbose=1, save_best_only=True, )
     history = LossHistory()
     model = get_model()
-    result = model.fit(train_data, train_label_one_hot, batch_size=50,
-                       epochs=40, verbose=1, validation_data=(test_data, test_label_one_hot),
+    result = model.fit(train_data, train_label_one_hot, batch_size=100,
+                       epochs=100, verbose=1, validation_data=(test_data, test_label_one_hot),
                        callbacks=[checkpointer, history])
     print(model.evaluate(test_data, test_label_one_hot, batch_size=50))
     model.save('keras_rnn_epochend5.hdf5')
@@ -50,11 +51,12 @@ def main():
 def get_model():
     model = Sequential()
     model.add(Masking(mask_value=0, input_shape=(max_sequence_len // 10, 10)))
-    model.add(LSTM(128, dropout=0.2, recurrent_dropout=0.2, return_sequences=True))
-    model.add(LSTM(128, dropout=0.2, recurrent_dropout=0.2))
+    model.add(Bidirectional(LSTM(128, dropout=0.2, recurrent_dropout=0.2)))
     model.add(BatchNormalization())
-    model.add(Dense(64, activation='relu'))
-    model.add(Dropout(0.5))
+    # model.add(Dense(32, activation='relu',))
+    model.add(Dense(64, activation='relu',kernel_regularizer=regularizers.l2(0.001),
+                activity_regularizer=regularizers.l1(0.001)))
+    model.add(Dropout(0.3))
     model.add(Dense(len(label2num), activation='softmax'))
     model.summary()
     model.compile(loss='categorical_crossentropy',
@@ -85,18 +87,20 @@ def get_all_data():
             continue
         label_path = os.path.join(dir_path, label)
         filenames = os.listdir(label_path)
+        filenames.remove('index.pkl')
         indexes = np.arange(len(filenames))
         np.random.shuffle(indexes)
         index_path=os.path.join(label_path,'index.pkl')
         pickle.dump(indexes,open(index_path,'wb'))
         train_top = int(len(filenames) * (1 - test_rate))
         for i in range(train_top):
-            filepath = os.path.join(label_path, filenames[i])
+            filepath = os.path.join(label_path, filenames[indexes[i]])
             data = get_data(filepath)
             train_data += data
             train_label += [label2num[label] for i in range(len(data))]
         for i in range(train_top, len(filenames)):
-            filepath = os.path.join(label_path, filenames[i])
+            filepath = os.path.join(label_path, filenames[indexes[i]])
+            print(filepath)
             data = get_data(filepath)
             test_data += data
             test_label += [label2num[label] for i in range(len(data))]
