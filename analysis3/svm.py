@@ -20,6 +20,49 @@ test_rate = 0.5
 
 
 def main():
+    # global label2num
+    # global num2label
+    # global test_rate
+    # model = get_model()
+    # label2num = {'chenhao': 3}
+    # num2label = {3: 'chenhao'}
+    # train_features, test_features = get_train_test_features(model)
+    # clf = svm.OneClassSVM(nu=0.01, kernel="rbf")
+    # clf.fit(train_features)
+    # true_predict = clf.predict(test_features)
+    # true_predict += 1
+    # true_predict = true_predict / 2
+    # true_predict = true_predict.reshape((-1, 40))
+    # true_predict = np.sum(true_predict, axis=1) // 20
+    # nozero_count = np.count_nonzero(true_predict)
+    # print('true_predict shape  {} nozero {} accuracy {}'.format(true_predict.shape, nozero_count,
+    #                                                             nozero_count / len(true_predict)))
+    # all_names = ['chenhao', 'dingfeng', 'dengyufeng', 'anna', 'huangsi', 'qingpeijie', 'xuhuatao', 'yinjunhao',
+    #              'yuyinggang', 'zhangqian', 'zhaorun', 'zhuyan', 'jianghao', 'chenbo']
+    # all_names.remove()
+    # for label in ['chenhao', 'dingfeng', 'dengyufeng', 'anna', 'huangsi', 'qingpeijie', 'xuhuatao', 'yinjunhao',
+    #               'yuyinggang', 'zhangqian', 'zhaorun', 'zhuyan', 'jianghao', 'chenbo']:
+    #     # for label in ['chenhao']:
+    #     print('label {}'.format(label))
+    #     label2num = {label: 6}
+    #     num2label = {6: label}
+    #     # test_rate = 1
+    #     train_features, test_features = get_train_test_features(model)
+    #     true_predict = clf.predict(test_features)
+    #     true_predict += 1
+    #     true_predict = true_predict / 2
+    #     true_predict = true_predict.reshape((-1, 40))
+    #     true_predict = np.sum(true_predict, axis=1) // 20
+    #     nozero_count = np.count_nonzero(true_predict)
+    #     print('false_predict shape  {} nozero {} accuracy {}'.format(true_predict.shape, nozero_count,
+    #                                                                  nozero_count / len(true_predict)))
+    all_names = ['chenhao', 'dingfeng', 'dengyufeng', 'anna', 'huangsi', 'qingpeijie', 'xuhuatao', 'yinjunhao',
+                  'yuyinggang', 'zhangqian', 'zhaorun', 'zhuyan', 'jianghao', 'chenbo']
+    for name in all_names:
+        test(name)
+
+
+def test(target_name):
     global label2num
     global num2label
     global test_rate
@@ -35,12 +78,14 @@ def main():
     true_predict = true_predict.reshape((-1, 40))
     true_predict = np.sum(true_predict, axis=1) // 20
     nozero_count = np.count_nonzero(true_predict)
-    print('true_predict shape  {} nozero {} accuracy {}'.format(true_predict.shape, nozero_count,
-                                                                nozero_count / len(true_predict)))
-
-    for label in ['dingfeng', 'dengyufeng', 'anna','huangsi','qingpeijie','xuhuatao','yinjunhao','yuyinggang','zhangqian','zhaorun','zhuyan','jianghao']:
-    # for label in ['chenhao']:
-        print('label {}'.format(label))
+    print('name {} true positive rate {}'.format(target_name, nozero_count / len(true_predict)))
+    all_names = ['chenhao', 'dingfeng', 'dengyufeng', 'anna', 'huangsi', 'qingpeijie', 'xuhuatao', 'yinjunhao',
+                 'yuyinggang', 'zhangqian', 'zhaorun', 'zhuyan', 'jianghao', 'chenbo']
+    all_names.remove(target_name)
+    right_count = 0
+    total_count = 0
+    for label in all_names:
+        # print('label {}'.format(label))
         label2num = {label: 6}
         num2label = {6: label}
         # test_rate = 1
@@ -51,8 +96,9 @@ def main():
         true_predict = true_predict.reshape((-1, 40))
         true_predict = np.sum(true_predict, axis=1) // 20
         nozero_count = np.count_nonzero(true_predict)
-        print('false_predict shape  {} nozero {} accuracy {}'.format(true_predict.shape, nozero_count,
-                                                                     nozero_count / len(true_predict)))
+        right_count += nozero_count
+        total_count += len(true_predict)
+    print('name {} false positive rate {}'.format(target_name, 1 - right_count / total_count))
 
 
 def get_train_test_features(model):
@@ -68,13 +114,10 @@ def get_train_test_features(model):
     return train_features, test_features
 
 
-
-
 def get_model():
     model = Sequential()
     model.add(Masking(mask_value=0, input_shape=(max_sequence_len // 10, 10)))
-    model.add(LSTM(128, dropout=0, recurrent_dropout=0, return_sequences=True))
-    model.add(LSTM(128, dropout=0, recurrent_dropout=0))
+    model.add(Bidirectional(LSTM(128)))
     model.add(BatchNormalization())
     model.add(Dense(64, activation='relu'))
     model.load_weights('keras_rnn14-half-test.hdf5', by_name=True)
@@ -98,18 +141,16 @@ def get_all_data():
         label_path = os.path.join(dir_path, label)
         filenames = os.listdir(label_path)
         filenames.remove('index.pkl')
-        # indexes = np.arange(len(filenames))
-        # np.random.shuffle(indexes)
         index_path = os.path.join(label_path, 'index.pkl')
-        indexes=np.load(open(index_path,'rb'))
+        indexes = np.load(open(index_path, 'rb'))
         train_top = int(len(filenames) * (1 - test_rate))
         for i in range(train_top):
-            filepath = os.path.join(label_path, filenames[i])
+            filepath = os.path.join(label_path, filenames[indexes[i]])
             data = get_data(filepath)
             train_data += data
             train_label += [label2num[label] for i in range(len(data))]
         for i in range(train_top, len(filenames)):
-            filepath = os.path.join(label_path, filenames[i])
+            filepath = os.path.join(label_path, filenames[indexes[i]])
             data = get_data(filepath)
             test_data += data
             test_label += [label2num[label] for i in range(len(data))]
@@ -123,13 +164,13 @@ def get_all_data():
     for data in test_data:
         max_value = max(np.max(np.abs(data)), max_value)
         seq_max_len = max(len(data), seq_max_len)
-    print('seq max len {}'.format(seq_max_len))
+    # print('seq max len {}'.format(seq_max_len))
     for i in range(len(train_data)):
         train_data[i] = train_data[i] * 1e5
     for i in range(len(test_data)):
         test_data[i] = test_data[i] * 1e5
 
-    print('seq_max_len {}'.format(seq_max_len))
+    # print('seq_max_len {}'.format(seq_max_len))
     return train_data, train_label, test_data, test_label
 
 
