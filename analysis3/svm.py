@@ -81,9 +81,10 @@ def test(target_name):
     true_predict = np.sum(true_predict, axis=1) // 20
     nozero_count = np.count_nonzero(true_predict)
     print('name {} true positive rate {}'.format(target_name, nozero_count / len(true_predict)))
-    all_names = ['chenhao', 'dingfeng', 'dengyufeng', 'anna', 'huangsi', 'qingpeijie', 'xuhuatao', 'yinjunhao',
-                 'yuyinggang', 'zhangqian', 'zhaorun', 'zhuyan', 'jianghao', 'chenbo']
-    all_names.remove(target_name)
+    # all_names = ['chenhao', 'dingfeng', 'dengyufeng', 'anna', 'huangsi', 'qingpeijie', 'xuhuatao', 'yinjunhao',
+    #              'yuyinggang', 'zhangqian', 'zhaorun', 'zhuyan', 'jianghao', 'chenbo']
+    # all_names.remove(target_name)
+    all_names=['dingfeng']
     right_count = 0
     total_count = 0
     for label in all_names:
