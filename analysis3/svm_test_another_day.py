@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
-# filename: svm date: 2019/1/3 9:52  
-# author: FD 
+# filename: svm date: 2019/1/3 9:52
+# author: FD
 import numpy as np
 import keras
 from keras.models import Sequential
@@ -60,14 +60,15 @@ def main():
     all_names = ['chenhao', 'dingfeng', 'dengyufeng', 'anna', 'huangsi', 'qingpeijie', 'xuhuatao', 'yinjunhao',
                   'yuyinggang', 'zhangqian', 'zhaorun', 'zhuyan', 'jianghao', 'chenbo']
     model = get_model()
-    for name in all_names:
-        test(name)
+    # for name in all_names:
+    test('dingfeng')
 
 
 def test(target_name):
     global label2num
     global num2label
     global test_rate
+    global dir_path
     global model
     label2num = {target_name: 3}
     num2label = {3: target_name}
@@ -86,22 +87,25 @@ def test(target_name):
     all_names.remove(target_name)
     right_count = 0
     total_count = 0
-    for label in all_names:
-        print('label {}'.format(label))
-        label2num = {label: 6}
-        num2label = {6: label}
-        # test_rate = 1
-        train_features, test_features = get_train_test_features(model)
-        true_predict = clf.predict(test_features)
-        true_predict += 1
-        true_predict = true_predict / 2
-        true_predict = true_predict.reshape((-1, 40))
-        true_predict = np.sum(true_predict, axis=1) // 20
-        nozero_count = np.count_nonzero(true_predict)
-        right_count += nozero_count
-        total_count += len(true_predict)
-        print('false_predict shape  {} nozero {} accuracy {}'.format(true_predict.shape, nozero_count,
-                                                                     nozero_count / len(true_predict)))
+    # for label in all_names:
+    label='chenhao'
+    print('label {}'.format(label))
+    label2num = {label: 6}
+    num2label = {6: label}
+    dir_path='../dataset/handwriting-lab-1/mimic-cutted/xuhuatao'
+    # test_rate = 1
+    train_features, test_features = get_train_test_features(model)
+    test_features=np.vstack((train_features,test_features))
+    true_predict = clf.predict(test_features)
+    true_predict += 1
+    true_predict = true_predict / 2
+    true_predict = true_predict.reshape((-1, 40))
+    true_predict = np.sum(true_predict, axis=1) // 20
+    nozero_count = np.count_nonzero(true_predict)
+    right_count += nozero_count
+    total_count += len(true_predict)
+    print('false_predict shape  {} nozero {} accuracy {}'.format(true_predict.shape, nozero_count,
+                                                                 nozero_count / len(true_predict)))
     print('name {} false positive rate {}'.format(target_name, 1 - right_count / total_count))
 
 
@@ -128,12 +132,12 @@ def get_model():
     print(model.summary())
     return model
 
-
+dir_path = '../dataset/handwriting-lab-1/cutted'
 def get_all_data():
     global label2num
     global num2label
     global test_rate
-    dir_path = '../dataset/handwriting-lab-1/cutted'
+    global dir_path
     train_data = []
     train_label = []
     test_data = []
@@ -144,9 +148,12 @@ def get_all_data():
             continue
         label_path = os.path.join(dir_path, label)
         filenames = os.listdir(label_path)
-        filenames.remove('index.pkl')
-        index_path = os.path.join(label_path, 'index.pkl')
-        indexes = np.load(open(index_path, 'rb'))
+        if 'index.pkl' in filenames:
+            filenames.remove('index.pkl')
+            index_path = os.path.join(label_path, 'index.pkl')
+            indexes = np.load(open(index_path, 'rb'))
+        else:
+            indexes=np.arange(len(filenames))
         train_top = int(len(filenames) * (1 - test_rate))
         for i in range(train_top):
             filepath = os.path.join(label_path, filenames[indexes[i]])

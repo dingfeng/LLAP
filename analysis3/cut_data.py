@@ -48,9 +48,20 @@ def init_IQ_multipliers():
 
 def main():
     init_IQ_multipliers()
-    cut_dir('../dataset/handwriting-lab-1/raw/chenbo', '../dataset/handwriting-lab-1/cutted/chenbo')
+    # cut_dir('../dataset/handwriting-lab-1/raw/chenbo', '../dataset/handwriting-lab-1/cutted/chenbo')
+    # cut_dir('../dataset/handwriting-lab-1/raw/chenbo', '../dataset/handwriting-lab-1/cutted/chenbo')
+    # cut_dir('../dataset/handwriting-lab-2/raw/dingfeng','../dataset/handwriting-lab-2/cutted/dingfeng')
+    mimic_cut('../dataset/handwriting-lab-1/mimic-raw/yuyinggang','../dataset/handwriting-lab-1/mimic-cutted/yuyinggang')
     return
 
+def mimic_cut(source_dir,dest_dir):
+    mimic_dirs=os.listdir(source_dir)
+    for mimic_dir in mimic_dirs:
+        source_mimic_dir_path=os.path.join(source_dir,mimic_dir)
+        dest_mimic_dir_path=os.path.join(dest_dir,mimic_dir)
+        if not os.path.isdir(dest_mimic_dir_path):
+            os.makedirs(dest_mimic_dir_path)
+        cut_dir(source_mimic_dir_path,dest_mimic_dir_path)
 
 
 

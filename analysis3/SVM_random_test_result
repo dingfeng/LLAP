@@ -1,0 +1,441 @@
+ssh://root@192.168.0.110:22/usr/local/bin/python3 -u /root/llap/analysis3/svm.py
+Using TensorFlow backend.
+2019-01-10 18:40:17.455564: I tensorflow/core/platform/cpu_feature_guard.cc:141] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #
+=================================================================
+masking_1 (Masking)          (None, 250, 10)           0
+_________________________________________________________________
+bidirectional_1 (Bidirection (None, 256)               142336
+_________________________________________________________________
+batch_normalization_1 (Batch (None, 256)               1024
+_________________________________________________________________
+dense_1 (Dense)              (None, 64)                16448
+=================================================================
+Total params: 159,808
+Trainable params: 159,296
+Non-trainable params: 512
+_________________________________________________________________
+None
+/usr/local/lib/python3.6/site-packages/sklearn/svm/base.py:196: FutureWarning: The default value of gamma will change from 'auto' to 'scale' in version 0.22 to account better for unscaled features. Set gamma explicitly to 'auto' or 'scale' to avoid this warning.
+  "avoid this warning.", FutureWarning)
+name chenhao true positive rate 0.9821428571428571
+label dingfeng
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label dengyufeng
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label anna
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label huangsi
+false_predict shape  (55,) nozero 0 accuracy 0.0
+label qingpeijie
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label xuhuatao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label yinjunhao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label yuyinggang
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label zhangqian
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label zhaorun
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label zhuyan
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label jianghao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label chenbo
+false_predict shape  (56,) nozero 0 accuracy 0.0
+name chenhao false positive rate 1.0
+/usr/local/lib/python3.6/site-packages/sklearn/svm/base.py:196: FutureWarning: The default value of gamma will change from 'auto' to 'scale' in version 0.22 to account better for unscaled features. Set gamma explicitly to 'auto' or 'scale' to avoid this warning.
+  "avoid this warning.", FutureWarning)
+name dingfeng true positive rate 1.0
+label chenhao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label dengyufeng
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label anna
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label huangsi
+false_predict shape  (55,) nozero 0 accuracy 0.0
+label qingpeijie
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label xuhuatao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label yinjunhao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label yuyinggang
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label zhangqian
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label zhaorun
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label zhuyan
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label jianghao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label chenbo
+false_predict shape  (56,) nozero 0 accuracy 0.0
+name dingfeng false positive rate 1.0
+/usr/local/lib/python3.6/site-packages/sklearn/svm/base.py:196: FutureWarning: The default value of gamma will change from 'auto' to 'scale' in version 0.22 to account better for unscaled features. Set gamma explicitly to 'auto' or 'scale' to avoid this warning.
+  "avoid this warning.", FutureWarning)
+name dengyufeng true positive rate 0.9821428571428571
+label chenhao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label dingfeng
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label anna
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label huangsi
+false_predict shape  (55,) nozero 0 accuracy 0.0
+label qingpeijie
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label xuhuatao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label yinjunhao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label yuyinggang
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label zhangqian
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label zhaorun
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label zhuyan
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label jianghao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label chenbo
+false_predict shape  (56,) nozero 0 accuracy 0.0
+name dengyufeng false positive rate 1.0
+/usr/local/lib/python3.6/site-packages/sklearn/svm/base.py:196: FutureWarning: The default value of gamma will change from 'auto' to 'scale' in version 0.22 to account better for unscaled features. Set gamma explicitly to 'auto' or 'scale' to avoid this warning.
+  "avoid this warning.", FutureWarning)
+name anna true positive rate 0.9821428571428571
+label chenhao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label dingfeng
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label dengyufeng
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label huangsi
+false_predict shape  (55,) nozero 0 accuracy 0.0
+label qingpeijie
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label xuhuatao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label yinjunhao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label yuyinggang
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label zhangqian
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label zhaorun
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label zhuyan
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label jianghao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label chenbo
+false_predict shape  (56,) nozero 0 accuracy 0.0
+name anna false positive rate 1.0
+/usr/local/lib/python3.6/site-packages/sklearn/svm/base.py:196: FutureWarning: The default value of gamma will change from 'auto' to 'scale' in version 0.22 to account better for unscaled features. Set gamma explicitly to 'auto' or 'scale' to avoid this warning.
+  "avoid this warning.", FutureWarning)
+name huangsi true positive rate 1.0
+label chenhao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label dingfeng
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label dengyufeng
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label anna
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label qingpeijie
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label xuhuatao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label yinjunhao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label yuyinggang
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label zhangqian
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label zhaorun
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label zhuyan
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label jianghao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label chenbo
+false_predict shape  (56,) nozero 0 accuracy 0.0
+name huangsi false positive rate 1.0
+/usr/local/lib/python3.6/site-packages/sklearn/svm/base.py:196: FutureWarning: The default value of gamma will change from 'auto' to 'scale' in version 0.22 to account better for unscaled features. Set gamma explicitly to 'auto' or 'scale' to avoid this warning.
+  "avoid this warning.", FutureWarning)
+name qingpeijie true positive rate 1.0
+label chenhao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label dingfeng
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label dengyufeng
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label anna
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label huangsi
+false_predict shape  (55,) nozero 0 accuracy 0.0
+label xuhuatao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label yinjunhao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label yuyinggang
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label zhangqian
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label zhaorun
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label zhuyan
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label jianghao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label chenbo
+false_predict shape  (56,) nozero 0 accuracy 0.0
+name qingpeijie false positive rate 1.0
+/usr/local/lib/python3.6/site-packages/sklearn/svm/base.py:196: FutureWarning: The default value of gamma will change from 'auto' to 'scale' in version 0.22 to account better for unscaled features. Set gamma explicitly to 'auto' or 'scale' to avoid this warning.
+  "avoid this warning.", FutureWarning)
+name xuhuatao true positive rate 0.9821428571428571
+label chenhao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label dingfeng
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label dengyufeng
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label anna
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label huangsi
+false_predict shape  (55,) nozero 0 accuracy 0.0
+label qingpeijie
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label yinjunhao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label yuyinggang
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label zhangqian
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label zhaorun
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label zhuyan
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label jianghao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label chenbo
+false_predict shape  (56,) nozero 0 accuracy 0.0
+name xuhuatao false positive rate 1.0
+/usr/local/lib/python3.6/site-packages/sklearn/svm/base.py:196: FutureWarning: The default value of gamma will change from 'auto' to 'scale' in version 0.22 to account better for unscaled features. Set gamma explicitly to 'auto' or 'scale' to avoid this warning.
+  "avoid this warning.", FutureWarning)
+name yinjunhao true positive rate 0.9642857142857143
+label chenhao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label dingfeng
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label dengyufeng
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label anna
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label huangsi
+false_predict shape  (55,) nozero 0 accuracy 0.0
+label qingpeijie
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label xuhuatao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label yuyinggang
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label zhangqian
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label zhaorun
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label zhuyan
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label jianghao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label chenbo
+false_predict shape  (56,) nozero 0 accuracy 0.0
+name yinjunhao false positive rate 1.0
+/usr/local/lib/python3.6/site-packages/sklearn/svm/base.py:196: FutureWarning: The default value of gamma will change from 'auto' to 'scale' in version 0.22 to account better for unscaled features. Set gamma explicitly to 'auto' or 'scale' to avoid this warning.
+  "avoid this warning.", FutureWarning)
+name yuyinggang true positive rate 1.0
+label chenhao
+false_predict shape  (56,) nozero 1 accuracy 0.017857142857142856
+label dingfeng
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label dengyufeng
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label anna
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label huangsi
+false_predict shape  (55,) nozero 0 accuracy 0.0
+label qingpeijie
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label xuhuatao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label yinjunhao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label zhangqian
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label zhaorun
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label zhuyan
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label jianghao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label chenbo
+false_predict shape  (56,) nozero 0 accuracy 0.0
+name yuyinggang false positive rate 0.9986244841815681
+/usr/local/lib/python3.6/site-packages/sklearn/svm/base.py:196: FutureWarning: The default value of gamma will change from 'auto' to 'scale' in version 0.22 to account better for unscaled features. Set gamma explicitly to 'auto' or 'scale' to avoid this warning.
+  "avoid this warning.", FutureWarning)
+name zhangqian true positive rate 1.0
+label chenhao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label dingfeng
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label dengyufeng
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label anna
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label huangsi
+false_predict shape  (55,) nozero 0 accuracy 0.0
+label qingpeijie
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label xuhuatao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label yinjunhao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label yuyinggang
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label zhaorun
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label zhuyan
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label jianghao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label chenbo
+false_predict shape  (56,) nozero 0 accuracy 0.0
+name zhangqian false positive rate 1.0
+/usr/local/lib/python3.6/site-packages/sklearn/svm/base.py:196: FutureWarning: The default value of gamma will change from 'auto' to 'scale' in version 0.22 to account better for unscaled features. Set gamma explicitly to 'auto' or 'scale' to avoid this warning.
+  "avoid this warning.", FutureWarning)
+name zhaorun true positive rate 0.9821428571428571
+label chenhao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label dingfeng
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label dengyufeng
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label anna
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label huangsi
+false_predict shape  (55,) nozero 0 accuracy 0.0
+label qingpeijie
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label xuhuatao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label yinjunhao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label yuyinggang
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label zhangqian
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label zhuyan
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label jianghao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label chenbo
+false_predict shape  (56,) nozero 0 accuracy 0.0
+name zhaorun false positive rate 1.0
+/usr/local/lib/python3.6/site-packages/sklearn/svm/base.py:196: FutureWarning: The default value of gamma will change from 'auto' to 'scale' in version 0.22 to account better for unscaled features. Set gamma explicitly to 'auto' or 'scale' to avoid this warning.
+  "avoid this warning.", FutureWarning)
+name zhuyan true positive rate 1.0
+label chenhao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label dingfeng
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label dengyufeng
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label anna
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label huangsi
+false_predict shape  (55,) nozero 0 accuracy 0.0
+label qingpeijie
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label xuhuatao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label yinjunhao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label yuyinggang
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label zhangqian
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label zhaorun
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label jianghao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label chenbo
+false_predict shape  (56,) nozero 0 accuracy 0.0
+name zhuyan false positive rate 1.0
+/usr/local/lib/python3.6/site-packages/sklearn/svm/base.py:196: FutureWarning: The default value of gamma will change from 'auto' to 'scale' in version 0.22 to account better for unscaled features. Set gamma explicitly to 'auto' or 'scale' to avoid this warning.
+  "avoid this warning.", FutureWarning)
+name jianghao true positive rate 0.9821428571428571
+label chenhao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label dingfeng
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label dengyufeng
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label anna
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label huangsi
+false_predict shape  (55,) nozero 0 accuracy 0.0
+label qingpeijie
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label xuhuatao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label yinjunhao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label yuyinggang
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label zhangqian
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label zhaorun
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label zhuyan
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label chenbo
+false_predict shape  (56,) nozero 0 accuracy 0.0
+name jianghao false positive rate 1.0
+/usr/local/lib/python3.6/site-packages/sklearn/svm/base.py:196: FutureWarning: The default value of gamma will change from 'auto' to 'scale' in version 0.22 to account better for unscaled features. Set gamma explicitly to 'auto' or 'scale' to avoid this warning.
+  "avoid this warning.", FutureWarning)
+name chenbo true positive rate 0.9642857142857143
+label chenhao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label dingfeng
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label dengyufeng
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label anna
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label huangsi
+false_predict shape  (55,) nozero 0 accuracy 0.0
+label qingpeijie
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label xuhuatao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label yinjunhao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label yuyinggang
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label zhangqian
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label zhaorun
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label zhuyan
+false_predict shape  (56,) nozero 0 accuracy 0.0
+label jianghao
+false_predict shape  (56,) nozero 0 accuracy 0.0
+name chenbo false positive rate 1.0
+
+Process finished with exit code 0
