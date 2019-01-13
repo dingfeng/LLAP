@@ -51,8 +51,8 @@ def main():
     # cut_dir('../dataset/handwriting-lab-1/raw/chenbo', '../dataset/handwriting-lab-1/cutted/chenbo')
     # cut_dir('../dataset/handwriting-lab-1/raw/chenbo', '../dataset/handwriting-lab-1/cutted/chenbo')
     # cut_dir('../dataset/test/raw/dingfeng','../dataset/test/cutted/dingfeng')
-    # mimic_cut('../dataset/handwriting-lab-1/mimic-raw/zhuyan','../dataset/handwriting-lab-1/mimic-cutted/zhuyan')
-    cut_undergraduate()
+    mimic_cut('../dataset/handwriting-lab-1/mimic-raw/qingpeijie','../dataset/handwriting-lab-1/mimic-cutted/qingpeijie')
+    # cut_undergraduate()
     return
 
 def cut_undergraduate():

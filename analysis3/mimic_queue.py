@@ -10,8 +10,6 @@ def main():
     np.random.shuffle(indexes)
     print(np.asarray(names)[np.asarray(indexes)])
     pass
-['jianghao' 'huangsi' 'qingpeijie' 'anna' 'xuhuatao' 'yuyinggang'
- 'dingfeng' 'yinjunhao' 'zhangqian' 'chenhao' 'zhuyan' ' ' 'chenbo'
- 'dengyufeng']
+['jianghao', 'huangsi', 'qingpeijie', 'anna', 'xuhuatao', 'yuyinggang', 'dingfeng', 'yinjunhao', 'zhangqian', 'chenhao', 'zhuyan', 'chenbo', 'dengyufeng']
 if __name__ == '__main__':
     main()
