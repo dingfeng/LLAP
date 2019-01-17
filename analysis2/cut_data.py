@@ -19,7 +19,7 @@ NUM_CLUSTERS = 5
 
 
 def main():
-    cut_dir('../dataset/dingfeng_big_write/raw/zhangqian', '../dataset/dingfeng_big_write/cutted/zhangqian')
+    cut_dir('../dataset/dingfeng_big_write/raw/zhangqian', '../dataset/dingfeng_big_write/cutted/zhangqian-forged-forged')
     return
 
 

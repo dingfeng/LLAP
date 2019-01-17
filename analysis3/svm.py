@@ -69,6 +69,8 @@ def test(target_name):
     global num2label
     global test_rate
     global model
+    global dir_path
+    test_rate = 0.5
     label2num = {target_name: 3}
     num2label = {3: target_name}
     train_features, test_features = get_train_test_features(model)
@@ -81,10 +83,11 @@ def test(target_name):
     true_predict = np.sum(true_predict, axis=1) // 20
     nozero_count = np.count_nonzero(true_predict)
     print('name {} true positive rate {}'.format(target_name, nozero_count / len(true_predict)))
-    # all_names = ['chenhao', 'dingfeng', 'dengyufeng', 'anna', 'huangsi', 'qingpeijie', 'xuhuatao', 'yinjunhao',
-    #              'yuyinggang', 'zhangqian', 'zhaorun', 'zhuyan', 'jianghao', 'chenbo']
+    all_names = [target_name]
     # all_names.remove(target_name)
-    all_names=['dingfeng']
+    # all_names=['dingfeng']
+    dir_path='../dataset/handwriting-lab-1/mimic_cutted_arranged'
+    test_rate=1.0
     right_count = 0
     total_count = 0
     for label in all_names:
@@ -129,12 +132,12 @@ def get_model():
     print(model.summary())
     return model
 
-
+dir_path = '../dataset/handwriting-lab-1/cutted'
 def get_all_data():
     global label2num
     global num2label
     global test_rate
-    dir_path = '../dataset/handwriting-lab-1/cutted'
+    global dir_path
     train_data = []
     train_label = []
     test_data = []
@@ -145,9 +148,12 @@ def get_all_data():
             continue
         label_path = os.path.join(dir_path, label)
         filenames = os.listdir(label_path)
-        filenames.remove('index.pkl')
-        index_path = os.path.join(label_path, 'index.pkl')
-        indexes = np.load(open(index_path, 'rb'))
+        if 'index.pkl' in filenames:
+            filenames.remove('index.pkl')
+            index_path = os.path.join(label_path, 'index.pkl')
+            indexes = np.load(open(index_path, 'rb'))
+        else:
+            indexes=np.arange(len(filenames))
         train_top = int(len(filenames) * (1 - test_rate))
         for i in range(train_top):
             filepath = os.path.join(label_path, filenames[indexes[i]])

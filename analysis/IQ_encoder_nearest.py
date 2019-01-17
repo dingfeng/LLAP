@@ -11,7 +11,7 @@ template_count = 12
 
 
 def main():
-    names = ['anna', 'chenhao', 'huangsi', 'dingfeng', 'huangsi', 'xuhuatao', 'yingjunhao', 'zhuyan',
+    names = ['anna', 'chenhao', 'huangsi', 'dingfeng', 'huangsi-forged-forged', 'xuhuatao', 'yingjunhao', 'zhuyan',
              'zhangqian', 'zhaorun', 'zhuyan']
     accuracy_result = np.ones((len(names), len(names)))
     for i, name0 in enumerate(names):

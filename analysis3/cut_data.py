@@ -13,7 +13,7 @@ import os
 from scipy.signal import butter, lfilter
 import time
 from analysis.utils import plot_fft
-
+import matplotlib.pyplot as plt
 
 fs = 48000
 freq = 20000
@@ -22,7 +22,6 @@ freqs = [17350 + i * 700 for i in range(8)]
 I_multipliers = None
 Q_multipliers = None
 filter_half_width = 100  # +-100Hz
-
 
 
 def init_IQ_multipliers():
@@ -46,30 +45,43 @@ def init_IQ_multipliers():
             Q_multipliers[freq_index, i, :] = mul_sin
 
 
+names = [#'anna', 'dengyufeng', 'dingfeng', 'huangsi',
+         #'jianghao', 'qingpeijie', 'xuhuatao',
+         'yinjunhao', 'yuyinggang',
+         #'zhangqian', 'zhaorun', 'zhuyan'
+         ]
+
+
 def main():
     init_IQ_multipliers()
-    # cut_dir('../dataset/handwriting-lab-1/raw/chenbo', '../dataset/handwriting-lab-1/cutted/chenbo')
-    # cut_dir('../dataset/handwriting-lab-1/raw/chenbo', '../dataset/handwriting-lab-1/cutted/chenbo')
-    # cut_dir('../dataset/test/raw/dingfeng','../dataset/test/cutted/dingfeng')
-    mimic_cut('../dataset/handwriting-lab-1/mimic-raw/qingpeijie','../dataset/handwriting-lab-1/mimic-cutted/qingpeijie')
+    # cut_dir('../dataset/handwriting-lab-1/raw/chenbo', '../dataset/handwriting-lab-1/cutted/chenbo-forged')
+    # cut_dir('../dataset/handwriting-lab-1/raw/chenbo', '../dataset/handwriting-lab-1/cutted/test')
+    for i in range(len(names)):
+        name = names[i]
+        print('name : {}'.format(name))
+        mimic_cut('../dataset/handwriting-lab-1/mimic-raw/' + name,
+                '../dataset/handwriting-lab-1/mimic_cutted_arranged3/' + name)
+        # cut_dir('../dataset/handwriting-lab-1/raw/'+name,'../dataset/handwriting-lab-1/cutted2/'+name)
+    # cut_dir('../dataset/test/raw/dingfeng','../dataset/test/cutted/dingfeng-forged-forged')
     # cut_undergraduate()
     return
 
-def cut_undergraduate():
-    root_dir='../dataset/handwriting-lab-3/'
-    dirnames=os.listdir(root_dir+'/raw')
-    for dirname in dirnames:
-        mimic_cut(os.path.join(root_dir,'raw',dirname),os.path.join(root_dir,'cutted',dirname))
 
-def mimic_cut(source_dir,dest_dir):
-    mimic_dirs=os.listdir(source_dir)
+def cut_undergraduate():
+    root_dir = '../dataset/handwriting-lab-3/'
+    dirnames = os.listdir(root_dir + '/raw')
+    for dirname in dirnames:
+        mimic_cut(os.path.join(root_dir, 'raw', dirname), os.path.join(root_dir, 'cutted', dirname))
+
+
+def mimic_cut(source_dir, dest_dir):
+    mimic_dirs = os.listdir(source_dir)
     for mimic_dir in mimic_dirs:
-        source_mimic_dir_path=os.path.join(source_dir,mimic_dir)
-        dest_mimic_dir_path=os.path.join(dest_dir,mimic_dir)
+        source_mimic_dir_path = os.path.join(source_dir, mimic_dir)
+        dest_mimic_dir_path = os.path.join(dest_dir, mimic_dir)
         if not os.path.isdir(dest_mimic_dir_path):
             os.makedirs(dest_mimic_dir_path)
-        cut_dir(source_mimic_dir_path,dest_mimic_dir_path)
-
+        cut_dir(source_mimic_dir_path, dest_mimic_dir_path)
 
 
 def cut_dir(source_dir, dest_dir):
@@ -81,8 +93,9 @@ def cut_dir(source_dir, dest_dir):
             source_path = os.path.join(source_dir, filename)
             dest_path = os.path.join(dest_dir, ''.join([filename[:-4], '.pkl']))
             cut_file(source_path, dest_path)
-            count+=1
+            count += 1
             print('count {}'.format(count))
+
 
 def cut_file(source_filepath, dest_filepath):
     global cluster_count
@@ -101,6 +114,7 @@ def cut_file(source_filepath, dest_filepath):
     for freq_index, freq in enumerate(freqs):
         freq_data = data  # butter_lowpass_filter(data,100,fs)#butter_bandpass_filter(data, freq - filter_half_width, freq + filter_half_width, fs)
         cutted_IQs = []
+        velocities = []
         # repeat_time = time.time()
         for i in range(64):
             I = getI(freq_data, freq_index, i)
@@ -113,11 +127,18 @@ def cut_file(source_filepath, dest_filepath):
             Q = decompositionQ.trend[11:]
             diff_time = time.time()
             IQ = np.asarray([I, Q]).T
-            IQ = IQ - np.roll(IQ, 1)
-            IQ = IQ[1:]
+            IQ0 = IQ - np.roll(IQ, 1, axis=0)
+            IQ1 = (IQ - np.roll(IQ, 2, axis=0)) / 2
+            IQ = (IQ0 + IQ1) / 2
+            IQ = IQ[4:-4, :]
+            IQ[:, 0] = IQ[:, 0] - IQ[0, 0]
+            IQ[:, 1] = IQ[:, 1] - IQ[0, 1]
             IQ = norm(IQ, ord=2, axis=1)
-            IQ = IQ - np.roll(IQ, 1)
-            IQ = IQ[1:]
+            velocity = IQ
+            IQ0 = IQ - np.roll(IQ, 1, axis=0)
+            IQ1 = (IQ - np.roll(IQ, 2, axis=0)) / 2
+            IQ = (IQ0 + IQ1) / 2
+            IQ = IQ[4:-4]
             cutted_IQ = IQ
             total_diff_time += time.time() - diff_time
             correlation_time = time.time()
@@ -126,32 +147,21 @@ def cut_file(source_filepath, dest_filepath):
                 # print(correlation)
                 if correlation > 0.95 and previous is not None:
                     cutted_IQs.append(cutted_IQ)
+                    velocities.append(velocity)
                     if not previous_added:
                         cutted_IQs.append(previous)
+                        velocities.append(velocity)
                         previous_added = True
                 else:
                     previous_added = False
             total_correlation_time += time.time() - correlation_time
             previous = cutted_IQ
-        # print('repeat time {}'.format(time.time() - repeat_time))
-        # 使用方差筛选去除最小的3条曲线
         vars = []
         for cutted_IQ in cutted_IQs:
             vars.append(np.var(cutted_IQ))
-        new_cutted_IQs = []
-        for index in np.argsort(vars)[3:]:
-            new_cutted_IQs.append(cutted_IQs[index])
-        distances_mat = np.zeros((len(new_cutted_IQs), len(new_cutted_IQs)))
-        for i in range(len(new_cutted_IQs)):
-            for j in range(i + 1, len(new_cutted_IQs)):
-                distances_mat[i, j] = distances_mat[j, i] = 1 - get_correlation(new_cutted_IQs[i], new_cutted_IQs[j])
-        indexes = np.arange(len(new_cutted_IQs))
-        np.random.shuffle(indexes)
-        kmedoids_instance = kmedoids(distances_mat, indexes[:NUM_CLUSTERS], data_type='distance_matrix')
-        kmedoids_instance.process()
-        medoids = kmedoids_instance.get_medoids()
-        for medoid in medoids:
-            final_features.append(new_cutted_IQs[medoid])
+        index = np.argsort(vars)[len(vars) - 1]
+        final_features.append(cutted_IQs[index])
+        final_features.append(velocities[index])
     print('total time {}'.format(time.time() - previous_time))
     print('average {} decompose {} diff {} correlation {}'.format(total_average_time, total_decompose_time,
                                                                   total_diff_time, total_correlation_time))

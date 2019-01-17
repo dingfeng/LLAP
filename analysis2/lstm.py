@@ -14,15 +14,15 @@ from analysis2.LossHistory import LossHistory
 import os
 import tensorflow as tf
 import keras.backend.tensorflow_backend as KTF
-
+import matplotlib.pyplot as plt
 # 指定第一块GPU可用
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-
-config = tf.ConfigProto()
-config.gpu_options.allow_growth=True   #不全部占满显存, 按需分配
-sess = tf.Session(config=config)
-
-KTF.set_session(sess)
+# os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+#
+# config = tf.ConfigProto()
+# config.gpu_options.allow_growth=True   #不全部占满显存, 按需分配
+# sess = tf.Session(config=config)
+#
+# KTF.set_session(sess)
 
 max_sequence_len = 1700
 
@@ -36,7 +36,7 @@ def main():
     test_data = test_data.reshape((-1, max_sequence_len//10, 10))
     test_label_one_hot = to_categorical(test_label)
 
-    checkpointer = ModelCheckpoint(filepath="keras_rnn12.hdf5", verbose=1, save_best_only=True, )
+    checkpointer = ModelCheckpoint(filepath="keras_rnntset.hdf5", verbose=1, save_best_only=True, )
     history = LossHistory()
     model = get_model()
     result = model.fit(train_data, train_label_one_hot, batch_size=50,
