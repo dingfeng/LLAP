@@ -23,7 +23,7 @@ sess = tf.Session(config=config)
 KTF.set_session(sess)
 
 def main():
-    dataset = np.load('dataset3.pkl')
+    dataset = np.load('dataset4.pkl')
     train_data_set = dataset['train_data_set']
     train_label_set = dataset['train_label_set']
     train_label_one_hot = to_categorical(train_label_set)

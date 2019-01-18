@@ -10,8 +10,8 @@ def main():
     mimic_arrange()
 
 def mimic_arrange():
-    root_dir = '../dataset/handwriting-lab-3/mimic_cutted/'
-    dest_dir = '../dataset/handwriting-lab-3/mimic_cutted_arranged'
+    root_dir = '../dataset/handwriting-lab-1/mimic-cutted3/'
+    dest_dir = '../dataset/handwriting-lab-1/mimic_cutted_arranged3'
     dir_names = os.listdir(root_dir)
     for dir_name in dir_names:
         dir_path = os.path.join(root_dir, dir_name)
