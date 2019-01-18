@@ -17,7 +17,7 @@ def main():
         generate_by_name(name)
     indexes = np.arange(len(data_set))
     np.random.shuffle(indexes)
-    test_rate = 0.5
+    test_rate = 0.3
     test_count = int(len(indexes) * test_rate)
     train_data_set = []
     train_label_set = []
@@ -38,7 +38,7 @@ def generate_by_name(name):
     filenames=filenames[:50]
     indexes = np.arange(len(filenames))
     np.random.shuffle(indexes)
-    template_count = 7
+    template_count = 20
     templates = []
     for i in range(template_count):
         data = np.load(open(dir_path + '/' + filenames[indexes[i]], 'rb'))
@@ -60,6 +60,7 @@ def generate_by_name(name):
             max_data[i][j] = max_value
             sum_data[i][j]=total
             mean_data[i][j] = total / len(templates)
+
     for i in range(len(filenames) - template_count):
         file_index = template_count + i
         data = np.load(open(dir_path + '/' + filenames[indexes[file_index]], 'rb'))

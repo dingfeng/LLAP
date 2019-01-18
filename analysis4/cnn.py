@@ -23,7 +23,7 @@ sess = tf.Session(config=config)
 KTF.set_session(sess)
 
 def main():
-    dataset = np.load('dataset4.pkl')
+    dataset = np.load('dataset5.pkl')
     train_data_set = dataset['train_data_set']
     train_label_set = dataset['train_label_set']
     train_label_one_hot = to_categorical(train_label_set)
@@ -45,7 +45,7 @@ def main():
 def get_model():
     model = Sequential()
 
-    model.add(Conv2D(128, 3, padding='same',activation='relu', input_shape=(200, 8,6)))
+    model.add(Conv2D(64, 3, padding='same',activation='relu', input_shape=(200, 8,6)))
     model.add(MaxPooling2D(2))
     model.add(Conv2D(32, 3, activation='relu'))
     model.add(MaxPooling2D(2))
