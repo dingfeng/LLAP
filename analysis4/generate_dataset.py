@@ -36,7 +36,7 @@ def generate_by_name(name):
     global names
     dir_path = '../dataset/handwriting-lab-1/feature3/' + name
     filenames = os.listdir(dir_path)
-    filenames=filenames[:50]
+    # filenames=filenames[:50]
     indexes = np.arange(len(filenames))
     np.random.shuffle(indexes)
     template_count = 20
@@ -85,7 +85,7 @@ def generate_by_name(name):
     # 计算模仿数据
     forged_dir_path = '../dataset/handwriting-lab-1/forged-feature3/'+name
     forged_filenames = os.listdir(forged_dir_path)
-    forged_filenames=forged_filenames[:40]
+    # forged_filenames=forged_filenames[:40]
     for i in range(len(forged_filenames)):
         data = np.load(open(forged_dir_path + '/' + forged_filenames[i], 'rb'))
         result_min_data = data - min_data

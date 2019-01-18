@@ -59,8 +59,8 @@ def main():
     # for i in range(len(names)):
     #     name = names[i]
     #     print('name : {}'.format(name))
-    mimic_cut('../dataset/handwriting-lab-1/mimic-raw/' + 'chenbo',
-            '../dataset/handwriting-lab-1/mimic-cutted3/' + 'chenbo')
+    mimic_cut('../dataset/handwriting-lab-1/mimic-raw/' + 'chenhao',
+            '../dataset/handwriting-lab-1/mimic-cutted3/' + 'chenhao')
         # cut_dir('../dataset/handwriting-lab-1/raw/'+name,'../dataset/handwriting-lab-1/cutted2/'+name)
     # cut_dir('../dataset/test/raw/dingfeng','../dataset/test/cutted/dingfeng-forged-forged')
     # cut_undergraduate()

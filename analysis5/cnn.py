@@ -24,14 +24,14 @@ KTF.set_session(sess)
 
 def main():
     dataset = np.load('dataset4.pkl')
-    train_data_set = dataset['train_data_set']
+    # train_data_set = dataset['train_data_set']
     train_label_set = dataset['train_label_set']
-    train_label_one_hot = to_categorical(train_label_set)
+    # train_label_one_hot = to_categorical(train_label_set)
     test_data_set = dataset['test_data_set']
     test_label_set = dataset['test_label_set']
     test_label_one_hot = to_categorical(test_label_set)
     model = get_model()
-    checkpointer = ModelCheckpoint(filepath="keras_binary_cnn_best_savedsdf.hdf5", verbose=1, save_best_only=True)
+    checkpointer = ModelCheckpoint(filepath="keras_binary_cnn.hdf5", verbose=1, save_best_only=True)
     history = LossHistory()
     # result = model.fit(np.asarray(train_data_set), train_label_one_hot, batch_size=10,
     #                    epochs=60, verbose=1, validation_data=(np.asarray(test_data_set), test_label_one_hot),
