@@ -85,9 +85,9 @@ def generate_by_name(name):
         label_set.append(1)
         data_set.append(result)
     # 计算模仿数据
-    forged_dir_path = '../dataset/handwriting-lab-3/forged-feature/'+name
-    forged_filenames = os.listdir(forged_dir_path)
-    # forged_filenames=forged_filenames[:40]
+    # forged_dir_path = '../dataset/handwriting-lab-3/forged-feature/'+name
+    # forged_filenames = os.listdir(forged_dir_path)
+    # # forged_filenames=forged_filenames[:40]
     # for i in range(len(forged_filenames)):
     #     data = np.load(open(forged_dir_path + '/' + forged_filenames[i], 'rb'))
     #     result_min_data = data - min_data
