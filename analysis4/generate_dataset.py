@@ -35,7 +35,7 @@ def generate_by_name(name):
     filenames=filenames[:50]
     indexes = np.arange(len(filenames))
     np.random.shuffle(indexes)
-    template_count = 25
+    template_count = 20
     templates = []
     for i in range(template_count):
         data = np.load(open(dir_path + '/' + filenames[indexes[i]], 'rb'))

@@ -56,14 +56,14 @@ def main():
     init_IQ_multipliers()
     # cut_dir('../dataset/handwriting-lab-1/raw/chenbo', '../dataset/handwriting-lab-1/cutted/chenbo-forged')
     # cut_dir('../dataset/handwriting-lab-1/raw/chenbo', '../dataset/handwriting-lab-1/cutted/test')
-    for i in range(len(names)):
-        name = names[i]
-        print('name : {}'.format(name))
-        mimic_cut('../dataset/handwriting-lab-1/mimic-raw/' + name,
-                '../dataset/handwriting-lab-1/mimic_cutted_arranged3/' + name)
+    # for i in range(len(names)):
+    #     name = names[i]
+    #     print('name : {}'.format(name))
+    #     mimic_cut('../dataset/handwriting-lab-1/mimic-raw/' + name,
+    #             '../dataset/handwriting-lab-1/mimic_cutted_arranged3/' + name)
         # cut_dir('../dataset/handwriting-lab-1/raw/'+name,'../dataset/handwriting-lab-1/cutted2/'+name)
     # cut_dir('../dataset/test/raw/dingfeng','../dataset/test/cutted/dingfeng-forged-forged')
-    # cut_undergraduate()
+    cut_undergraduate()
     return
 
 

@@ -10,8 +10,8 @@ import os
 from scipy.linalg import norm
 
 def main():
-    source_dir = '../dataset/handwriting-lab-1/mimic_cutted_arranged3'
-    dest_dir = '../dataset/handwriting-lab-1/forged-feature3'
+    source_dir = '../dataset/handwriting-lab-3/mimic_cutted_arranged'
+    dest_dir = '../dataset/handwriting-lab-3/forged_feature'
     cut_to_dir(source_dir, dest_dir)
     pass
 
@@ -47,10 +47,13 @@ def cut_feature_to_file(source_path, dest_path):
         dct_result = ss.transform(dct_result)[:200,:]
         if index % 2 ==0:
             dct_result[40:200,:]=0
-        if final_dct_result is None:
-            final_dct_result = dct_result
-        else:
-            final_dct_result = np.hstack((final_dct_result, dct_result))
+        try:
+            if final_dct_result is None:
+                final_dct_result = dct_result
+            else:
+                final_dct_result = np.hstack((final_dct_result, dct_result))
+        except:
+            print('error')
 
     pickle.dump(final_dct_result, open(dest_path, 'wb'))
 
