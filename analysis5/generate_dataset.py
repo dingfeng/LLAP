@@ -9,9 +9,10 @@ label_set = []
 
 
 def main():
-    names=['anna','chenbo',
-           'chenhao',
-           'dengyufeng','dingfeng','huangsi','jianghao','qingpeijie','xuhuatao','yinjunhao','yuyinggang','zhangqian','zhaorun','zhuyan']
+    # names=['anna','chenbo',
+    #        'chenhao',
+    #        'dengyufeng','dingfeng','huangsi','jianghao','qingpeijie','xuhuatao','yinjunhao','yuyinggang','zhangqian','zhaorun','zhuyan']
+    names=os.listdir('../dataset/handwriting-lab-3/forged-feature')
     for name in names:
         generate_by_name(name)
     indexes = np.arange(len(data_set))
@@ -32,12 +33,12 @@ def main():
                  'test_label_set': test_label_set}, open('dataset4.pkl', 'wb'))
 
 def generate_by_name(name):
-    dir_path = '../dataset/handwriting-lab-1/feature3/' + name
+    dir_path = '../dataset/handwriting-lab-3/feature/' + name
     filenames = os.listdir(dir_path)
     filenames=filenames[:50]
     indexes = np.arange(len(filenames))
     np.random.shuffle(indexes)
-    template_count = 20
+    template_count = 7
     templates = []
     for i in range(template_count):
         data = np.load(open(dir_path + '/' + filenames[indexes[i]], 'rb'))
@@ -81,9 +82,9 @@ def generate_by_name(name):
         label_set.append(1)
         data_set.append(result)
     # 计算模仿数据
-    forged_dir_path = '../dataset/handwriting-lab-1/forged-feature3/'+name
+    forged_dir_path = '../dataset/handwriting-lab-3/forged-feature/'+name
     forged_filenames = os.listdir(forged_dir_path)
-    forged_filenames=forged_filenames[:40]
+    # forged_filenames=forged_filenames[:40]
     for i in range(len(forged_filenames)):
         data = np.load(open(forged_dir_path + '/' + forged_filenames[i], 'rb'))
         result_min_data = data - min_data

@@ -45,15 +45,15 @@ def main():
 def get_model():
     model = Sequential()
 
-    model.add(Conv2D(128, 3, padding='same',activation='relu', input_shape=(200, 8,6)))
+    model.add(Conv2D(128, 2, padding='same',activation='relu', input_shape=(200, 8,6)))
     model.add(MaxPooling2D(2))
-    model.add(Conv2D(32, 3, activation='relu'))
+    model.add(Conv2D(32, 2, activation='relu'))
     model.add(MaxPooling2D(2))
     model.add(Flatten())
     model.add(BatchNormalization())
     model.add(Dense(8, activation='relu', kernel_regularizer=regularizers.l2(0.002),
                     activity_regularizer=regularizers.l1(0.002)))
-    model.add(Dropout(0.2))
+    model.add(Dropout(0.5))
     model.add(Dense(2, activation='softmax'))
     print(model.summary())
     model.compile(loss='categorical_crossentropy',
