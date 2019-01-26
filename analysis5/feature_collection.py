@@ -11,8 +11,8 @@ from scipy.linalg import norm
 
 
 def main():
-    source_dir = '../dataset/handwriting-lab-3/cutted'
-    dest_dir = '../dataset/handwriting-lab-3/feature'
+    source_dir = '../dataset/handwriting-lab-3/mimic-cutted-chord-arranged'
+    dest_dir = '../dataset/handwriting-lab-3/forged-feature-chord-40'
     cut_to_dir(source_dir, dest_dir)
     pass
 

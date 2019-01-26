@@ -14,7 +14,7 @@ from scipy.signal import butter, lfilter
 import time
 from analysis.utils import plot_fft
 import matplotlib.pyplot as plt
-
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
 fs = 48000
 freq = 20000
 NUM_CLUSTERS = 5
@@ -45,10 +45,10 @@ def init_IQ_multipliers():
             Q_multipliers[freq_index, i, :] = mul_sin
 
 
-names = [#'anna', 'dengyufeng', 'dingfeng', 'huangsi',
-         #'jianghao', 'qingpeijie', 'xuhuatao',
+names = ['dingfeng','anna', 'dengyufeng',  'huangsi',
+         'jianghao', 'qingpeijie', 'xuhuatao',
          'yinjunhao', 'yuyinggang',
-         #'zhangqian', 'zhaorun', 'zhuyan'
+         'zhangqian', 'zhaorun', 'zhuyan','chenbo','chenhao'
          ]
 
 
@@ -56,14 +56,19 @@ def main():
     init_IQ_multipliers()
     # cut_dir('../dataset/handwriting-lab-1/raw/chenbo', '../dataset/handwriting-lab-1/cutted/chenbo-forged')
     # cut_dir('../dataset/handwriting-lab-1/raw/chenbo', '../dataset/handwriting-lab-1/cutted/test')
+    # names=os.listdir('../dataset/handwriting-lab-3/raw/')
     # for i in range(len(names)):
     #     name = names[i]
     #     print('name : {}'.format(name))
-    mimic_cut('../dataset/handwriting-lab-1/mimic-raw/' + 'chenhao',
-            '../dataset/handwriting-lab-1/mimic-cutted3/' + 'chenhao')
-        # cut_dir('../dataset/handwriting-lab-1/raw/'+name,'../dataset/handwriting-lab-1/cutted2/'+name)
+        # mimic_cut('../dataset/handwriting-lab-3/raw/' + name,
+        #         '../dataset/handwriting-lab-3/cutted-chord/' + name)
+    #     cut_dir('../dataset/handwriting-lab-1/raw/'+name,'../dataset/handwriting-lab-1/cutted-chord/'+name)
     # cut_dir('../dataset/test/raw/dingfeng','../dataset/test/cutted/dingfeng-forged-forged')
     # cut_undergraduate()
+    filenames=os.listdir('../dataset/handwriting-lab-1/raw/dingfeng')
+    for filename in filenames:
+        print('filename {}'.format(filename))
+        cut_file('../dataset/handwriting-lab-1/raw/dingfeng/'+filename,None)
     return
 
 
@@ -119,20 +124,35 @@ def cut_file(source_filepath, dest_filepath):
         for i in range(64):
             I = getI(freq_data, freq_index, i)
             I = butter_lowpass_filter(I, 100, fs)[200:][::300]
+            # import matplotlib
+            # plt.figure(figsize=(10,5))
+            # plt.xlabel('Time (Seconds)',fontdict={'style': 'normal', 'weight': 'bold','size':22})
+            # plt.ylabel('I (normalized)',fontdict={'style': 'normal', 'weight': 'bold','size':22})
+            # plt.xticks(fontsize=17,fontname='normal')
+            # plt.yticks(fontsize=17,fontname='normal')
+            # ss1 = MinMaxScaler(feature_range=(-100, 100))
+            # I_ravel=I.reshape((-1,1))
+            # ss1.fit(I_ravel)
+            # I_ravel = ss1.transform(I_ravel).ravel()
+            # times=np.arange(len(I_ravel))/160
+            # plt.plot(times,I_ravel,label='noisy')
+            # plt.tight_layout()
             decompositionI = seasonal_decompose(I, freq=10, two_sided=False)
-            I = decompositionI.trend[11:]
+            I = decompositionI.trend[10:]
+            # I_trend=I_trend.reshape((-1,1))
+            # I_trend = ss1.transform(I_trend).ravel()
+            # plt.plot(times[5:-10+5],I_trend,label='denoised')
+            # plt.legend(prop = {'size':22})
+            # plt.savefig('noisy-I.pdf', dpi=100)
+            # plt.show()
             Q = getQ(freq_data, freq_index, i)
             Q = butter_lowpass_filter(Q, 100, fs)[200:][::300]
             decompositionQ = seasonal_decompose(Q, freq=10, two_sided=False)
-            Q = decompositionQ.trend[11:]
+            Q = decompositionQ.trend[10:]
             diff_time = time.time()
             IQ = np.asarray([I, Q]).T
-            IQ0 = IQ - np.roll(IQ, 1, axis=0)
-            IQ1 = (IQ - np.roll(IQ, 2, axis=0)) / 2
-            IQ = (IQ0 + IQ1) / 2
-            IQ = IQ[4:-4, :]
-            IQ[:, 0] = IQ[:, 0] - IQ[0, 0]
-            IQ[:, 1] = IQ[:, 1] - IQ[0, 1]
+            IQ= IQ - np.roll(IQ, 1, axis=0)
+            IQ=IQ[1:,:]
             IQ = norm(IQ, ord=2, axis=1)
             velocity = IQ
             IQ0 = IQ - np.roll(IQ, 1, axis=0)
@@ -142,6 +162,7 @@ def cut_file(source_filepath, dest_filepath):
             cutted_IQ = IQ
             total_diff_time += time.time() - diff_time
             correlation_time = time.time()
+
             if previous is not None:
                 correlation = get_correlation(cutted_IQ, previous)
                 # print(correlation)
@@ -154,18 +175,27 @@ def cut_file(source_filepath, dest_filepath):
                         previous_added = True
                 else:
                     previous_added = False
+                    # plt.figure()
+                    # # times = np.arange(len(velocity)) / 160
+                    # plt.scatter([i for i in range(len(cutted_IQ))], cutted_IQ)
+                    # plt.ylim(-0.0002, 0.0002)
+                    # plt.show()
+                    print('heloo')
+
             total_correlation_time += time.time() - correlation_time
             previous = cutted_IQ
         vars = []
         for cutted_IQ in cutted_IQs:
             vars.append(np.var(cutted_IQ))
+            # print('var {}'.format(np.var(cutted_IQ)))
         index = np.argsort(vars)[len(vars) - 1]
         final_features.append(cutted_IQs[index])
         final_features.append(velocities[index])
-    print('total time {}'.format(time.time() - previous_time))
-    print('average {} decompose {} diff {} correlation {}'.format(total_average_time, total_decompose_time,
-                                                                  total_diff_time, total_correlation_time))
-    pickle.dump(final_features, open(dest_filepath, 'wb'))
+        previous=None
+    # print('total time {}'.format(time.time() - previous_time))
+    # print('average {} decompose {} diff {} correlation {}'.format(total_average_time, total_decompose_time,
+    #                                                               total_diff_time, total_correlation_time))
+    # pickle.dump(final_features, open(dest_filepath, 'wb'))
 
 
 def get_PAM_distance(index0, index1):

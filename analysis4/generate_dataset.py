@@ -4,15 +4,18 @@
 import numpy as np
 import os
 import pickle
+
 data_set = []
 label_set = []
 names = None
 
+
 def main():
     global names
-    names=['anna','chenbo',
-           'chenhao',
-           'dengyufeng','dingfeng','huangsi','jianghao','qingpeijie','xuhuatao','yinjunhao','yuyinggang','zhangqian','zhaorun','zhuyan']
+    names = ['anna', 'chenbo',
+             'chenhao',
+             'dengyufeng', 'dingfeng', 'huangsi', 'jianghao', 'qingpeijie', 'xuhuatao', 'yinjunhao', 'yuyinggang',
+             'zhangqian', 'zhaorun', 'zhuyan']
     for name in names:
         generate_by_name(name)
     indexes = np.arange(len(data_set))
@@ -30,11 +33,13 @@ def main():
         train_data_set.append(data_set[indexes[i]])
         train_label_set.append(label_set[indexes[i]])
     pickle.dump({'train_data_set': train_data_set, 'train_label_set': train_label_set, 'test_data_set': test_data_set,
-                 'test_label_set': test_label_set}, open('dataset5.pkl', 'wb'))
+                 'test_label_set': test_label_set}, open('dataset-chord-normalized-40.pkl', 'wb'))
+
 
 def generate_by_name(name):
     global names
-    dir_path = '../dataset/handwriting-lab-1/feature3/' + name
+    global data_set
+    dir_path = '../dataset/handwriting-lab-1/feature-chord/' + name
     filenames = os.listdir(dir_path)
     # filenames=filenames[:50]
     indexes = np.arange(len(filenames))
@@ -47,7 +52,8 @@ def generate_by_name(name):
     min_data = np.zeros(data.shape)
     max_data = np.zeros(data.shape)
     mean_data = np.zeros(data.shape)
-    sum_data=np.zeros(data.shape)
+    sum_data = np.zeros(data.shape)
+    local_dataset = []
     for i in range(data.shape[0]):
         for j in range(data.shape[1]):
             total = 0
@@ -59,31 +65,38 @@ def generate_by_name(name):
                 max_value = max(max_value, template[i][j])
             min_data[i][j] = min_value
             max_data[i][j] = max_value
-            sum_data[i][j]=total
+            sum_data[i][j] = total
             mean_data[i][j] = total / len(templates)
+    max_record = np.zeros(6)
+    for i in range(len(max_record)):
+        max_record[i] = -10000
     for i in range(len(filenames) - template_count):
         file_index = template_count + i
         data = np.load(open(dir_path + '/' + filenames[indexes[file_index]], 'rb'))
         result_min_data = data - min_data
         result_max_data = data - max_data
         result_mean_data = data - mean_data
-        result_sum_data=data-sum_data
-        result = np.zeros((data.shape[0], data.shape[1]//2,6))
+        result_sum_data = data - sum_data
+        result = np.zeros((data.shape[0], data.shape[1] // 2, 6))
         for i in range(data.shape[0]):
-            for j in range(data.shape[1]//2):
-                result[i][j][0] = result_min_data[i, j*2]
-                result[i][j][1] = result_max_data[i, j*2]
-                result[i][j][2]= result_mean_data[i, j*2]
-                result[i][j][3] = result_min_data[i, j*2+1]
-                result[i][j][4] = result_max_data[i, j*2+1]
-                result[i][j][5] = result_mean_data[i, j*2+1]
-                # result[i][j][6] = result_sum_data[i, j * 2]
-                # result[i][j][7] = result_sum_data[i, j * 2 + 1]
-                # result[i][j][3]=result_sum_data[i,j]
+            for j in range(data.shape[1] // 2):
+                result[i][j][0] = result_min_data[i, j * 2]
+                result[i][j][1] = result_max_data[i, j * 2]
+                result[i][j][2] = result_mean_data[i, j * 2]
+                result[i][j][3] = result_min_data[i, j * 2 + 1]
+                result[i][j][4] = result_max_data[i, j * 2 + 1]
+                result[i][j][5] = result_mean_data[i, j * 2 + 1]
+                # for k in range(len(max_record)):
+                #     result[i][j][k]=np.abs(result[i][j][k])
+                #     max_record[k] = max(result[i][j][k], max_record[k])
+
+                    # result[i][j][6] = result_sum_data[i, j * 2]
+                    # result[i][j][7] = result_sum_data[i, j * 2 + 1]
+                    # result[i][j][3]=result_sum_data[i,j]
         label_set.append(1)
-        data_set.append(result)
+        local_dataset.append(result)
     # 计算模仿数据
-    forged_dir_path = '../dataset/handwriting-lab-1/forged-feature3/'+name
+    forged_dir_path = '../dataset/handwriting-lab-1/mimic-feature-chord/' + name
     forged_filenames = os.listdir(forged_dir_path)
     # forged_filenames=forged_filenames[:40]
     for i in range(len(forged_filenames)):
@@ -91,10 +104,10 @@ def generate_by_name(name):
         result_min_data = data - min_data
         result_max_data = data - max_data
         result_mean_data = data - mean_data
-        result_sum_data=data-sum_data
-        result = np.zeros((data.shape[0], data.shape[1]//2,6))
+        result_sum_data = data - sum_data
+        result = np.zeros((data.shape[0], data.shape[1] // 2, 6))
         for i in range(data.shape[0]):
-            for j in range(data.shape[1]//2):
+            for j in range(data.shape[1] // 2):
                 result[i][j][0] = result_min_data[i, j * 2]
                 result[i][j][1] = result_max_data[i, j * 2]
                 result[i][j][2] = result_mean_data[i, j * 2]
@@ -104,17 +117,20 @@ def generate_by_name(name):
                 # result[i][j][6] = result_sum_data[i, j * 2]
                 # result[i][j][7] = result_sum_data[i, j * 2+1]
                 # result[i][j][3]=result_sum_data[i,j]
+                # for k in range(len(max_record)):
+                #     result[i][j][k] = np.abs(result[i][j][k])
+                #     max_record[k] = max(result[i][j][k], max_record[k])
         label_set.append(0)
-        data_set.append(result)
-    #random forger
-    randomForgerFilepaths=[]
+        local_dataset.append(result)
+    # random forger
+    randomForgerFilepaths = []
     for i in range(len(names)):
         if names[i] != name:
-            dir_path='../dataset/handwriting-lab-1/feature3/' + names[i]
-            filenames=os.listdir(dir_path)
+            dir_path = '../dataset/handwriting-lab-1/feature-chord/' + names[i]
+            filenames = os.listdir(dir_path)
             np.random.shuffle(filenames)
             for i in range(3):
-                filepath=os.path.join(dir_path,filenames[i])
+                filepath = os.path.join(dir_path, filenames[i])
                 randomForgerFilepaths.append(filepath)
     for filepath in randomForgerFilepaths:
         data = np.load(open(filepath, 'rb'))
@@ -134,9 +150,12 @@ def generate_by_name(name):
                 # result[i][j][6] = result_sum_data[i, j * 2]
                 # result[i][j][7] = result_sum_data[i, j * 2+1]
                 # result[i][j][3]=result_sum_data[i,j]
+                # for k in range(len(max_record)):
+                #     result[i][j][k] = np.abs(result[i][j][k])
+                #     max_record[k] = max(result[i][j][k], max_record[k])
         label_set.append(0)
-        data_set.append(result)
-
+        local_dataset.append(result)
+    data_set+=local_dataset
 
 if __name__ == '__main__':
     main()

@@ -9,11 +9,18 @@ import pickle
 import os
 from scipy.linalg import norm
 
+
 def main():
-    source_dir = '../dataset/handwriting-lab-1/mimic_cutted_arranged3'
-    dest_dir = '../dataset/handwriting-lab-1/forged-feature3'
+    source_dir = '../dataset/handwriting-lab-1/cutted-chord'
+    dest_dir = '../dataset/handwriting-lab-1/feature-chord'
     cut_to_dir(source_dir, dest_dir)
     pass
+
+
+def test():
+    source_path = '../dataset/handwriting-lab-1/cutted-chord/dingfeng/2.pkl'
+    dest_path = None
+    cut_feature_to_file(source_path, dest_path)
 
 
 def cut_to_dir(source_dir, dest_dir):
@@ -25,7 +32,7 @@ def cut_to_dir(source_dir, dest_dir):
         if not os.path.isdir(dest_dir_path):
             os.makedirs(dest_dir_path)
         for filename in filenames:
-            if  filename.startswith('index'):
+            if filename.startswith('index'):
                 continue
             filepath = os.path.join(dir_path, filename)
             dest_filepath = os.path.join(dest_dir_path, filename)
@@ -33,20 +40,42 @@ def cut_to_dir(source_dir, dest_dir):
 
 
 def cut_feature_to_file(source_path, dest_path):
-    data = np.load(open(source_path, 'rb'))
+    print(source_path)
+    try:
+        data = np.load(open(source_path, 'rb'))
+    except:
+        print('error file {}'.format(source_path))
+        return
     final_dct_result = None
-    for index,item in enumerate(data):
+    for index, item in enumerate(data):
         dct_result = dct(item)
-        # plt.figure()
-        # print('a figure')
-        # plt.plot(dct_result)
-        # plt.show()
+        plt.figure(figsize=(10,7))
+        print('a figure')
+        # plt.figure(figsize=(10,5))
+        plt.subplot(211)
+        plt.plot(item*100000)
+        plt.ylabel('Velocity (1e-5)',fontdict={'style': 'normal', 'weight': 'bold','size':20})
+        plt.xticks(fontsize=17,fontname='normal')
+        plt.yticks(fontsize=17,fontname='normal')
+        # plt.legend(prop={'size': 20})
+        if len(dct_result) < 200:
+            dct_result = np.pad(dct_result, (0, -len(dct_result) + 200), 'constant', constant_values=0)
         dct_result = dct_result.reshape(-1, 1)
         ss = StandardScaler()
         ss.fit(dct_result)
-        dct_result = ss.transform(dct_result)[:200,:]
-        if index % 2 ==0:
-            dct_result[40:200,:]=0
+        plt.subplot(212)
+        plt.plot(ss.transform(dct_result),label='dct')
+        plt.xlabel('Data Index', fontdict={'style': 'normal', 'weight': 'bold', 'size': 20})
+        plt.ylabel('DCT (normalized)',fontdict={'style': 'normal', 'weight': 'bold','size':20})
+        plt.xticks(fontsize=17, fontname='normal')
+        plt.yticks(fontsize=17, fontname='normal')
+        # plt.legend(prop={'size': 20})
+        plt.tight_layout()
+        plt.savefig('velocity-dct.pdf', dpi=100)
+        plt.show()
+        dct_result = ss.transform(dct_result)[:200, :]
+        if index % 2 == 0:
+            dct_result[40:200, :] = 0
         try:
             if final_dct_result is None:
                 final_dct_result = dct_result
@@ -59,4 +88,5 @@ def cut_feature_to_file(source_path, dest_path):
 
 
 if __name__ == '__main__':
-    main()
+    # main()
+    test()
