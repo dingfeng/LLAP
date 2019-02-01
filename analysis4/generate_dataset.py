@@ -42,7 +42,7 @@ def generate_dataset():
     global data_set
     global label_set
     global deep_label_set
-    for reference_amount in range(1,23):
+    for reference_amount in range(21,23):
         for k in range(20):
             names = None
             data_set = []
@@ -70,13 +70,12 @@ def generate_dataset():
             for i in range(test_count, len(indexes)):
                 train_data_set.append(data_set[indexes[i]])
                 train_label_set.append(label_set[indexes[i]])
-            dir_path='./evaluation/reference-dataset/{}'.format(reference_amount)
+            dir_path='O:/reference-dataset/{}'.format(reference_amount)
             if not os.path.isdir(dir_path):
                 os.makedirs(dir_path)
             pickle.dump(
                 {'train_data_set': train_data_set, 'train_label_set': train_label_set, 'test_data_set': test_data_set,
-                 'test_label_set': test_label_set,'deep_test_label_set':deep_test_label_set}, open('./evaluation/reference-dataset/{}/dataset-{}.pkl'.format(reference_amount,k + 1), 'wb'))
-
+                 'test_label_set': test_label_set,'deep_test_label_set':deep_test_label_set}, open('O:/reference-dataset/{}/dataset-{}.pkl'.format(reference_amount,k + 1), 'wb'))
 
 def generate_by_name(name,template_count):
     global names
@@ -84,6 +83,8 @@ def generate_by_name(name,template_count):
     global deep_label_set
     dir_path = '../dataset/handwriting-lab-1/feature-chord/' + name
     filenames = os.listdir(dir_path)
+    # print('name {}'.format())
+    # print('len of filenames {}'.format(len(filenames)))
     # filenames=filenames[:50]
     # indexes = np.arange(len(filenames))
     np.random.shuffle(filenames)
@@ -114,7 +115,7 @@ def generate_by_name(name,template_count):
     max_record = np.zeros(6)
     for i in range(len(max_record)):
         max_record[i] = -10000
-    for i in range(90):
+    for i in range(min(90,len(filenames)-template_count)):
         file_index = template_count + i
         data = np.load(open(dir_path + '/' + filenames[file_index], 'rb'))
         result_min_data = data - min_data

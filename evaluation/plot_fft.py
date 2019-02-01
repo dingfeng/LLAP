@@ -5,7 +5,7 @@ import scipy.fftpack as fftp
 import numpy as np
 import matplotlib.pyplot as plt
 def main():
-    source_filepath='multi-freq-nocompensation.pcm'
+    source_filepath='multi-frequency.pcm'
     data = np.memmap(source_filepath, dtype=np.float32, mode='r')
     plot_fft(data[48000*3:48000*4])
 
@@ -14,6 +14,19 @@ def plot_fft(data,fs=48000):
     xf = np.arange(len(data)) / len(data) * fs
     yf = fftp.fft(data, len(data))
     yf = np.abs(yf)
+    baseF = 17350
+    deltaF = 700
+    values=np.zeros(8)
+    for i in range(8):
+        freq=int(baseF + i*deltaF)
+        print('freq = {}, value = {}'.format(freq,yf[freq]))
+        values[i]=yf[freq]
+    #统计信息
+    minimum=np.min(values)
+    maximum=np.max(values)
+    rangeValue=maximum-minimum
+    std = np.std(values)
+    print('min = {}, max = {}, range = {}, standard deviation = {}'.format(minimum,maximum,rangeValue,std))
     plt.xlabel('Frequency (Hz)',fontdict={'style': 'normal', 'weight': 'bold','size':22})
     plt.ylabel('Magnitude',fontdict={'style': 'normal', 'weight': 'bold','size':22})
     plt.xticks(fontsize=17,fontname='normal')
