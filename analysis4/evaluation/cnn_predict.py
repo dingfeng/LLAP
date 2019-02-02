@@ -12,6 +12,7 @@ import numpy as np
 import tensorflow as tf
 import keras.backend.tensorflow_backend as KTF
 import os
+import pickle
 import keras
 import keras_metrics
 from sklearn.metrics import roc_curve, auc
@@ -25,10 +26,10 @@ config.gpu_options.allow_growth = True  # 不全部占满显存, 按需分配
 
 
 def main():
-    model_path = './model/model-4.hdf5'
+    model_path = 'O:/evaluation/reference-model/21/model-19.hdf5'
     # model_path = './model/model-1.hdf5'
     model = get_model(model_path)
-    dataset = np.load('./dataset/dataset-4.pkl')
+    dataset = np.load('O:/evaluation/reference-dataset/21/dataset-19.pkl')
     # dataset=np.load('./dataset/dataset-1.pkl')
     test_data_set = dataset['test_data_set']
     test_label_set = dataset['test_label_set']
@@ -83,7 +84,7 @@ def main():
     pass
 
 
-def repeat_predict():
+def repeat_predict(template_count):
     total_auc_random = 0
     total_auc_mimic = 0
     total_auc_all = 0
@@ -93,9 +94,9 @@ def repeat_predict():
     for i in range(20):
         sess = tf.Session(config=config)
         KTF.set_session(sess)
-        model_path = './model/model-4.hdf5'
+        model_path = 'O:/evaluation/reference-model/{}/model-{}.hdf5'.format(template_count,i+1)
         model = get_model(model_path)
-        dataset = np.load('./dataset/dataset-4.pkl')
+        dataset = np.load('O:/evaluation/reference-dataset/{}/dataset-{}.pkl'.format(template_count,i+1))
         test_data_set = dataset['test_data_set']
         test_label_set = dataset['test_label_set']
         # 'deep_test_label_set': deep_test_label_set}
@@ -146,7 +147,7 @@ def repeat_predict():
     plt.yticks(fontsize=20, fontname='normal')
     plt.ylim(0.91,1.0)
     plt.tight_layout()
-    plt.savefig('auc-bars.pdf', dpi=100)
+    # plt.savefig('auc-bars.pdf', dpi=100)
     # plt.show()
     mean_eer_random=total_eer_random/20
     mean_eer_mimic=total_eer_mimic/20
@@ -163,8 +164,9 @@ def repeat_predict():
     plt.yticks(fontsize=20, fontname='normal')
     plt.ylim(0.05, 0.08)
     plt.tight_layout()
-    plt.savefig('eer-bars.pdf', dpi=100)
+    # plt.savefig('eer-bars.pdf', dpi=100)
     plt.show()
+    return np.asarray([mean_auc_random,mean_auc_mimic,mean_auc_all,mean_eer_random,mean_eer_mimic,mean_eer_all])
 
 def get_model(model_path):
     model = Sequential()
@@ -186,6 +188,15 @@ def get_model(model_path):
     return model
 
 
+def template_count_evaluation():
+    template_evaluation_result=[]
+    for i in range(22):
+        repeat_predict_result=repeat_predict(i+1)
+        template_evaluation_result.append(repeat_predict_result)
+    template_evaluation_result=np.asarray(template_evaluation_result)
+    pickle.dump(template_evaluation_result,open('tcount_evaresult.pkl','wb'))
+
 if __name__ == '__main__':
     # main()
-    repeat_predict()
+    repeat_predict(4)
+    # template_count_evaluation()

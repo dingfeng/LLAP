@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
-# filename: generate_dataset date: 2019/1/16 13:30  
-# author: FD 
+# filename: generate_dataset date: 2019/1/16 13:30
+# author: FD
 import numpy as np
 import os
 import pickle
@@ -11,47 +11,17 @@ deep_label_set=[]
 names = None
 
 
-def main():
-    global names
-    names = ['anna', 'chenbo',
-             'chenhao',
-             'dengyufeng', 'dingfeng', 'huangsi', 'jianghao', 'qingpeijie', 'xuhuatao', 'yinjunhao', 'yuyinggang',
-             'zhangqian', 'zhaorun', 'zhuyan']
-    for name in names:
-        generate_by_name(name)
-    indexes = np.arange(len(data_set))
-    np.random.shuffle(indexes)
-    test_rate = 0.3
-    test_count = int(len(indexes) * test_rate)
-    train_data_set = []
-    train_label_set = []
-    test_data_set = []
-    test_label_set = []
-    for i in range(test_count):
-        test_data_set.append(data_set[indexes[i]])
-        test_label_set.append(label_set[indexes[i]])
-    for i in range(test_count, len(indexes)):
-        train_data_set.append(data_set[indexes[i]])
-        train_label_set.append(label_set[indexes[i]])
-    pickle.dump({'train_data_set': train_data_set, 'train_label_set': train_label_set, 'test_data_set': test_data_set,
-                 'test_label_set': test_label_set}, open('dataset-1.pkl', 'wb'))
-
-
 def generate_dataset():
     global names
     global data_set
     global label_set
     global deep_label_set
-    for reference_amount in range(21,23):
-        for k in range(20):
-            names = None
+    names=os.listdir('../../dataset/handwriting-lab-3/forged-feature-chord-40')
+    for reference_amount in [6, 8, 10, 12]:
+        for k in range(10):
             data_set = []
             label_set = []
             deep_label_set = []
-            names = ['anna', 'chenbo',
-                     'chenhao',
-                     'dengyufeng', 'dingfeng', 'huangsi', 'jianghao', 'qingpeijie', 'xuhuatao', 'yinjunhao', 'yuyinggang',
-                     'zhangqian', 'zhaorun', 'zhuyan']
             for name in names:
                 generate_by_name(name,reference_amount)
             indexes = np.arange(len(data_set))
@@ -81,7 +51,7 @@ def generate_by_name(name,template_count):
     global names
     global data_set
     global deep_label_set
-    dir_path = '../dataset/handwriting-lab-1/feature-chord/' + name
+    dir_path = '../../dataset/handwriting-lab-3/feature-chord-40/' + name
     filenames = os.listdir(dir_path)
     # print('name {}'.format())
     # print('len of filenames {}'.format(len(filenames)))
@@ -115,7 +85,7 @@ def generate_by_name(name,template_count):
     max_record = np.zeros(6)
     for i in range(len(max_record)):
         max_record[i] = -10000
-    for i in range(min(90,len(filenames)-template_count)):
+    for i in range(min(20,len(filenames)-template_count)):
         file_index = template_count + i
         data = np.load(open(dir_path + '/' + filenames[file_index], 'rb'))
         result_min_data = data - min_data
@@ -142,10 +112,9 @@ def generate_by_name(name,template_count):
         deep_label_set.append(1)
         local_dataset.append(result)
     # 计算模仿数据
-    forged_dir_path = '../dataset/handwriting-lab-1/mimic-feature-chord/' + name
+    forged_dir_path = '../../dataset/handwriting-lab-3/forged-feature-chord-40/'+name
     forged_filenames = os.listdir(forged_dir_path)
-    np.random.shuffle(forged_filenames)
-    forged_filenames=forged_filenames[:45]
+    forged_filenames=forged_filenames[:10]
     for i in range(len(forged_filenames)):
         data = np.load(open(forged_dir_path + '/' + forged_filenames[i], 'rb'))
         result_min_data = data - min_data
@@ -172,17 +141,20 @@ def generate_by_name(name,template_count):
         local_dataset.append(result)
     # random forger
     randomForgerFilepaths = []
-
-    for i in range(len(names)):
-        if names[i] != name:
-            dir_path = '../dataset/handwriting-lab-1/feature-chord/' + names[i]
+    indexes=list(range(len(names)))
+    np.random.shuffle(indexes)
+    random_names=[]
+    for i in indexes:
+        random_names.append(names[i])
+    random_names.remove(name)
+    for i in range(5):
+        if random_names[i] != name:
+            dir_path = '../../dataset/handwriting-lab-3/feature-chord-40/' + random_names[i]
             filenames = os.listdir(dir_path)
             np.random.shuffle(filenames)
-            for i in range(4):
+            for i in range(2):
                 filepath = os.path.join(dir_path, filenames[i])
                 randomForgerFilepaths.append(filepath)
-    np.random.shuffle(randomForgerFilepaths)
-    randomForgerFilepaths = randomForgerFilepaths[:45]
     for filepath in randomForgerFilepaths:
         data = np.load(open(filepath, 'rb'))
         result_min_data = data - min_data
@@ -198,12 +170,6 @@ def generate_by_name(name,template_count):
                 result[i][j][3] = result_min_data[i, j * 2 + 1]
                 result[i][j][4] = result_max_data[i, j * 2 + 1]
                 result[i][j][5] = result_mean_data[i, j * 2 + 1]
-                # result[i][j][6] = result_sum_data[i, j * 2]
-                # result[i][j][7] = result_sum_data[i, j * 2+1]
-                # result[i][j][3]=result_sum_data[i,j]
-                # for k in range(len(max_record)):
-                #     result[i][j][k] = np.abs(result[i][j][k])
-                #     max_record[k] = max(result[i][j][k], max_record[k])
         label_set.append(0)
         deep_label_set.append(3)
         local_dataset.append(result)
