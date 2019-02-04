@@ -26,7 +26,7 @@ def generate_dataset():
                 generate_by_name(name,reference_amount)
             indexes = np.arange(len(data_set))
             np.random.shuffle(indexes)
-            test_rate = 0.3
+            test_rate = 1
             test_count = int(len(indexes) * test_rate)
             train_data_set = []
             train_label_set = []
@@ -114,6 +114,7 @@ def generate_by_name(name,template_count):
     # 计算模仿数据
     forged_dir_path = '../../dataset/handwriting-lab-3/forged-feature-chord-40/'+name
     forged_filenames = os.listdir(forged_dir_path)
+    np.random.shuffle(forged_filenames)
     forged_filenames=forged_filenames[:10]
     for i in range(len(forged_filenames)):
         data = np.load(open(forged_dir_path + '/' + forged_filenames[i], 'rb'))
