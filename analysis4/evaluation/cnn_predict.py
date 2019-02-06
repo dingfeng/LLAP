@@ -147,7 +147,7 @@ def repeat_predict(template_count):
     plt.yticks(fontsize=20, fontname='normal')
     plt.ylim(0.91,1.0)
     plt.tight_layout()
-    # plt.savefig('auc-bars.pdf', dpi=100)
+    plt.savefig('auc-bars.pdf', dpi=100)
     # plt.show()
     mean_eer_random=total_eer_random/20
     mean_eer_mimic=total_eer_mimic/20
@@ -164,7 +164,7 @@ def repeat_predict(template_count):
     plt.yticks(fontsize=20, fontname='normal')
     plt.ylim(0.05, 0.08)
     plt.tight_layout()
-    # plt.savefig('eer-bars.pdf', dpi=100)
+    plt.savefig('eer-bars.pdf', dpi=100)
     plt.show()
     return np.asarray([mean_auc_random,mean_auc_mimic,mean_auc_all,mean_eer_random,mean_eer_mimic,mean_eer_all])
 

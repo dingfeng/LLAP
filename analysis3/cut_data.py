@@ -29,7 +29,7 @@ def init_IQ_multipliers():
     global Q_multipliers
     max_len = 48000 * 15
     times = np.arange(0, max_len) * 1 / fs
-    line_num = 64
+    line_num = 1
     I_multipliers = np.zeros((len(freqs), line_num, max_len))
     Q_multipliers = np.zeros((len(freqs), line_num, max_len))
     for freq_index, freq in enumerate(freqs):
@@ -53,6 +53,7 @@ names = ['dingfeng','anna', 'dengyufeng',  'huangsi',
 
 
 def main():
+    global records
     init_IQ_multipliers()
     # cut_dir('../dataset/handwriting-lab-1/raw/chenbo', '../dataset/handwriting-lab-1/cutted/chenbo-forged')
     # cut_dir('../dataset/handwriting-lab-1/raw/chenbo', '../dataset/handwriting-lab-1/cutted/test')
@@ -65,10 +66,13 @@ def main():
     #     cut_dir('../dataset/handwriting-lab-1/raw/'+name,'../dataset/handwriting-lab-1/cutted-chord/'+name)
     # cut_dir('../dataset/test/raw/dingfeng','../dataset/test/cutted/dingfeng-forged-forged')
     # cut_undergraduate()
-    filenames=os.listdir('../dataset/handwriting-lab-1/raw/dingfeng')
-    for filename in filenames:
-        print('filename {}'.format(filename))
-        cut_file('../dataset/handwriting-lab-1/raw/dingfeng/'+filename,None)
+    for name in names:
+        filenames=os.listdir('../dataset/handwriting-lab-1/raw/{}'.format(name))
+        for filename in filenames:
+            if filename.endswith('pcm'):
+                print('filename {}'.format(filename))
+                cut_file('../dataset/handwriting-lab-1/raw/{}/{}'.format(name,filename),None)
+        pickle.dump(records,open('records','wb'))
     return
 
 
@@ -101,27 +105,23 @@ def cut_dir(source_dir, dest_dir):
             count += 1
             print('count {}'.format(count))
 
-
+records={}
 def cut_file(source_filepath, dest_filepath):
     global cluster_count
     global freqs
     global fs
+    global records
     data = np.memmap(source_filepath, dtype=np.float32, mode='r')
     data = data[54000:]
     previous = None
     previous_added = False
     previous_time = time.time()
     final_features = []
-    total_average_time = 0.0
-    total_decompose_time = 0.0
-    total_diff_time = 0.0
-    total_correlation_time = 0.0
+    start_time=time.time()
+    sound_file_duration=len(data)/48000
     for freq_index, freq in enumerate(freqs):
         freq_data = data  # butter_lowpass_filter(data,100,fs)#butter_bandpass_filter(data, freq - filter_half_width, freq + filter_half_width, fs)
-        cutted_IQs = []
-        velocities = []
-        # repeat_time = time.time()
-        for i in range(64):
+        for i in range(1):
             I = getI(freq_data, freq_index, i)
             I = butter_lowpass_filter(I, 100, fs)[200:][::300]
             # import matplotlib
@@ -160,38 +160,42 @@ def cut_file(source_filepath, dest_filepath):
             IQ = (IQ0 + IQ1) / 2
             IQ = IQ[4:-4]
             cutted_IQ = IQ
-            total_diff_time += time.time() - diff_time
-            correlation_time = time.time()
 
-            if previous is not None:
-                correlation = get_correlation(cutted_IQ, previous)
-                # print(correlation)
-                if correlation > 0.95 and previous is not None:
-                    cutted_IQs.append(cutted_IQ)
-                    velocities.append(velocity)
-                    if not previous_added:
-                        cutted_IQs.append(previous)
-                        velocities.append(velocity)
-                        previous_added = True
-                else:
-                    previous_added = False
+            # total_diff_time += time.time() - diff_time
+            # correlation_time = time.time()
+
+            # if previous is not None:
+            #     correlation = get_correlation(cutted_IQ, previous)
+            #     # print(correlation)
+            #     if correlation > 0.95 and previous is not None:
+            #         cutted_IQs.append(cutted_IQ)
+            #         velocities.append(velocity)
+            #         if not previous_added:
+            #             cutted_IQs.append(previous)
+            #             velocities.append(velocity)
+            #             previous_added = True
+            #     else:
+            #         previous_added = False
                     # plt.figure()
                     # # times = np.arange(len(velocity)) / 160
                     # plt.scatter([i for i in range(len(cutted_IQ))], cutted_IQ)
                     # plt.ylim(-0.0002, 0.0002)
                     # plt.show()
-                    print('heloo')
-
-            total_correlation_time += time.time() - correlation_time
-            previous = cutted_IQ
-        vars = []
-        for cutted_IQ in cutted_IQs:
-            vars.append(np.var(cutted_IQ))
-            # print('var {}'.format(np.var(cutted_IQ)))
-        index = np.argsort(vars)[len(vars) - 1]
-        final_features.append(cutted_IQs[index])
-        final_features.append(velocities[index])
-        previous=None
+                    # print('heloo')
+    end_time=time.time()
+    duration=end_time-start_time
+    key=source_filepath.split('/')[-2]+'-'+source_filepath.split('/')[-1][:-4]
+    records[key]=[sound_file_duration,duration]
+            # total_correlation_time += time.time() - correlation_time
+            # previous = cutted_IQ
+        # vars = []
+        # for cutted_IQ in cutted_IQs:
+        #     vars.append(np.var(cutted_IQ))
+        #     # print('var {}'.format(np.var(cutted_IQ)))
+        # index = np.argsort(vars)[len(vars) - 1]
+        # final_features.append(cutted_IQs[index])
+        # final_features.append(velocities[index])
+        # previous=None
     # print('total time {}'.format(time.time() - previous_time))
     # print('average {} decompose {} diff {} correlation {}'.format(total_average_time, total_decompose_time,
     #                                                               total_diff_time, total_correlation_time))
@@ -266,6 +270,8 @@ def butter_lowpass_filter(data, cutoff, fs, order=5):
     b, a = butter_lowpass(cutoff, fs, order=order)
     y = lfilter(b, a, data)
     return y
+
+
 
 
 if __name__ == '__main__':
