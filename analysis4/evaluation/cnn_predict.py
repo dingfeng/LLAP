@@ -19,6 +19,8 @@ from sklearn.metrics import roc_curve, auc
 import matplotlib.pyplot as plt
 from scipy.optimize import brentq
 from scipy.interpolate import interp1d
+import time
+
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 config = tf.ConfigProto()
@@ -75,9 +77,9 @@ def main():
     plt.plot(fpr_random, tpr_random, label='random', lw=2)
     plt.plot(fpr_mimic, tpr_mimic, label='skilled', lw=2)
     plt.plot(fpr_total, tpr_total, label='all', lw=2)
-    plt.plot([0,1],[1,0],linestyle="--")
-    plt.xlim(0,1.0)
-    plt.ylim(0,1.0)
+    plt.plot([0, 1], [1, 0], linestyle="--")
+    plt.xlim(0, 1.0)
+    plt.ylim(0, 1.0)
     plt.legend(prop={'size': 20})
     plt.savefig('mimic-random-total-ROC-curves.pdf', dpi=100)
     plt.show()
@@ -88,15 +90,15 @@ def repeat_predict(template_count):
     total_auc_random = 0
     total_auc_mimic = 0
     total_auc_all = 0
-    total_eer_random=0
-    total_eer_mimic=0
-    total_eer_all=0
+    total_eer_random = 0
+    total_eer_mimic = 0
+    total_eer_all = 0
     for i in range(20):
         sess = tf.Session(config=config)
         KTF.set_session(sess)
-        model_path = 'O:/evaluation/reference-model/{}/model-{}.hdf5'.format(template_count,i+1)
+        model_path = 'O:/evaluation/reference-model/{}/model-{}.hdf5'.format(template_count, i + 1)
         model = get_model(model_path)
-        dataset = np.load('O:/evaluation/reference-dataset/{}/dataset-{}.pkl'.format(template_count,i+1))
+        dataset = np.load('O:/evaluation/reference-dataset/{}/dataset-{}.pkl'.format(template_count, i + 1))
         test_data_set = dataset['test_data_set']
         test_label_set = dataset['test_label_set']
         # 'deep_test_label_set': deep_test_label_set}
@@ -110,7 +112,7 @@ def repeat_predict(template_count):
         total_auc_random += AUC
         print('random forger AUC {}'.format(AUC))
         eer = brentq(lambda x: 1. - x - interp1d(fpr_random, tpr_random)(x), 0., 1.)
-        total_eer_random+=eer
+        total_eer_random += eer
 
         random_indices = np.where(deep_test_label_set != 3)[0]
         result = model.predict(np.asarray(test_data_set)[random_indices]).ravel()
@@ -120,7 +122,7 @@ def repeat_predict(template_count):
         total_auc_mimic += AUC
         print('mimic forger AUC {}'.format(AUC))
         eer = brentq(lambda x: 1. - x - interp1d(fpr_mimic, tpr_mimic)(x), 0., 1.)
-        total_eer_mimic+=eer
+        total_eer_mimic += eer
 
         result = model.predict(np.asarray(test_data_set)).ravel()
         result = np.vstack((result, np.asarray(test_label_set))).T
@@ -129,29 +131,29 @@ def repeat_predict(template_count):
         total_auc_all += AUC
         print('all forger AUC {}'.format(AUC))
         eer = brentq(lambda x: 1. - x - interp1d(fpr_total, tpr_total)(x), 0., 1.)
-        total_eer_all+=eer
+        total_eer_all += eer
         # plt.plot(fpr, tpr, lw=1)
         # plt.show()
         KTF.clear_session()
     mean_auc_random = total_auc_random / 20
     mean_auc_mimic = total_auc_mimic / 20
     mean_auc_all = total_auc_all / 20
-    print('mean_auc_random={} mean_auc_mimic={} mean_auc_all={}'.format(mean_auc_random,mean_auc_mimic,mean_auc_all))
+    print('mean_auc_random={} mean_auc_mimic={} mean_auc_all={}'.format(mean_auc_random, mean_auc_mimic, mean_auc_all))
     plt.figure(figsize=(5, 5))
-    plt.bar('skilled', mean_auc_mimic,ec='r', ls='--', lw=2,color='C0')
-    plt.bar('random', mean_auc_random,ec='r', ls='--', lw=2,color='C1')
-    plt.bar('all', mean_auc_all,ec='r', ls='--', lw=2,color='C2')
+    plt.bar('skilled', mean_auc_mimic, ec='r', ls='--', lw=2, color='C0')
+    plt.bar('random', mean_auc_random, ec='r', ls='--', lw=2, color='C1')
+    plt.bar('all', mean_auc_all, ec='r', ls='--', lw=2, color='C2')
     plt.xlabel('Forger Types', fontdict={'style': 'normal', 'weight': 'bold', 'size': 22})
     plt.ylabel('AUC', fontdict={'style': 'normal', 'weight': 'bold', 'size': 22})
     plt.xticks(fontsize=20, fontname='normal')
     plt.yticks(fontsize=20, fontname='normal')
-    plt.ylim(0.91,1.0)
+    plt.ylim(0.91, 1.0)
     plt.tight_layout()
     plt.savefig('auc-bars.pdf', dpi=100)
     # plt.show()
-    mean_eer_random=total_eer_random/20
-    mean_eer_mimic=total_eer_mimic/20
-    mean_eer_all=total_eer_all/20
+    mean_eer_random = total_eer_random / 20
+    mean_eer_mimic = total_eer_mimic / 20
+    mean_eer_all = total_eer_all / 20
     print('mean_eer_random={} mean_eer_mimic={} mean_eer_all={}'.format(mean_eer_random, mean_eer_mimic,
                                                                         mean_eer_all))
     plt.figure(figsize=(5, 5))
@@ -166,7 +168,8 @@ def repeat_predict(template_count):
     plt.tight_layout()
     plt.savefig('eer-bars.pdf', dpi=100)
     plt.show()
-    return np.asarray([mean_auc_random,mean_auc_mimic,mean_auc_all,mean_eer_random,mean_eer_mimic,mean_eer_all])
+    return np.asarray([mean_auc_random, mean_auc_mimic, mean_auc_all, mean_eer_random, mean_eer_mimic, mean_eer_all])
+
 
 def get_model(model_path):
     model = Sequential()
@@ -189,14 +192,38 @@ def get_model(model_path):
 
 
 def template_count_evaluation():
-    template_evaluation_result=[]
+    template_evaluation_result = []
     for i in range(22):
-        repeat_predict_result=repeat_predict(i+1)
+        repeat_predict_result = repeat_predict(i + 1)
         template_evaluation_result.append(repeat_predict_result)
-    template_evaluation_result=np.asarray(template_evaluation_result)
-    pickle.dump(template_evaluation_result,open('tcount_evaresult.pkl','wb'))
+    template_evaluation_result = np.asarray(template_evaluation_result)
+    pickle.dump(template_evaluation_result, open('tcount_evaresult.pkl', 'wb'))
+
+
+def test_repeat_predict(template_count):
+    total_duration = 0
+    total_size = 0
+    for i in range(20):
+        sess = tf.Session(config=config)
+        KTF.set_session(sess)
+        model_path = 'O:/evaluation/reference-model/{}/model-{}.hdf5'.format(template_count, i + 1)
+        model = get_model(model_path)
+        dataset = np.load('O:/evaluation/reference-dataset/{}/dataset-{}.pkl'.format(template_count, i + 1))
+        test_data_set = dataset['test_data_set']
+        test_label_set = dataset['test_label_set']
+        predicted_data = np.asarray(test_data_set)
+        start_time = time.time()
+        result = model.predict(predicted_data)
+        end_time = time.time()
+        duration = end_time - start_time
+        total_duration += duration
+        total_size += len(test_data_set)
+        KTF.clear_session()
+    print('mean time {}'.format(total_duration / total_size))
+
 
 if __name__ == '__main__':
     # main()
-    repeat_predict(4)
+    # repeat_predict(4)
     # template_count_evaluation()
+    test_repeat_predict(4)

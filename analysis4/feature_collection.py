@@ -16,7 +16,7 @@ records = {}
 def main():
     global records
     source_dir = '../dataset/handwriting-lab-1/cutted-chord'
-    dest_dir = '../dataset/handwriting-lab-1/feature-chord'
+    dest_dir = '../dataset/handwriting-lab-1/feature-chord-300-dct'
     cut_to_dir(source_dir, dest_dir)
     pickle.dump(records,open('feature_time_records','wb'))
     pass
@@ -65,8 +65,8 @@ def cut_feature_to_file(source_path, dest_path):
         # plt.xticks(fontsize=17,fontname='normal')
         # plt.yticks(fontsize=17,fontname='normal')
         # plt.legend(prop={'size': 20})
-        if len(dct_result) < 200:
-            dct_result = np.pad(dct_result, (0, -len(dct_result) + 200), 'constant', constant_values=0)
+        if len(dct_result) < 300:
+            dct_result = np.pad(dct_result, (0, -len(dct_result) + 300), 'constant', constant_values=0)
         dct_result = dct_result.reshape(-1, 1)
         ss = StandardScaler()
         ss.fit(dct_result)
@@ -80,9 +80,9 @@ def cut_feature_to_file(source_path, dest_path):
         # plt.tight_layout()
         # plt.savefig('velocity-dct.pdf', dpi=100)
         # plt.show()
-        dct_result = ss.transform(dct_result)[:200, :]
+        dct_result = ss.transform(dct_result)[:300, :]
         if index % 2 == 0:
-            dct_result[40:200, :] = 0
+            dct_result[40:300, :] = 0
         try:
             if final_dct_result is None:
                 final_dct_result = dct_result
@@ -91,7 +91,7 @@ def cut_feature_to_file(source_path, dest_path):
         except:
             print('error')
     end_time = time.time()
-    pickle.dump(final_dct_result, open(dest_path, 'wb'))
+    # pickle.dump(final_dct_result, open(dest_path, 'wb'))
     duration = end_time - start_time
     records[key] = duration
 

@@ -12,7 +12,7 @@ def main():
     # ))
     # return
     # mean_auc_random, mean_auc_mimic, mean_auc_all, mean_eer_random, mean_eer_mimic, mean_eer_all
-    plt.figure(figsize=(10, 5))
+    plt.figure(figsize=(10, 6))
     # plt.subplot(211)
     plt.plot(np.arange(1,evaresult.shape[0]+1),evaresult[:,0],label='random forgers',marker='o')
     plt.plot(np.arange(1,evaresult.shape[0]+1),evaresult[:,1],label='skilled forgers',marker='*')
@@ -26,7 +26,7 @@ def main():
     plt.tight_layout()
     plt.savefig('rcount-auc-lines.pdf', dpi=100)
     # plt.subplot(212)
-    plt.figure(figsize=(10,5))
+    plt.figure(figsize=(10,6))
     plt.plot(np.arange(1,evaresult.shape[0]+1),evaresult[:,3],label='random forgers',marker='o')
     plt.plot(np.arange(1,evaresult.shape[0]+1),evaresult[:,4],label='skilled forgers',marker='*')
     plt.plot(np.arange(1,evaresult.shape[0]+1),evaresult[:,5],label='all forgers',marker='x')

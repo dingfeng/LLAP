@@ -44,7 +44,7 @@ def generate_dataset():
     global data_set
     global label_set
     global deep_label_set
-    for reference_amount in range(21,23):
+    for reference_amount in range(21,22):
         for k in range(20):
             names = None
             data_set = []
@@ -135,66 +135,58 @@ def generate_by_name(name,template_count):
         deep_label_set.append(1)
         local_dataset.append(result)
     # 计算模仿数据
-    # forged_dir_path = '../dataset/handwriting-lab-1/mimic-feature-chord/' + name
-    # forged_filenames = os.listdir(forged_dir_path)
-    # np.random.shuffle(forged_filenames)
-    # forged_filenames=forged_filenames[:45]
-    # for i in range(len(forged_filenames)):
-    #     data = np.load(open(forged_dir_path + '/' + forged_filenames[i], 'rb'))
-    #     result_min_data = data - min_data
-    #     result_max_data = data - max_data
-    #     result_mean_data = data - mean_data
-    #     result_sum_data = data - sum_data
-    #     result = np.zeros((data.shape[0], data.shape[1] // 2, 6))
-    #     for i in range(data.shape[0]):
-    #         for j in range(data.shape[1] // 2):
-    #             result[i][j][0] = result_min_data[i, j * 2]
-    #             result[i][j][1] = result_max_data[i, j * 2]
-    #             result[i][j][2] = result_mean_data[i, j * 2]
-    #             result[i][j][3] = result_min_data[i, j * 2 + 1]
-    #             result[i][j][4] = result_max_data[i, j * 2 + 1]
-    #             result[i][j][5] = result_mean_data[i, j * 2 + 1]
-    #             # result[i][j][6] = result_sum_data[i, j * 2]
-    #             # result[i][j][7] = result_sum_data[i, j * 2+1]
-    #             # result[i][j][3]=result_sum_data[i,j]
-    #             # for k in range(len(max_record)):
-    #             #     result[i][j][k] = np.abs(result[i][j][k])
-    #             #     max_record[k] = max(result[i][j][k], max_record[k])
-    #     label_set.append(0)
-    #     deep_label_set.append(2)
-    #     local_dataset.append(result)
+    forged_dir_path = '../dataset/handwriting-lab-1/mimic-feature-chord/' + name
+    forged_filenames = os.listdir(forged_dir_path)
+    np.random.shuffle(forged_filenames)
+    forged_filenames=forged_filenames[:45]
+    for i in range(len(forged_filenames)):
+        data = np.load(open(forged_dir_path + '/' + forged_filenames[i], 'rb'))
+        result_min_data = data - min_data
+        result_max_data = data - max_data
+        result_mean_data = data - mean_data
+        result = np.zeros((data.shape[0], data.shape[1] // 2, 6))
+        for i in range(data.shape[0]):
+            for j in range(data.shape[1] // 2):
+                result[i][j][0] = result_min_data[i, j * 2]
+                result[i][j][1] = result_max_data[i, j * 2]
+                result[i][j][2] = result_mean_data[i, j * 2]
+                result[i][j][3] = result_min_data[i, j * 2 + 1]
+                result[i][j][4] = result_max_data[i, j * 2 + 1]
+                result[i][j][5] = result_mean_data[i, j * 2 + 1]
+        label_set.append(0)
+        deep_label_set.append(2)
+        local_dataset.append(result)
     # random forger
     randomForgerFilepaths = []
 
-    # for i in range(len(names)):
-    #     if names[i] != name:
-    #         dir_path = '../dataset/handwriting-lab-1/feature-chord/' + names[i]
-    #         filenames = os.listdir(dir_path)
-    #         np.random.shuffle(filenames)
-    #         for i in range(4):
-    #             filepath = os.path.join(dir_path, filenames[i])
-    #             randomForgerFilepaths.append(filepath)
-    # np.random.shuffle(randomForgerFilepaths)
-    # randomForgerFilepaths = randomForgerFilepaths[:45]
-    # for filepath in randomForgerFilepaths:
-    #     data = np.load(open(filepath, 'rb'))
-    #     result_min_data = data - min_data
-    #     result_max_data = data - max_data
-    #     result_mean_data = data - mean_data
-    #     result_sum_data = data - sum_data
-    #     result = np.zeros((data.shape[0], data.shape[1] // 2, 6))
-    #     for i in range(data.shape[0]):
-    #         for j in range(data.shape[1] // 2):
-    #             result[i][j][0] = result_min_data[i, j * 2]
-    #             result[i][j][1] = result_max_data[i, j * 2]
-    #             result[i][j][2] = result_mean_data[i, j * 2]
-    #             result[i][j][3] = result_min_data[i, j * 2 + 1]
-    #             result[i][j][4] = result_max_data[i, j * 2 + 1]
-    #             result[i][j][5] = result_mean_data[i, j * 2 + 1]
-    #     label_set.append(0)
-    #     deep_label_set.append(3)
-    #     local_dataset.append(result)
-    # data_set += local_dataset
+    for i in range(len(names)):
+        if names[i] != name:
+            dir_path = '../dataset/handwriting-lab-1/feature-chord/' + names[i]
+            filenames = os.listdir(dir_path)
+            np.random.shuffle(filenames)
+            for i in range(4):
+                filepath = os.path.join(dir_path, filenames[i])
+                randomForgerFilepaths.append(filepath)
+    np.random.shuffle(randomForgerFilepaths)
+    randomForgerFilepaths = randomForgerFilepaths[:45]
+    for filepath in randomForgerFilepaths:
+        data = np.load(open(filepath, 'rb'))
+        result_min_data = data - min_data
+        result_max_data = data - max_data
+        result_mean_data = data - mean_data
+        result = np.zeros((data.shape[0], data.shape[1] // 2, 6))
+        for i in range(data.shape[0]):
+            for j in range(data.shape[1] // 2):
+                result[i][j][0] = result_min_data[i, j * 2]
+                result[i][j][1] = result_max_data[i, j * 2]
+                result[i][j][2] = result_mean_data[i, j * 2]
+                result[i][j][3] = result_min_data[i, j * 2 + 1]
+                result[i][j][4] = result_max_data[i, j * 2 + 1]
+                result[i][j][5] = result_mean_data[i, j * 2 + 1]
+        label_set.append(0)
+        deep_label_set.append(3)
+        local_dataset.append(result)
+    data_set += local_dataset
 
 
 if __name__ == '__main__':
