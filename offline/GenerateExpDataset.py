@@ -9,14 +9,15 @@ from skimage.io import imread
 from skimage import img_as_ubyte
 from sigver.preprocessing.normalize import preprocess_signature
 
-name2label = {0: 'chenyijun', 1: 'gaoshihao', 2: 'huangyuyang', 3: 'kanghuquan', 4: 'linjianghao', 5: 'liujia',
-              6: 'liuqianxi', 7: 'liuzhengwei', 8: 'lvzhenyu', 9: 'qipeng', 10: 'shenjiahuan', 11: 'taobocheng',
-              12: 'wanghaoyu', 13: 'wangxinzhe', 14: 'wangzhulai', 15: 'xiayuxing', 16: 'xiejiahang',
-              17: 'yuanjianyong', 18: 'zhaoxing', 19: 'zhaoxuyang', 20: 'zhuchaoyang', 21: 'zhuwenjie'}
-label2name = {'chenyijun': 0, 'gaoshihao': 1, 'huangyuyang': 2, 'kanghuquan': 3, 'linjianghao': 4, 'liujia': 5,
-              'liuqianxi': 6, 'liuzhengwei': 7, 'lvzhenyu': 8, 'qipeng': 9, 'shenjiahuan': 10, 'taobocheng': 11,
-              'wanghaoyu': 12, 'wangxinzhe': 13, 'wangzhulai': 14, 'xiayuxing': 15, 'xiejiahang': 16,
-              'yuanjianyong': 17, 'zhaoxing': 18, 'zhaoxuyang': 19, 'zhuchaoyang': 20, 'zhuwenjie': 21}
+name2label = {'gaoshihao': 0, 'huangyuyang': 1, 'kanghuquan': 2, 'linjianghao': 3, 'liujia': 4, 'liuqianxi': 5,
+              'liuzhengwei': 6, 'lvzhenyu': 7, 'qipeng': 8, 'shenjiahuan': 9, 'taobocheng': 10, 'wanghaoyu': 11,
+              'wangxinzhe': 12, 'wangzhulai': 13, 'xiayuxing': 14, 'xiejiahang': 15, 'yuanjianyong': 16, 'zhaoxing': 17,
+              'zhaoxuyang': 18, 'zhuchaoyang': 19, 'zhuwenjie': 20}
+
+label2name = {0: 'gaoshihao', 1: 'huangyuyang', 2: 'kanghuquan', 3: 'linjianghao', 4: 'liujia', 5: 'liuqianxi',
+              6: 'liuzhengwei', 7: 'lvzhenyu', 8: 'qipeng', 9: 'shenjiahuan', 10: 'taobocheng', 11: 'wanghaoyu',
+              12: 'wangxinzhe', 13: 'wangzhulai', 14: 'xiayuxing', 15: 'xiejiahang', 16: 'yuanjianyong', 17: 'zhaoxing',
+              18: 'zhaoxuyang', 19: 'zhuchaoyang', 20: 'zhuwenjie'}
 
 genuine_num = 32
 skilled_forged_num = 15
@@ -55,6 +56,7 @@ def main():
         skill_forged_filenames = skill_forged_filenames[:skilled_forged_num]
         for skill_forged_filename in skill_forged_filenames:
             skill_forged_filepath = os.path.join(skill_forged_name_path, skill_forged_filename)
+            print('path {}'.format(skill_forged_filepath))
             image_array = get_array(skill_forged_filepath)
             x = image_array.reshape((1, image_array.shape[0], image_array.shape[1]))
             y = name2label[name]
@@ -69,9 +71,10 @@ def main():
 def fuse_datasets():
     dev_dataset = np.load(open('./data/dataset/sig_dev_dataset.npz', 'rb'))
     exp_dataset = np.load(open('./testdata/dataset/sig_exp_dataset.npz', 'rb'))
-    exp_dataset['y'] = np.vstack((dev_dataset['y'], exp_dataset['y']))
     exp_dataset['x'] = np.vstack((dev_dataset['x'], exp_dataset['x']))
-    pickle.dump(exp_dataset, open('./testdata/dataset/sig_exp_dataset.npz', 'wb'))
+    exp_dataset['y'] = np.hstack((dev_dataset['y'], exp_dataset['y']))
+    exp_dataset['yforg']=np.hstack((dev_dataset['yforg'],exp_dataset['yforg']))
+    pickle.dump(exp_dataset, open('./testdata/dataset/sig_exp_dataset_fused.npz', 'wb'))
     pass
 
 
