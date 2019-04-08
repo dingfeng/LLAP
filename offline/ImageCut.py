@@ -32,15 +32,14 @@ def im2array(im):
     gimg_ndarr = np.asarray(im, dtype='float64')
     return gimg_ndarr
 
-
+count=0
 def rotate():
-    rootDir = './data'
-    rawDir = os.path.join(rootDir, 'forged_raw')
-    cuttedDir = os.path.join(rootDir, 'forged_cutted')
+    global count
+    rootDir = './testdata'
+    rawDir = os.path.join(rootDir, 'raw')
+    cuttedDir = os.path.join(rootDir, 'cutted')
     personDirs = os.listdir(rawDir)
     for personDir in personDirs:
-        if personDir!='test1':
-            continue
         personDirPath = os.path.join(rawDir, personDir)
         destPersonDirPath = os.path.join(cuttedDir, personDir)
         if not os.path.isdir(destPersonDirPath):
@@ -49,7 +48,7 @@ def rotate():
         confs = np.loadtxt(confFilepath)
         filenames = os.listdir(personDirPath)
         filenames = np.sort(filenames).tolist()
-        for i in range(4):
+        for i in range(2):
             filename = ''.join([filenames[i]])
             if filename.endswith('txt'):
                 continue
@@ -65,8 +64,9 @@ def rotate():
                     y_pos = conf[1] + Y_vector[n]
                     y_pos -= move_distance
                     cropped_im = rotated_im.crop([x_pos, y_pos, x_pos + len, y_pos + width])
+                    count+=1
                     dest_filepath = os.path.join(destPersonDirPath,
-                                                 ''.join([str(i + 1), '-', str(m + 1), '-', str(n + 1), '.jpg']))
+                                                 ''.join([str(count), '.jpg']))
                     cropped_im.save(dest_filepath)
                     # cropped_im.show()
 
