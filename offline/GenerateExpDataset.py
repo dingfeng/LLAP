@@ -9,15 +9,15 @@ from skimage.io import imread
 from skimage import img_as_ubyte
 from sigver.preprocessing.normalize import preprocess_signature
 
-name2label = {'gaoshihao': 0, 'huangyuyang': 1, 'kanghuquan': 2, 'linjianghao': 3, 'liujia': 4, 'liuqianxi': 5,
-              'liuzhengwei': 6, 'lvzhenyu': 7, 'qipeng': 8, 'shenjiahuan': 9, 'taobocheng': 10, 'wanghaoyu': 11,
-              'wangxinzhe': 12, 'wangzhulai': 13, 'xiayuxing': 14, 'xiejiahang': 15, 'yuanjianyong': 16, 'zhaoxing': 17,
-              'zhaoxuyang': 18, 'zhuchaoyang': 19, 'zhuwenjie': 20}
+name2label = {'gaoshihao': 1000, 'huangyuyang': 1001, 'kanghuquan': 1002, 'linjianghao': 1003, 'liujia': 1004, 'liuqianxi': 1005,
+              'liuzhengwei': 1006, 'lvzhenyu': 1007, 'qipeng': 1008, 'shenjiahuan': 1009, 'taobocheng': 1010, 'wanghaoyu': 1011,
+              'wangxinzhe': 1012, 'wangzhulai': 1013, 'xiayuxing': 1014, 'xiejiahang': 1015, 'yuanjianyong': 1016, 'zhaoxing': 1017,
+              'zhaoxuyang': 1018, 'zhuchaoyang': 1019, 'zhuwenjie': 1020}
 
-label2name = {0: 'gaoshihao', 1: 'huangyuyang', 2: 'kanghuquan', 3: 'linjianghao', 4: 'liujia', 5: 'liuqianxi',
-              6: 'liuzhengwei', 7: 'lvzhenyu', 8: 'qipeng', 9: 'shenjiahuan', 10: 'taobocheng', 11: 'wanghaoyu',
-              12: 'wangxinzhe', 13: 'wangzhulai', 14: 'xiayuxing', 15: 'xiejiahang', 16: 'yuanjianyong', 17: 'zhaoxing',
-              18: 'zhaoxuyang', 19: 'zhuchaoyang', 20: 'zhuwenjie'}
+label2name = {1000: 'gaoshihao', 1001: 'huangyuyang', 1002: 'kanghuquan', 1003: 'linjianghao', 1004: 'liujia', 1005: 'liuqianxi',
+              1006: 'liuzhengwei', 1007: 'lvzhenyu', 1008: 'qipeng', 1009: 'shenjiahuan', 1010: 'taobocheng', 1011: 'wanghaoyu',
+              1012: 'wangxinzhe', 1013: 'wangzhulai', 1014: 'xiayuxing', 1015: 'xiejiahang', 1016: 'yuanjianyong', 1017: 'zhaoxing',
+              1018: 'zhaoxuyang', 1019: 'zhuchaoyang', 1020: 'zhuwenjie'}
 
 genuine_num = 32
 skilled_forged_num = 15
@@ -75,7 +75,7 @@ def fuse_datasets():
     exp_dataset['y'] = np.hstack((dev_dataset['y'], exp_dataset['y']))
     exp_dataset['yforg']=np.hstack((dev_dataset['yforg'],exp_dataset['yforg']))
     pickle.dump(exp_dataset, open('./testdata/dataset/sig_exp_dataset_fused.npz', 'wb'))
-    pass
+
 
 
 def add2result(x, y, yforg):
