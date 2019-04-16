@@ -149,7 +149,6 @@ def cut_file(source_filepath, dest_filepath):
             Q = butter_lowpass_filter(Q, 100, fs)[200:][::300]
             decompositionQ = seasonal_decompose(Q, freq=10, two_sided=False)
             Q = decompositionQ.trend[10:]
-            diff_time = time.time()
             IQ = np.asarray([I, Q]).T
             IQ= IQ - np.roll(IQ, 1, axis=0)
             IQ=IQ[1:,:]
@@ -160,28 +159,6 @@ def cut_file(source_filepath, dest_filepath):
             IQ = (IQ0 + IQ1) / 2
             IQ = IQ[4:-4]
             cutted_IQ = IQ
-
-            # total_diff_time += time.time() - diff_time
-            # correlation_time = time.time()
-
-            # if previous is not None:
-            #     correlation = get_correlation(cutted_IQ, previous)
-            #     # print(correlation)
-            #     if correlation > 0.95 and previous is not None:
-            #         cutted_IQs.append(cutted_IQ)
-            #         velocities.append(velocity)
-            #         if not previous_added:
-            #             cutted_IQs.append(previous)
-            #             velocities.append(velocity)
-            #             previous_added = True
-            #     else:
-            #         previous_added = False
-                    # plt.figure()
-                    # # times = np.arange(len(velocity)) / 160
-                    # plt.scatter([i for i in range(len(cutted_IQ))], cutted_IQ)
-                    # plt.ylim(-0.0002, 0.0002)
-                    # plt.show()
-                    # print('heloo')
     end_time=time.time()
     duration=end_time-start_time
     key=source_filepath.split('/')[-2]+'-'+source_filepath.split('/')[-1][:-4]
