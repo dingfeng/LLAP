@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 from scipy.optimize import brentq
 from scipy.interpolate import interp1d
 import time
-
+from scipy.optimize import brentq
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 config = tf.ConfigProto()

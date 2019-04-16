@@ -20,7 +20,7 @@ def main():
              'dengyufeng', 'dingfeng', 'huangsi', 'jianghao', 'qingpeijie', 'xuhuatao', 'yinjunhao', 'yuyinggang',
              'zhangqian', 'zhaorun', 'zhuyan']
     for name in names:
-        generate_by_name(name,1)
+        generate_by_name(name,21)
     indexes = np.arange(len(data_set))
     np.random.shuffle(indexes)
     test_rate = 0.3
@@ -35,8 +35,8 @@ def main():
     for i in range(test_count, len(indexes)):
         train_data_set.append(data_set[indexes[i]])
         train_label_set.append(label_set[indexes[i]])
-    # pickle.dump({'train_data_set': train_data_set, 'train_label_set': train_label_set, 'test_data_set': test_data_set,
-    #              'test_label_set': test_label_set}, open('dataset-1.pkl', 'wb'))
+    pickle.dump({'train_data_set': train_data_set, 'train_label_set': train_label_set, 'test_data_set': test_data_set,
+                 'test_label_set': test_label_set}, open('dataset-1-tr.pkl', 'wb'))
     pickle.dump(records,open('generate_dataset_records','wb'))
 
 def generate_dataset():
