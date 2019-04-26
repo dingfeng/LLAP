@@ -42,7 +42,7 @@ def main():
     pass
 
 def train():
-    for j in range(0,21):
+    for j in range(21,22):
         for i in range(20):
             sess = tf.Session(config=config)
             KTF.set_session(sess)

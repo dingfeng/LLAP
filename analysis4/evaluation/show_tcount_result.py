@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def main():
-    evaresult=np.load(open('./tcount_evaresult.pkl','rb'))
+    evaresult=np.load(open('./2tcount_evaresult.pkl','rb'),allow_pickle=True)
     # reference_amount=5
     # print('mean_auc_random={} mean_auc_mimic={} mean_auc_all={} mean_eer_random={} mean_eer_mimic={} mean_eer_all={}'.format(
     #     evaresult[reference_amount-1,0],evaresult[reference_amount-1,1],evaresult[reference_amount-1,2],evaresult[reference_amount-1,3],evaresult[reference_amount-1,4],evaresult[reference_amount-1,5]
@@ -13,10 +13,11 @@ def main():
     # return
     # mean_auc_random, mean_auc_mimic, mean_auc_all, mean_eer_random, mean_eer_mimic, mean_eer_all
     plt.figure(figsize=(10, 6))
+    x=np.arange(1,evaresult.shape[0]+1)
     # plt.subplot(211)
     plt.plot(np.arange(1,evaresult.shape[0]+1),evaresult[:,0],label='random forgers',marker='o')
     plt.plot(np.arange(1,evaresult.shape[0]+1),evaresult[:,1],label='skilled forgers',marker='*')
-    plt.plot(np.arange(1,evaresult.shape[0]+1),evaresult[:,2],label='all forgers',marker='x')
+    plt.plot(x,evaresult[:,2],label='all forgers',marker='x')
     plt.xlabel('Reference Signature Amount', fontdict={'style': 'normal', 'weight': 'bold', 'size': 22})
     plt.ylabel('AUC', fontdict={'style': 'normal', 'weight': 'bold', 'size': 22})
     plt.xticks(fontsize=20, fontname='normal')
@@ -29,7 +30,7 @@ def main():
     plt.figure(figsize=(10,6))
     plt.plot(np.arange(1,evaresult.shape[0]+1),evaresult[:,3],label='random forgers',marker='o')
     plt.plot(np.arange(1,evaresult.shape[0]+1),evaresult[:,4],label='skilled forgers',marker='*')
-    plt.plot(np.arange(1,evaresult.shape[0]+1),evaresult[:,5],label='all forgers',marker='x')
+    plt.plot(x,evaresult[:,5],label='all forgers',marker='x')
     plt.xlabel('Reference Signature Amount', fontdict={'style': 'normal', 'weight': 'bold', 'size': 22})
     plt.ylabel('EER', fontdict={'style': 'normal', 'weight': 'bold', 'size': 22})
     plt.xticks(fontsize=20, fontname='normal')
@@ -41,6 +42,12 @@ def main():
     plt.show()
     pass
 
+
+def get_fitted_line(x,y):
+    z1 = np.polyfit(x, y, 2)
+    p1 = np.poly1d(z1)
+    yvals = p1(x)
+    return yvals
 
 if __name__ == '__main__':
     main()

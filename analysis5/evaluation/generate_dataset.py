@@ -40,12 +40,12 @@ def generate_dataset():
             for i in range(test_count, len(indexes)):
                 train_data_set.append(data_set[indexes[i]])
                 train_label_set.append(label_set[indexes[i]])
-            dir_path='O:/evaluation/test-dataset/{}'.format(reference_amount)
+            dir_path='O:/evaluation2/test-dataset/{}'.format(reference_amount)
             if not os.path.isdir(dir_path):
                 os.makedirs(dir_path)
             pickle.dump(
                 {'train_data_set': train_data_set, 'train_label_set': train_label_set, 'test_data_set': test_data_set,
-                 'test_label_set': test_label_set,'deep_test_label_set':deep_test_label_set}, open('O:/evaluation/test-dataset/{}/dataset-{}.pkl'.format(reference_amount,k + 1), 'wb'))
+                 'test_label_set': test_label_set,'deep_test_label_set':deep_test_label_set}, open('O:/evaluation2/test-dataset/{}/dataset-{}.pkl'.format(reference_amount,k + 1), 'wb'))
 
 def generate_by_name(name,template_count):
     global names
@@ -62,7 +62,7 @@ def generate_by_name(name,template_count):
     # template_count = 20
     templates = []
     for i in range(template_count):
-        data = np.load(open(dir_path + '/' + filenames[i], 'rb'))
+        data = np.load(open(dir_path + '/' + filenames[i], 'rb'),allow_pickle=True)
         templates.append(data)
     min_data = np.zeros(data.shape)
     max_data = np.zeros(data.shape)
@@ -87,7 +87,7 @@ def generate_by_name(name,template_count):
         max_record[i] = -10000
     for i in range(min(20,len(filenames)-template_count)):
         file_index = template_count + i
-        data = np.load(open(dir_path + '/' + filenames[file_index], 'rb'))
+        data = np.load(open(dir_path + '/' + filenames[file_index], 'rb'),allow_pickle=True)
         result_min_data = data - min_data
         result_max_data = data - max_data
         result_mean_data = data - mean_data
@@ -117,7 +117,7 @@ def generate_by_name(name,template_count):
     np.random.shuffle(forged_filenames)
     forged_filenames=forged_filenames[:10]
     for i in range(len(forged_filenames)):
-        data = np.load(open(forged_dir_path + '/' + forged_filenames[i], 'rb'))
+        data = np.load(open(forged_dir_path + '/' + forged_filenames[i], 'rb'),allow_pickle=True)
         result_min_data = data - min_data
         result_max_data = data - max_data
         result_mean_data = data - mean_data
@@ -157,7 +157,7 @@ def generate_by_name(name,template_count):
                 filepath = os.path.join(dir_path, filenames[i])
                 randomForgerFilepaths.append(filepath)
     for filepath in randomForgerFilepaths:
-        data = np.load(open(filepath, 'rb'))
+        data = np.load(open(filepath, 'rb'),allow_pickle=True)
         result_min_data = data - min_data
         result_max_data = data - max_data
         result_mean_data = data - mean_data

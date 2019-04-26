@@ -31,7 +31,7 @@ def main():
         train_data_set.append(data_set[indexes[i]])
         train_label_set.append(label_set[indexes[i]])
     pickle.dump({'train_data_set': train_data_set, 'train_label_set': train_label_set, 'test_data_set': test_data_set,
-                 'test_label_set': test_label_set}, open('dataset-chord-normalized-40.pkl', 'wb'))
+                 'test_label_set': test_label_set}, open('2dataset-chord-normalized-40.pkl', 'wb'))
 
 def generate_by_name(name):
     global names

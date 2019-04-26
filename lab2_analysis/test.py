@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
-# filename: extract_feature date: 2019/4/16 10:20  
-# author: FD 
+# filename: extract_feature date: 2019/4/16 10:20
+# author: FD
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 import time
@@ -22,12 +22,9 @@ filter_half_width = 100  # +-100Hz
 
 def main():
     init_IQ_multipliers()
-    dataset_dir = '../dataset2'
-    names = os.listdir(dataset_dir)
-    for name in names:
-        if name == 'zhuyan':
-            dir_path = os.path.join(dataset_dir, name)
-            cut_dir(dir_path)
+    data=cut_file('1.pcm')
+    data1=np.load('1.pkl','rb')
+    return
 
 
 def init_IQ_multipliers():
@@ -51,32 +48,18 @@ def init_IQ_multipliers():
             Q_multipliers[freq_index, i, :] = mul_sin
 
 
-def cut_dir(dir_path):
-    sub_dirs = ['music', 'reference', 'walk', '0day','1day','7day']
-    to_dump = {}
-    dest_filepath = os.path.join(dir_path, 'feature.pkl')
-    for sub_dir in sub_dirs:
-        sub_dir_path = os.path.join(dir_path, sub_dir)
-        filenames = os.listdir(sub_dir_path)
-        features = []
-        for filename in filenames:
-            filepath = os.path.join(sub_dir_path, filename)
-            feature = cut_file(filepath)
-            features.append(feature)
-        to_dump[sub_dir] = features
-    pickle.dump(to_dump, open(dest_filepath, 'wb'))
-
 
 def extract_feature(data):
     final_dct_result = None
     for index, item in enumerate(data):
-        item = (item - np.min(item)) / (np.max(item) - np.min(item))
         dct_result = dct(item)
         if len(dct_result) < 200:
             dct_result = np.pad(dct_result, (0, -len(dct_result) + 200), 'constant', constant_values=0)
         dct_result = dct_result.reshape(-1, 1)
-        dct_result = dct_result[:200, :]
-        if index % 2 == 1:
+        ss = StandardScaler()
+        ss.fit(dct_result)
+        dct_result = ss.transform(dct_result)[:200, :]
+        if index % 2 == 0:
             dct_result[40:200, :] = 0
         try:
             if final_dct_result is None:
@@ -117,7 +100,7 @@ def cut_file(source_filepath):
             cutted_IQ = IQ
             preprocess_results.append(cutted_IQ)
             preprocess_results.append(velocity)
-    feature = extract_feature(preprocess_results)
+    feature = preprocess_results
     return feature
 
 

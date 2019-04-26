@@ -11,8 +11,10 @@ from scipy.linalg import norm
 
 
 def main():
-    source_dir = '../dataset/handwriting-lab-3/mimic-cutted-chord-arranged'
-    dest_dir = '../dataset/handwriting-lab-3/forged-feature-chord-40'
+    # source_dir = '../dataset/handwriting-lab-3/mimic-cutted-chord-arranged'
+    # dest_dir = '../dataset/handwriting-lab-3/forged-feature-chord-40'
+    source_dir = '../dataset/handwriting-lab-3/cutted-chord'
+    dest_dir = '../dataset/handwriting-lab-3/feature-chord-40'
     cut_to_dir(source_dir, dest_dir)
     pass
 
@@ -34,26 +36,21 @@ def cut_to_dir(source_dir, dest_dir):
 
 
 def cut_feature_to_file(source_path, dest_path):
-    print(source_path)
     try:
-        data = np.load(open(source_path, 'rb'))
+        data = np.load(open(source_path, 'rb'),allow_pickle=True)
     except:
         print('error file {}'.format(source_path))
         return
     final_dct_result = None
     for index, item in enumerate(data):
+        # item=item[:min(len(data),value_dict[dir_name])]
+        item = (item - np.min(item)) / (np.max(item) - np.min(item))
         dct_result = dct(item)
-        # plt.figure()
-        # print('a figure')
-        # plt.plot(dct_result)
-        # plt.show()
         if len(dct_result) < 200:
             dct_result = np.pad(dct_result, (0, -len(dct_result) + 200), 'constant', constant_values=0)
         dct_result = dct_result.reshape(-1, 1)
-        ss = StandardScaler()
-        ss.fit(dct_result)
-        dct_result = ss.transform(dct_result)[:200, :]
-        if index % 2 == 0:
+        dct_result = dct_result[:200, :]
+        if index % 2 == 1:
             dct_result[40:200, :] = 0
         try:
             if final_dct_result is None:
@@ -62,8 +59,8 @@ def cut_feature_to_file(source_path, dest_path):
                 final_dct_result = np.hstack((final_dct_result, dct_result))
         except:
             print('error')
-
     pickle.dump(final_dct_result, open(dest_path, 'wb'))
+    return len(data[0][:])
 
 
 if __name__ == '__main__':

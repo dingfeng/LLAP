@@ -25,13 +25,16 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True  # 不全部占满显存, 按需分配
-
+sess = tf.Session(config=config)
+KTF.set_session(sess)
 
 def main():
-    model_path = 'O:/evaluation/reference-model/21/model-19.hdf5'
+    # model_path = 'O:/evaluation/reference-model/21/model-19.hdf5'
     # model_path = './model/model-1.hdf5'
-    model = get_model(model_path)
-    dataset = np.load('O:/evaluation/reference-dataset/21/dataset-19.pkl')
+    # model = get_model('../lab2_model.hdf5')
+    # dataset = np.load('../dataset-1-tr_lab_2.pkl')
+    model = get_model('O:/evaluation2/reference-model/20/model-1.hdf5')
+    dataset = np.load('O:/evaluation2/reference-dataset/20/dataset-1.pkl',allow_pickle=True)
     # dataset=np.load('./dataset/dataset-1.pkl')
     test_data_set = dataset['test_data_set']
     test_label_set = dataset['test_label_set']
@@ -96,9 +99,9 @@ def repeat_predict(template_count):
     for i in range(20):
         sess = tf.Session(config=config)
         KTF.set_session(sess)
-        model_path = 'O:/evaluation/reference-model/{}/model-{}.hdf5'.format(template_count, i + 1)
+        model_path = 'O:/evaluation2/reference-model/{}/model-{}.hdf5'.format(template_count, i + 1)
         model = get_model(model_path)
-        dataset = np.load('O:/evaluation/reference-dataset/{}/dataset-{}.pkl'.format(template_count, i + 1))
+        dataset = np.load('O:/evaluation2/reference-dataset/{}/dataset-{}.pkl'.format(template_count, i + 1),allow_pickle=True)
         test_data_set = dataset['test_data_set']
         test_label_set = dataset['test_label_set']
         # 'deep_test_label_set': deep_test_label_set}
@@ -110,28 +113,26 @@ def repeat_predict(template_count):
         fpr_random, tpr_random, thresholds_random = roc_curve(result[:, 1].astype(np.int), result[:, 0])
         AUC = auc(fpr_random, tpr_random)
         total_auc_random += AUC
-        print('random forger AUC {}'.format(AUC))
         eer = brentq(lambda x: 1. - x - interp1d(fpr_random, tpr_random)(x), 0., 1.)
         total_eer_random += eer
-
+        print('random forger AUC {} EER {}'.format(AUC,eer))
         random_indices = np.where(deep_test_label_set != 3)[0]
         result = model.predict(np.asarray(test_data_set)[random_indices]).ravel()
         result = np.vstack((result, np.asarray(test_label_set)[random_indices])).T
         fpr_mimic, tpr_mimic, thresholds_mimic = roc_curve(result[:, 1].astype(np.int), result[:, 0])
         AUC = auc(fpr_mimic, tpr_mimic)
         total_auc_mimic += AUC
-        print('mimic forger AUC {}'.format(AUC))
         eer = brentq(lambda x: 1. - x - interp1d(fpr_mimic, tpr_mimic)(x), 0., 1.)
         total_eer_mimic += eer
-
+        # print('mimic forger AUC {} EER {}'.format(AUC,eer))
         result = model.predict(np.asarray(test_data_set)).ravel()
         result = np.vstack((result, np.asarray(test_label_set))).T
         fpr_total, tpr_total, thresholds_total = roc_curve(result[:, 1].astype(np.int), result[:, 0])
         AUC = auc(fpr_total, tpr_total)
         total_auc_all += AUC
-        print('all forger AUC {}'.format(AUC))
         eer = brentq(lambda x: 1. - x - interp1d(fpr_total, tpr_total)(x), 0., 1.)
         total_eer_all += eer
+        # print('all forger AUC {} EER {}'.format(AUC,eer))
         # plt.plot(fpr, tpr, lw=1)
         # plt.show()
         KTF.clear_session()
@@ -150,7 +151,7 @@ def repeat_predict(template_count):
     plt.ylim(0.91, 1.0)
     plt.tight_layout()
     plt.savefig('auc-bars.pdf', dpi=100)
-    # plt.show()
+    plt.show()
     mean_eer_random = total_eer_random / 20
     mean_eer_mimic = total_eer_mimic / 20
     mean_eer_all = total_eer_all / 20
@@ -182,7 +183,7 @@ def get_model(model_path):
     model.add(Dense(8, activation='relu'))
     # model.add(Dropout(0.2))
     model.add(Dense(1, activation='sigmoid'))
-    print(model.summary())
+    # print(model.summary())
     model.load_weights(model_path, by_name=True)
     # model.compile(loss='binary_crossentropy',
     #               optimizer='adam',
@@ -197,7 +198,7 @@ def template_count_evaluation():
         repeat_predict_result = repeat_predict(i + 1)
         template_evaluation_result.append(repeat_predict_result)
     template_evaluation_result = np.asarray(template_evaluation_result)
-    pickle.dump(template_evaluation_result, open('tcount_evaresult.pkl', 'wb'))
+    pickle.dump(template_evaluation_result, open('2tcount_evaresult.pkl', 'wb'))
 
 
 def test_repeat_predict(template_count):
@@ -208,9 +209,9 @@ def test_repeat_predict(template_count):
         KTF.set_session(sess)
         model_path = 'O:/evaluation/reference-model/{}/model-{}.hdf5'.format(template_count, i + 1)
         model = get_model(model_path)
+        test_label_set = dataset['test_label_set']
         dataset = np.load('O:/evaluation/reference-dataset/{}/dataset-{}.pkl'.format(template_count, i + 1))
         test_data_set = dataset['test_data_set']
-        test_label_set = dataset['test_label_set']
         predicted_data = np.asarray(test_data_set)
         start_time = time.time()
         result = model.predict(predicted_data)
@@ -224,6 +225,6 @@ def test_repeat_predict(template_count):
 
 if __name__ == '__main__':
     # main()
-    # repeat_predict(4)
+    repeat_predict(20)
     # template_count_evaluation()
-    test_repeat_predict(4)
+    # test_repeat_predict(4)

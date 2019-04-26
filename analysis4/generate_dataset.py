@@ -47,7 +47,7 @@ def generate_dataset():
     global data_set
     global label_set
     global deep_label_set
-    for reference_amount in range(4,14):
+    for reference_amount in range(22,23):
         for k in range(20):
             names = None
             data_set = []

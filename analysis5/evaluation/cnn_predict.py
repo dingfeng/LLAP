@@ -98,9 +98,9 @@ def repeat_predict(template_count):
             count+=1
             sess = tf.Session(config=config)
             KTF.set_session(sess)
-            model_path = 'O:/evaluation/reference-model/21/model-{}.hdf5'.format(j+1)
+            model_path = 'O:/evaluation2/reference-model/20/model-{}.hdf5'.format(j+1)
             model = get_model(model_path)
-            dataset = np.load('O:/evaluation/reference-dataset/{}/dataset-{}.pkl'.format(template_count,i+1))
+            dataset = np.load('O:/evaluation2/test-dataset/{}/dataset-{}.pkl'.format(template_count,i+1),allow_pickle=True)
             test_data_set = dataset['test_data_set']
             test_label_set = dataset['test_label_set']
             # 'deep_test_label_set': deep_test_label_set}
@@ -132,7 +132,7 @@ def repeat_predict(template_count):
             total_auc_all += AUC
             eer = brentq(lambda x: 1. - x - interp1d(fpr_total, tpr_total)(x), 0., 1.)
             total_eer_all+=eer
-            # print('all forger AUC {} eer {}'.format(AUC,eer))
+            print('all forger AUC {} eer {}'.format(AUC,eer))
             # plt.plot(fpr, tpr, lw=1)
             # plt.show()
             KTF.clear_session()
@@ -157,8 +157,8 @@ def repeat_predict(template_count):
     mean_eer_random=total_eer_random/200
     mean_eer_mimic=total_eer_mimic/200
     mean_eer_all=total_eer_all/200
-    # print('mean_eer_random={} mean_eer_mimic={} mean_eer_all={}'.format(mean_eer_random, mean_eer_mimic,
-    #                                                                     mean_eer_all))
+    print('mean_eer_random={} mean_eer_mimic={} mean_eer_all={}'.format(mean_eer_random, mean_eer_mimic,
+                                                                        mean_eer_all))
     # plt.figure(figsize=(5, 5))
     # plt.bar('skilled', mean_eer_mimic, ec='r', ls='--', lw=2, color='C0')
     # plt.bar('random', mean_eer_random, ec='r', ls='--', lw=2, color='C1')
@@ -193,18 +193,15 @@ def get_model(model_path):
     return model
 
 
-def template_count_evaluation():
-    template_evaluation_result=[]
-    for i in range(22):
-        repeat_predict_result=repeat_predict(i+1)
-        template_evaluation_result.append(repeat_predict_result)
-    template_evaluation_result=np.asarray(template_evaluation_result)
-    pickle.dump(template_evaluation_result,open('tcount_evaresult.pkl','wb'))
 
 if __name__ == '__main__':
     # main()
-    for i in [6,8,10,12]:
-        result=repeat_predict(i)
-        pickle.dump(result,open('./predict-result/template-{}-result.pkl'.format(i),'wb'))
-        print('mean_auc_random={} mean_auc_mimic={} mean_auc_all={} mean_eer_random={} mean_eer_mimic={} mean_eer_all={}'.format(result[0],result[1],result[2],result[3],result[4],result[5]))
+    # for i in [6,8,10,12]:
+    #     result=repeat_predict(i)
+    #     pickle.dump(result,open('./predict-result2/template-{}-result.pkl'.format(i),'wb'))
+    #     print('mean_auc_random={} mean_auc_mimic={} mean_auc_all={} mean_eer_random={} mean_eer_mimic={} mean_eer_all={}'.format(result[0],result[1],result[2],result[3],result[4],result[5]))
     # template_count_evaluation()
+    for i in [6,8,10,12]:
+        data=np.load(open('./predict-result2/template-{}-result.pkl'.format(i),'rb'),allow_pickle=True)
+        print(data)
+
