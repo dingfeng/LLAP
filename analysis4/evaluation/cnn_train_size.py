@@ -29,12 +29,13 @@ def main():
             os.mkdir(dir_path)
         for i in range(1,21):
             model=get_model()
-            dataset_filepath='O:/evaluation/reference-dataset/21/dataset-{}.pkl'.format(i)
-            dataset = np.load(dataset_filepath)
+            # dataset_filepath='O:/evaluation/reference-dataset/21/dataset-{}.pkl'.format(i)
+            dataset_filepath = './dataset/dataset-{}.pkl'.format(i)
+            dataset = np.load(dataset_filepath,allow_pickle=True)
             train_data_set = dataset['train_data_set']
             train_data_set=train_data_set[:train_size]
-            train_label_set = dataset['train_label_set']
             train_label_set=train_label_set[:train_size]
+            train_label_set = dataset['train_label_set']
             test_data_set = dataset['test_data_set']
             test_label_set = dataset['test_label_set']
             model_filepath='./train_size_model/{}/{}.hdf5'.format(train_size,i)
@@ -62,7 +63,7 @@ def get_model():
                     activity_regularizer=regularizers.l1(0.001)))
     model.add(Dropout(0.2))
     model.add(Dense(1, activation='sigmoid'))
-    print(model.summary())
+    # print(model.summary())
     model.compile(loss='binary_crossentropy',
                   optimizer='adam',
                   metrics=['accuracy', keras_metrics.precision(label=1), keras_metrics.recall(label=1),

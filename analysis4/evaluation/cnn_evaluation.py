@@ -19,8 +19,10 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True  # 不全部占满显存, 按需分配
-
-unit_nums = [8, 16, 32, 64, 96, 128]
+unit_nums = [#8, 16, 32, 64, 96,
+             128,
+            # 256
+            ]
 
 
 def main():
@@ -30,20 +32,24 @@ def main():
             os.mkdir(dir_path)
         for i in range(1,21):
             model=get_model(unit_num)
-            dataset_filepath='O:/evaluation/reference-dataset/21/dataset-{}.pkl'.format(i)
-            dataset = np.load(dataset_filepath)
+            dataset_filepath='./dataset/dataset-{}.pkl'.format(i)
+            dataset = np.load(dataset_filepath,allow_pickle=True)
             train_data_set = dataset['train_data_set']
+            train_data_set=np.asarray(train_data_set)
+            train_data_set = train_data_set[:, :10, :]
             train_label_set = dataset['train_label_set']
             test_data_set = dataset['test_data_set']
+            test_data_set=np.asarray(test_data_set)
+            test_data_set = test_data_set[:, :10, :]
             test_label_set = dataset['test_label_set']
-            print(test_label_set)
+            # print(test_label_set)
             model_filepath='./cnn_model/{}/{}.hdf5'.format(unit_num,i)
             checkpointer = ModelCheckpoint(
                 filepath=model_filepath, verbose=1,
                 save_best_only=True)
             history = LossHistory()
-            result = model.fit(np.asarray(train_data_set), np.asarray(train_label_set), batch_size=10,
-                               epochs=60, verbose=1,
+            result = model.fit(np.asarray(train_data_set), np.asarray(train_label_set), batch_size=32,
+                               epochs=40, verbose=1,
                                validation_data=(np.asarray(test_data_set), np.asarray(test_label_set)),
                                callbacks=[checkpointer, history])
             KTF.clear_session()
@@ -52,7 +58,7 @@ def get_model(unit_num):
     sess = tf.Session(config=config)
     KTF.set_session(sess)
     model = Sequential()
-    model.add(Conv2D(unit_num, 3, padding='same', activation='relu', input_shape=(200, 8, 6)))
+    model.add(Conv2D(unit_num, 3, padding='same', activation='relu', input_shape=(10, 8, 6)))
     model.add(MaxPooling2D(2))
     model.add(Conv2D(unit_num, 3, activation='relu'))
     model.add(MaxPooling2D(2))

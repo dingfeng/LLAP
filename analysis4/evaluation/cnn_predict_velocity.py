@@ -30,7 +30,7 @@ config.gpu_options.allow_growth = True  # 不全部占满显存, 按需分配
 def repeat_predict():
     dct_coefficients = [8,10,12,15,20,40]
     results = []
-    for dct_coefficient in dct_coefficients:
+    for dct_coefficient in [20]:
         total_auc_all = 0
         total_eer_all = 0
         for i in range(20):
@@ -38,19 +38,19 @@ def repeat_predict():
             KTF.set_session(sess)
             model_path = './only_velocity/{}/{}.hdf5'.format(dct_coefficient, i + 1)
             model = get_model(dct_coefficient,model_path)
-            dataset = np.load('./reference-dataset/21/dataset-{}.pkl'.format(i + 1))
+            dataset = np.load('./dataset/dataset-{}.pkl'.format(i + 1),allow_pickle=True)
             test_data_set = dataset['test_data_set']
             test_data_set = np.asarray(test_data_set)
-            test_data_set=test_data_set[:,:dct_coefficient,:,[0,2,4]]
+            test_data_set=test_data_set[:,:dct_coefficient,:,[1,3,5]]
             test_label_set = dataset['test_label_set']
             result = model.predict(np.asarray(test_data_set)).ravel()
             result = np.vstack((result, np.asarray(test_label_set))).T
             fpr_total, tpr_total, thresholds_total = roc_curve(result[:, 1].astype(np.int), result[:, 0])
             AUC = auc(fpr_total, tpr_total)
             total_auc_all += AUC
-            print('all forger AUC {}'.format(AUC))
             eer = brentq(lambda x: 1. - x - interp1d(fpr_total, tpr_total)(x), 0., 1.)
             total_eer_all += eer
+            print('all forger AUC {} eer {}'.format(AUC,eer))
             KTF.clear_session()
         mean_auc_all = total_auc_all / 20
         mean_eer_all = total_eer_all / 20
@@ -108,7 +108,9 @@ def show_evaluation_plot():
 
 
 if __name__ == '__main__':
-    main()
+    # main()
     # repeat_predict(4)
     # template_count_evaluation()
-    show_evaluation_plot()
+    # show_evaluation_plot()
+    repeat_predict()
+

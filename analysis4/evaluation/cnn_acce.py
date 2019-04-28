@@ -28,23 +28,24 @@ config.gpu_options.allow_growth = True  # 不全部占满显存, 按需分配
 
 
 def main():
-    dct_coefficients = [8,10,12,15,20,40,60,80,100, 120, 140, 160, 180, 200]
+    dct_coefficients = [#8,10,12,15,20,40,60,80,100, 120, 140, 160, 180,
+                        20]
     for dct_coefficient in dct_coefficients:
         dir_path = './only_acce/' + str(dct_coefficient)
         if not os.path.isdir(dir_path):
             os.makedirs(dir_path)
         for i in range(1, 21):
             model = get_model(dct_coefficient)
-            dataset_filepath = './reference-dataset/21/dataset-{}.pkl'.format(i)
-            dataset = np.load(dataset_filepath)
+            dataset_filepath = './dataset/dataset-{}.pkl'.format(i)
+            dataset = np.load(dataset_filepath,allow_pickle=True)
             train_data_set = dataset['train_data_set']
             train_data_set = np.asarray(train_data_set)
-            train_data_set=train_data_set[:,:dct_coefficient,:,[1,3,5]]
+            train_data_set=train_data_set[:,:dct_coefficient,:,[0,2,4]]
             print('shape {}'.format(train_data_set.shape))
             train_label_set = dataset['train_label_set']
             test_data_set = dataset['test_data_set']
             test_data_set = np.asarray(test_data_set)
-            test_data_set=test_data_set[:,:dct_coefficient,:,[1,3,5]]
+            test_data_set=test_data_set[:,:dct_coefficient,:,[0,2,4]]
             test_label_set = dataset['test_label_set']
             model_filepath = './only_acce/{}/{}.hdf5'.format(dct_coefficient, i)
             checkpointer = ModelCheckpoint(
@@ -81,7 +82,8 @@ def get_model(dct_coefficient):
 
 
 def repeat_predict():
-    dct_coefficients = [40]
+    dct_coefficients = [#8,10,12,15,20,40,60,80,100, 120, 140, 160, 180,
+                        200]
     results = []
     for dct_coefficient in dct_coefficients:
         total_auc_all = 0

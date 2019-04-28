@@ -98,16 +98,17 @@ def repeat_predict(template_count):
             count+=1
             sess = tf.Session(config=config)
             KTF.set_session(sess)
-            model_path = 'O:/evaluation2/reference-model/20/model-{}.hdf5'.format(j+1)
-            model = get_model(model_path)
+            # model_path = 'O:/evaluation2/reference-model/20/model-{}.hdf5'.format(j+1)
+            model = get_model('1.hdf5')
             dataset = np.load('O:/evaluation2/test-dataset/{}/dataset-{}.pkl'.format(template_count,i+1),allow_pickle=True)
             test_data_set = dataset['test_data_set']
+            test_data_set=np.asarray(test_data_set)[:,:25,:]
             test_label_set = dataset['test_label_set']
             # 'deep_test_label_set': deep_test_label_set}
             deep_test_label_set = np.asarray(dataset['deep_test_label_set'])
 
             mimic_indices = np.where(deep_test_label_set != 2)[0]
-            result = model.predict(np.asarray(test_data_set)[mimic_indices]).ravel()
+            result = model.predict(test_data_set[mimic_indices],batch_size=len(mimic_indices)).ravel()
             result = np.vstack((result, np.asarray(test_label_set)[mimic_indices])).T
             fpr_random, tpr_random, thresholds_random = roc_curve(result[:, 1].astype(np.int), result[:, 0])
             AUC = auc(fpr_random, tpr_random)
@@ -116,7 +117,7 @@ def repeat_predict(template_count):
             total_eer_random+=eer
             # print('random forger AUC {} eer {}'.format(AUC,eer))
             random_indices = np.where(deep_test_label_set != 3)[0]
-            result = model.predict(np.asarray(test_data_set)[random_indices]).ravel()
+            result = model.predict(test_data_set[random_indices],batch_size=len(random_indices)).ravel()
             result = np.vstack((result, np.asarray(test_label_set)[random_indices])).T
             fpr_mimic, tpr_mimic, thresholds_mimic = roc_curve(result[:, 1].astype(np.int), result[:, 0])
             AUC = auc(fpr_mimic, tpr_mimic)
@@ -125,7 +126,7 @@ def repeat_predict(template_count):
             total_eer_mimic+=eer
             # print('mimic forger AUC {} eer {}'.format(AUC,eer))
 
-            result = model.predict(np.asarray(test_data_set)).ravel()
+            result = model.predict(test_data_set,batch_size=test_data_set.shape[0]).ravel()
             result = np.vstack((result, np.asarray(test_label_set))).T
             fpr_total, tpr_total, thresholds_total = roc_curve(result[:, 1].astype(np.int), result[:, 0])
             AUC = auc(fpr_total, tpr_total)
@@ -175,13 +176,14 @@ def repeat_predict(template_count):
 
 def get_model(model_path):
     model = Sequential()
-    model.add(Conv2D(64, 3, padding='same', activation='relu', input_shape=(200, 8, 6)))
+    model.add(Conv2D(128, 3, padding='same', activation='relu', input_shape=(25, 8, 6)))
     model.add(MaxPooling2D(2))
-    model.add(Conv2D(64, 3, activation='relu'))
+    model.add(Conv2D(128, 3, activation='relu'))
     model.add(MaxPooling2D(2))
     model.add(Flatten())
     model.add(BatchNormalization())
-    model.add(Dense(8, activation='relu'))
+    model.add(Dense(8, activation='relu', kernel_regularizer=regularizers.l2(0.001),
+                    activity_regularizer=regularizers.l1(0.001)))
     # model.add(Dropout(0.2))
     model.add(Dense(1, activation='sigmoid'))
     print(model.summary())
@@ -196,12 +198,12 @@ def get_model(model_path):
 
 if __name__ == '__main__':
     # main()
-    # for i in [6,8,10,12]:
-    #     result=repeat_predict(i)
-    #     pickle.dump(result,open('./predict-result2/template-{}-result.pkl'.format(i),'wb'))
-    #     print('mean_auc_random={} mean_auc_mimic={} mean_auc_all={} mean_eer_random={} mean_eer_mimic={} mean_eer_all={}'.format(result[0],result[1],result[2],result[3],result[4],result[5]))
+    for i in [12]:
+        result=repeat_predict(i)
+        # pickle.dump(result,open('./predict-result2/template-{}-result.pkl'.format(i),'wb'))
+        print('mean_auc_random={} mean_auc_mimic={} mean_auc_all={} mean_eer_random={} mean_eer_mimic={} mean_eer_all={}'.format(result[0],result[1],result[2],result[3],result[4],result[5]))
     # template_count_evaluation()
-    for i in [6,8,10,12]:
-        data=np.load(open('./predict-result2/template-{}-result.pkl'.format(i),'rb'),allow_pickle=True)
-        print(data)
+    # for i in [6,8,10,12]:
+    #     data=np.load(open('./predict-result2/template-{}-result.pkl'.format(i),'rb'),allow_pickle=True)
+    #     print(data)
 

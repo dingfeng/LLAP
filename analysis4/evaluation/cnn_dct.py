@@ -28,15 +28,17 @@ config.gpu_options.allow_growth = True  # 不全部占满显存, 按需分配
 
 
 def main():
-    dct_coefficients = [12]
+    dct_coefficients = [8,9
+                        # 10,15,20,25,30,35,40
+                        ]
     for dct_coefficient in dct_coefficients:
         dir_path = './dct_model/' + str(dct_coefficient)
         if not os.path.isdir(dir_path):
             os.mkdir(dir_path)
-        for i in range(14, 21):
+        for i in range(1,21):
             model = get_model(dct_coefficient)
-            dataset_filepath = './reference-dataset/21/dataset-{}.pkl'.format(i)
-            dataset = np.load(dataset_filepath)
+            dataset_filepath = './dataset/dataset-{}.pkl'.format(i)
+            dataset = np.load(dataset_filepath,allow_pickle=True)
             train_data_set = dataset['train_data_set']
             train_data_set = np.asarray(train_data_set)
             train_data_set=train_data_set[:,:dct_coefficient,:]
@@ -52,7 +54,7 @@ def main():
                 save_best_only=True)
             history = LossHistory()
             result = model.fit(train_data_set, np.asarray(train_label_set), batch_size=10,
-                               epochs=60, verbose=1,
+                               epochs=40, verbose=1,
                                validation_data=(test_data_set, np.asarray(test_label_set)),
                                callbacks=[checkpointer, history])
             KTF.clear_session()
@@ -62,9 +64,9 @@ def get_model(dct_coefficient):
     sess = tf.Session(config=config)
     KTF.set_session(sess)
     model = Sequential()
-    model.add(Conv2D(64, 3, padding='same', activation='relu', input_shape=(dct_coefficient, 8, 6)))
+    model.add(Conv2D(128, 3, padding='same', activation='relu', input_shape=(dct_coefficient, 8, 6)))
     model.add(MaxPooling2D(2))
-    model.add(Conv2D(64, 3, activation='relu'))
+    model.add(Conv2D(128, 3, activation='relu'))
     model.add(MaxPooling2D(2))
     model.add(Flatten())
     model.add(BatchNormalization())

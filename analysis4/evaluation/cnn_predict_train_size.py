@@ -24,7 +24,7 @@ import time
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 config = tf.ConfigProto()
-config.gpu_options.allow_growth = True  # 不全部占满显存, 按需分配
+config.gpu_options.allow_growth = True  # 不全部占满显存, 按需分配ls
 
 
 def repeat_predict():
@@ -38,7 +38,8 @@ def repeat_predict():
             KTF.set_session(sess)
             model_path = './train_size_model/{}/{}.hdf5'.format(train_size, i + 1)
             model = get_model(model_path)
-            dataset = np.load('O:/evaluation/reference-dataset/21/dataset-{}.pkl'.format(i + 1))
+            # dataset = np.load('O:/evaluation/reference-dataset/21/dataset-{}.pkl'.format(i + 1))
+            dataset = np.load('./dataset/dataset-{}.pkl'.format(i + 1), allow_pickle=True)
             test_data_set = dataset['test_data_set']
             test_label_set = dataset['test_label_set']
             result = model.predict(np.asarray(test_data_set)).ravel()
@@ -84,10 +85,11 @@ def main():
 
 
 def show_evaluation_plot():
-    results = np.load('train_size_result.pkl')
+    results = np.load('train_size_result.pkl', allow_pickle=True)
     results = np.asarray(results)
+    x = [100, 300, 500, 700, 900, 1100, 1300, 1500, 1700]
     plt.figure(figsize=(10, 6))
-    plt.plot([100, 300, 500, 700, 900, 1100, 1300, 1500, 1700], results[:, 0], lw=2, marker='o', c='r', markersize=12)
+    plt.plot(x, results[:, 0], lw=2, marker='o', c='r', markersize=12)
     plt.xlabel('Training Set Size', fontdict={'style': 'normal', 'weight': 'bold', 'size': 22})
     plt.ylabel('AUC', fontdict={'style': 'normal', 'weight': 'bold', 'size': 22})
     plt.xticks(fontsize=20, fontname='normal')
@@ -95,7 +97,7 @@ def show_evaluation_plot():
     plt.tight_layout()
     plt.savefig('./train_size_auc.pdf')
     plt.figure(figsize=(10, 6))
-    plt.plot([100, 300, 500, 700, 900, 1100, 1300, 1500, 1700], results[:, 1], lw=2, marker='o', c='r', markersize=12)
+    plt.plot(x, results[:, 1], lw=2, marker='o', c='r', markersize=12)
     plt.xlabel('Training Set Size', fontdict={'style': 'normal', 'weight': 'bold', 'size': 22})
     plt.ylabel('EER', fontdict={'style': 'normal', 'weight': 'bold', 'size': 22})
     plt.xticks(fontsize=20, fontname='normal')
@@ -107,6 +109,6 @@ def show_evaluation_plot():
 
 if __name__ == '__main__':
     # main()
-    # repeat_predict(4)
+    # # repeat_predict(4)
     # template_count_evaluation()
     show_evaluation_plot()

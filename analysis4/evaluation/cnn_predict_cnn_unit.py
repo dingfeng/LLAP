@@ -28,7 +28,7 @@ config.gpu_options.allow_growth = True  # 不全部占满显存, 按需分配
 
 
 def repeat_predict():
-    cnn_units = [8, 16, 32, 64, 96, 128]
+    cnn_units = [8, 16, 32, 64, 96,128,256]
     results = []
     for cnn_unit in cnn_units:
         total_auc_all = 0
@@ -37,29 +37,32 @@ def repeat_predict():
             sess = tf.Session(config=config)
             KTF.set_session(sess)
             model_path = './cnn_model/{}/{}.hdf5'.format(cnn_unit, i + 1)
-            model = get_model(cnn_unit,model_path)
-            dataset = np.load('O:/evaluation/reference-dataset/21/dataset-{}.pkl'.format(i + 1))
+            model = get_model(cnn_unit, model_path)
+            # dataset = np.load('O:/evaluation2/reference-dataset/20/dataset-{}.pkl'.format(i + 1),allow_pickle=True)
+            dataset = np.load('./dataset/dataset-{}.pkl'.format(i + 1), allow_pickle=True)
             test_data_set = dataset['test_data_set']
+            test_data_set = np.asarray(test_data_set)
+            test_data_set = test_data_set[:, :10, :]
             test_label_set = dataset['test_label_set']
-            result = model.predict(np.asarray(test_data_set)).ravel()
+            result = model.predict(test_data_set).ravel()
             result = np.vstack((result, np.asarray(test_label_set))).T
             fpr_total, tpr_total, thresholds_total = roc_curve(result[:, 1].astype(np.int), result[:, 0])
             AUC = auc(fpr_total, tpr_total)
             total_auc_all += AUC
-            print('all forger AUC {}'.format(AUC))
             eer = brentq(lambda x: 1. - x - interp1d(fpr_total, tpr_total)(x), 0., 1.)
             total_eer_all += eer
+            print('all forger AUC {} eer {}'.format(AUC, eer))
             KTF.clear_session()
         mean_auc_all = total_auc_all / 20
         mean_eer_all = total_eer_all / 20
-        print('mean_auc_all {} mean_eer_all {}'.format(mean_auc_all,mean_eer_all))
+        print('mean_auc_all {} mean_eer_all {}'.format(mean_auc_all, mean_eer_all))
         results.append([mean_auc_all, mean_eer_all])
     return np.asarray(results)
 
 
 def get_model(unit_num, model_path):
     model = Sequential()
-    model.add(Conv2D(unit_num, 3, padding='same', activation='relu', input_shape=(200, 8, 6)))
+    model.add(Conv2D(unit_num, 3, padding='same', activation='relu', input_shape=(10, 8, 6)))
     model.add(MaxPooling2D(2))
     model.add(Conv2D(unit_num, 3, activation='relu'))
     model.add(MaxPooling2D(2))
@@ -79,24 +82,38 @@ def get_model(unit_num, model_path):
 
 def main():
     results = repeat_predict()
-    pickle.dump(results,open('cnn_unit_result.pkl','wb'))
+
+    pickle.dump(results, open('cnn_unit_result.pkl', 'wb'))
     # pass
 
+
 def show_evaluation_plot():
-    results=np.load('cnn_unit_result.pkl')
-    results=np.asarray(results)
+    results = np.load('cnn_unit_result.pkl', allow_pickle=True)
+    results = np.asarray(results)
+    results=np.vstack((results[:4,:],results[5:,:]))
     plt.figure(figsize=(10, 6))
-    plt.plot([8, 16, 32, 64, 96, 128],results[:,0],lw=2,marker='o',c='r', markersize=12)
+    x = [8, 16, 32, 64,128,256]
+    plt.plot(x,  results[:, 0], lw=2, marker='o', c='r', markersize=12)
     plt.xlabel('Filter Number', fontdict={'style': 'normal', 'weight': 'bold', 'size': 22})
     plt.ylabel('AUC', fontdict={'style': 'normal', 'weight': 'bold', 'size': 22})
     plt.xticks(fontsize=20, fontname='normal')
     plt.yticks(fontsize=20, fontname='normal')
     plt.tight_layout()
     plt.savefig('./filter_number_auc.pdf')
+    plt.figure(figsize=(10, 6))
+    plt.plot(x, results[:, 1], lw=2, marker='o', c='r', markersize=12)
+    plt.xlabel('Filter Number', fontdict={'style': 'normal', 'weight': 'bold', 'size': 22})
+    plt.ylabel('EER', fontdict={'style': 'normal', 'weight': 'bold', 'size': 22})
+    plt.xticks(fontsize=20, fontname='normal')
+    plt.yticks(fontsize=20, fontname='normal')
+    plt.tight_layout()
+    plt.savefig('./filter_number_eer.pdf')
     plt.show()
 
+
 if __name__ == '__main__':
-    # main()
-    # repeat_predict(4)
+    main()
+    # results = repeat_predict()
+    # pickle.dump(results,open('cnn_unit_result.pkl','wb'))
     # template_count_evaluation()
     show_evaluation_plot()

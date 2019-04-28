@@ -28,7 +28,7 @@ config.gpu_options.allow_growth = True  # 不全部占满显存, 按需分配
 
 
 def repeat_predict():
-    dct_coefficients = [8,10,12,15,20,40,60,80,100, 120, 140, 160, 180, 200]
+    dct_coefficients = [8, 9, 10, 15, 20, 25, 30, 35, 40]
     results = []
     for dct_coefficient in dct_coefficients:
         total_auc_all = 0
@@ -37,20 +37,20 @@ def repeat_predict():
             sess = tf.Session(config=config)
             KTF.set_session(sess)
             model_path = './dct_model/{}/{}.hdf5'.format(dct_coefficient, i + 1)
-            model = get_model(dct_coefficient,model_path)
-            dataset = np.load('./reference-dataset/21/dataset-{}.pkl'.format(i + 1))
+            model = get_model(dct_coefficient, model_path)
+            dataset = np.load('./dataset/dataset-{}.pkl'.format(i + 1), allow_pickle=True)
             test_data_set = dataset['test_data_set']
             test_data_set = np.asarray(test_data_set)
-            test_data_set=test_data_set[:,:dct_coefficient,:]
+            test_data_set = test_data_set[:, :dct_coefficient, :]
             test_label_set = dataset['test_label_set']
             result = model.predict(np.asarray(test_data_set)).ravel()
             result = np.vstack((result, np.asarray(test_label_set))).T
             fpr_total, tpr_total, thresholds_total = roc_curve(result[:, 1].astype(np.int), result[:, 0])
             AUC = auc(fpr_total, tpr_total)
             total_auc_all += AUC
-            print('all forger AUC {}'.format(AUC))
             eer = brentq(lambda x: 1. - x - interp1d(fpr_total, tpr_total)(x), 0., 1.)
             total_eer_all += eer
+            print('all forger AUC {} eer {}'.format(AUC, eer))
             KTF.clear_session()
         mean_auc_all = total_auc_all / 20
         mean_eer_all = total_eer_all / 20
@@ -59,11 +59,11 @@ def repeat_predict():
     return np.asarray(results)
 
 
-def get_model(dct_coefficient,model_path):
+def get_model(dct_coefficient, model_path):
     model = Sequential()
-    model.add(Conv2D(64, 3, padding='same', activation='relu', input_shape=(dct_coefficient, 8, 6)))
+    model.add(Conv2D(128, 3, padding='same', activation='relu', input_shape=(dct_coefficient, 8, 6)))
     model.add(MaxPooling2D(2))
-    model.add(Conv2D(64, 3, activation='relu'))
+    model.add(Conv2D(128, 3, activation='relu'))
     model.add(MaxPooling2D(2))
     model.add(Flatten())
     model.add(BatchNormalization())
@@ -86,10 +86,12 @@ def main():
 
 
 def show_evaluation_plot():
-    results = np.load('dct_result.pkl')
+    results = np.load('dct_result.pkl', allow_pickle=True)
     results = np.asarray(results)
+    x = [8,9,10, 15, 20, 25, 30, 35, 40]
     plt.figure(figsize=(10, 6))
-    plt.plot([8,10,12,15,20,40,60,80,100, 120, 140, 160, 180, 200], results[:, 0], lw=2, marker='o', c='r', markersize=12)
+    plt.plot(x, results[:, 0], lw=2, marker='o', c='r',
+             markersize=12)
     plt.xlabel('Dct Coefficient Number', fontdict={'style': 'normal', 'weight': 'bold', 'size': 22})
     plt.ylabel('AUC', fontdict={'style': 'normal', 'weight': 'bold', 'size': 22})
     plt.xticks(fontsize=20, fontname='normal')
@@ -97,7 +99,8 @@ def show_evaluation_plot():
     plt.tight_layout()
     plt.savefig('./dct_auc.pdf')
     plt.figure(figsize=(10, 6))
-    plt.plot([8,10,12,15,20,40,60,80,100, 120, 140, 160, 180, 200], results[:, 1], lw=2, marker='o', c='r', markersize=12)
+    plt.plot(x, results[:, 1], lw=2, marker='o', c='r',
+             markersize=12)
     plt.xlabel('Dct Coefficient Number', fontdict={'style': 'normal', 'weight': 'bold', 'size': 22})
     plt.ylabel('EER', fontdict={'style': 'normal', 'weight': 'bold', 'size': 22})
     plt.xticks(fontsize=20, fontname='normal')
@@ -108,7 +111,10 @@ def show_evaluation_plot():
 
 
 if __name__ == '__main__':
-    main()
-    # repeat_predict(4)
+    # main()
     # template_count_evaluation()
     show_evaluation_plot()
+    # results = repeat_predict()
+    # print(results)
+    # pickle.dump(results, open('dct_result.pkl', 'wb'))
+    # print(repeat_predict())
