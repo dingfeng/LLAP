@@ -28,9 +28,7 @@ config.gpu_options.allow_growth = True  # 不全部占满显存, 按需分配
 
 
 def main():
-    dct_coefficients = [8,9
-                        # 10,15,20,25,30,35,40
-                        ]
+    dct_coefficients = [8,9,10,15,20,25,30,35,40]
     for dct_coefficient in dct_coefficients:
         dir_path = './dct_model/' + str(dct_coefficient)
         if not os.path.isdir(dir_path):
@@ -53,7 +51,7 @@ def main():
                 filepath=model_filepath, verbose=1,
                 save_best_only=True)
             history = LossHistory()
-            result = model.fit(train_data_set, np.asarray(train_label_set), batch_size=10,
+            result = model.fit(train_data_set, np.asarray(train_label_set), batch_size=32,
                                epochs=40, verbose=1,
                                validation_data=(test_data_set, np.asarray(test_label_set)),
                                callbacks=[checkpointer, history])

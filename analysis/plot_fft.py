@@ -26,31 +26,62 @@ def filter(data):
 
 
 def main():
-    filepath = '../server/2018-12-27-14-00-44/temp/lab/caizbi/1.pcm'
+    filepath = '../server/2019-05-24-14-59-29/temp/dingfeng/sound/2.pcm'
     data = np.memmap(filepath, dtype=np.float32, mode='r')
     # data = filter(data)
-    xf = np.arange(len(data)) / len(data) * 48000
-    yf = fftp.fft(data, len(data))
-    yf = np.abs(yf)
-    baseF = 17350
-    deltaF = 700
-    fn = 8
-    fslist = []
-    currentF = baseF
-    fslist.append(currentF)
-    for i in range(fn - 1):
-        currentF += deltaF
-        fslist.append(currentF)
-    for index, fc in enumerate(fslist):
-        print(index)
-        for value_index, value in enumerate(xf):
-            if value == fc:
-                print('index {} fc {} freq {} fft_energy {}'.format(index, fc, xf[value_index], yf[value_index]))
+    data=data[-48000:]
+    plot_fft(data)
+    # xf = np.arange(len(data)) / len(data) * 48000
+    # yf = fftp.fft(data, len(data))
+    # yf = np.abs(yf)
+    # baseF = 17350
+    # deltaF = 700
+    # fn = 8
+    # fslist = []
+    # currentF = baseF
+    # fslist.append(currentF)
+    # for i in range(fn - 1):
+    #     currentF += deltaF
+    #     fslist.append(currentF)
+    # for index, fc in enumerate(fslist):
+    #     print(index)
+    #     for value_index, value in enumerate(xf):
+    #         if value == fc:
+    #             print('index {} fc {} freq {} fft_energy {}'.format(index, fc, xf[value_index], yf[value_index]))
+
     # for i in range(20):
     #     yf[np.argmax(yf)] = 0
-    plt.plot(xf, yf)
-    plt.show()
+    # plt.plot(xf, yf)
+    # plt.show()
     pass
+
+
+def plot_fft(data,fs=48000):
+    plt.figure(figsize=(10,5))
+    xf = np.arange(len(data)) / len(data) * fs
+    yf = fftp.fft(data, len(data))
+    yf = np.abs(yf)
+    # baseF = 17350
+    # deltaF = 700
+    # values=np.zeros(8)
+    # for i in range(8):
+    #     freq=int(baseF + i*deltaF)
+    #     print('freq = {}, value = {}'.format(freq,yf[freq]))
+    #     values[i]=yf[freq]
+    # #统计信息
+    # minimum=np.min(values)
+    # maximum=np.max(values)
+    # rangeValue=maximum-minimum
+    # std = np.std(values)
+    # print('min = {}, max = {}, range = {}, standard deviation = {}'.format(minimum,maximum,rangeValue,std))
+    plt.xlabel('Frequency (Hz)',fontdict={'style': 'normal', 'weight': 'bold','size':22})
+    plt.ylabel('Magnitude',fontdict={'style': 'normal', 'weight': 'bold','size':22})
+    plt.xticks(fontsize=17,fontname='normal')
+    plt.yticks(fontsize=17,fontname='normal')
+    plt.plot(xf, yf)
+    plt.tight_layout()
+    plt.savefig('two-freq-fft.pdf', dpi=100)
+    plt.show()
 
 
 if __name__ == '__main__':

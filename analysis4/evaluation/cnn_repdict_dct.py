@@ -111,9 +111,9 @@ def show_evaluation_plot():
 
 
 if __name__ == '__main__':
-    # main()
+    main()
     # template_count_evaluation()
-    show_evaluation_plot()
+    # show_evaluation_plot()
     # results = repeat_predict()
     # print(results)
     # pickle.dump(results, open('dct_result.pkl', 'wb'))

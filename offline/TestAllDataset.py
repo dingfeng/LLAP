@@ -84,10 +84,10 @@ if __name__ == '__main__':
     parser.add_argument('--exp-users', type=int, nargs=2, default=(1000, 1020))
     parser.add_argument('--dev-users', type=int, nargs=2, default=(0, 13))
 
-    parser.add_argument('--gen-for-train', type=int, default=12)
-    parser.add_argument('--gen-for-test', type=int, default=10)
-    parser.add_argument('--forg-from_exp', type=int, default=0)
-    parser.add_argument('--forg-from_dev', type=int, default=14)
+    parser.add_argument('--gen-for-train', type=int, default=10)
+    parser.add_argument('--gen-for-test', type=int, default=20)
+    parser.add_argument('--forg-from_exp', type=int, default=10)
+    parser.add_argument('--forg-from_dev', type=int, default=0)
 
     parser.add_argument('--svm-type', choices=['rbf', 'linear'], default='rbf')
     parser.add_argument('--svm-c', type=float, default=1)

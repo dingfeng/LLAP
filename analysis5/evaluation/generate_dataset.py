@@ -17,8 +17,8 @@ def generate_dataset():
     global label_set
     global deep_label_set
     names=os.listdir('../../dataset/handwriting-lab-3/forged-feature-chord-40')
-    for reference_amount in [6, 8, 10, 12]:
-        for k in range(10):
+    for reference_amount in [10]:
+        for k in range(1):
             data_set = []
             label_set = []
             deep_label_set = []
@@ -26,7 +26,7 @@ def generate_dataset():
                 generate_by_name(name,reference_amount)
             indexes = np.arange(len(data_set))
             np.random.shuffle(indexes)
-            test_rate = 1
+            test_rate = 0.2
             test_count = int(len(indexes) * test_rate)
             train_data_set = []
             train_label_set = []
@@ -40,12 +40,12 @@ def generate_dataset():
             for i in range(test_count, len(indexes)):
                 train_data_set.append(data_set[indexes[i]])
                 train_label_set.append(label_set[indexes[i]])
-            dir_path='O:/evaluation2/test-dataset/{}'.format(reference_amount)
+            dir_path='O:/evaluation2/pretrain-dataset/{}'.format(reference_amount)
             if not os.path.isdir(dir_path):
                 os.makedirs(dir_path)
             pickle.dump(
                 {'train_data_set': train_data_set, 'train_label_set': train_label_set, 'test_data_set': test_data_set,
-                 'test_label_set': test_label_set,'deep_test_label_set':deep_test_label_set}, open('O:/evaluation2/test-dataset/{}/dataset-{}.pkl'.format(reference_amount,k + 1), 'wb'))
+                 'test_label_set': test_label_set,'deep_test_label_set':deep_test_label_set}, open('O:/evaluation2/pretrain-dataset/{}/dataset-{}.pkl'.format(reference_amount,k + 1), 'wb'))
 
 def generate_by_name(name,template_count):
     global names

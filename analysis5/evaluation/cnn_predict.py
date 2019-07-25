@@ -23,21 +23,22 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True  # 不全部占满显存, 按需分配
-
+sess = tf.Session(config=config)
+KTF.set_session(sess)
 
 def main():
-    model_path = 'O:/evaluation/reference-model/21/model-19.hdf5'
+    model_path = 'trained-model-1.hdf5'
     # model_path = './model/model-1.hdf5'
     model = get_model(model_path)
-    dataset = np.load('O:/evaluation/reference-dataset/21/dataset-19.pkl')
+    dataset = np.load('O:/evaluation2/pretrain-dataset/10/dataset-1.pkl',allow_pickle=True)
     # dataset=np.load('./dataset/dataset-1.pkl')
     test_data_set = dataset['test_data_set']
+    test_data_set = np.asarray(test_data_set)
+    test_data_set = test_data_set[:, :10, :]
     test_label_set = dataset['test_label_set']
-    # 'deep_test_label_set': deep_test_label_set}
     deep_test_label_set = np.asarray(dataset['deep_test_label_set'])
-
     mimic_indices = np.where(deep_test_label_set != 2)[0]
-    result = model.predict(np.asarray(test_data_set)[mimic_indices]).ravel()
+    result = model.predict(test_data_set[mimic_indices]).ravel()
     result = np.vstack((result, np.asarray(test_label_set)[mimic_indices])).T
     fpr_random, tpr_random, thresholds_random = roc_curve(result[:, 1].astype(np.int), result[:, 0])
     AUC = auc(fpr_random, tpr_random)
@@ -47,7 +48,7 @@ def main():
     print('random forger err {}'.format(eer))
 
     random_indices = np.where(deep_test_label_set != 3)[0]
-    result = model.predict(np.asarray(test_data_set)[random_indices]).ravel()
+    result = model.predict(test_data_set[random_indices]).ravel()
     result = np.vstack((result, np.asarray(test_label_set)[random_indices])).T
     fpr_mimic, tpr_mimic, thresholds_mimic = roc_curve(result[:, 1].astype(np.int), result[:, 0])
     AUC = auc(fpr_mimic, tpr_mimic)
@@ -56,7 +57,7 @@ def main():
     # thresh = interp1d(fpr_mimic, thresholds_mimic)(eer)
     print('mimic forger err {}'.format(eer))
 
-    result = model.predict(np.asarray(test_data_set)).ravel()
+    result = model.predict(test_data_set).ravel()
     result = np.vstack((result, np.asarray(test_label_set))).T
     fpr_total, tpr_total, thresholds_total = roc_curve(result[:, 1].astype(np.int), result[:, 0])
     AUC = auc(fpr_total, tpr_total)
@@ -65,22 +66,22 @@ def main():
     # thresh = interp1d(fpr_total, thresholds_total)(eer)
     print('total forger err {}'.format(eer))
     # plt.plot(fpr, tpr, lw=2)
-    plt.figure(figsize=(5, 5))
-    plt.xlabel('False Positive Rate', fontdict={'style': 'normal', 'weight': 'bold', 'size': 22})
-    plt.ylabel('True Positive Rate', fontdict={'style': 'normal', 'weight': 'bold', 'size': 22})
-    plt.xticks(fontsize=20, fontname='normal')
-    plt.yticks(fontsize=20, fontname='normal')
-
-    plt.tight_layout()
-    plt.plot(fpr_random, tpr_random, label='random', lw=2)
-    plt.plot(fpr_mimic, tpr_mimic, label='skilled', lw=2)
-    plt.plot(fpr_total, tpr_total, label='all', lw=2)
-    plt.plot([0,1],[1,0],linestyle="--")
-    plt.xlim(0,1.0)
-    plt.ylim(0,1.0)
-    plt.legend(prop={'size': 20})
-    plt.savefig('mimic-random-total-ROC-curves.pdf', dpi=100)
-    plt.show()
+    # plt.figure(figsize=(5, 5))
+    # plt.xlabel('False Positive Rate', fontdict={'style': 'normal', 'weight': 'bold', 'size': 22})
+    # plt.ylabel('True Positive Rate', fontdict={'style': 'normal', 'weight': 'bold', 'size': 22})
+    # plt.xticks(fontsize=20, fontname='normal')
+    # plt.yticks(fontsize=20, fontname='normal')
+    #
+    # plt.tight_layout()
+    # plt.plot(fpr_random, tpr_random, label='random', lw=2)
+    # plt.plot(fpr_mimic, tpr_mimic, label='skilled', lw=2)
+    # plt.plot(fpr_total, tpr_total, label='all', lw=2)
+    # plt.plot([0,1],[1,0],linestyle="--")
+    # plt.xlim(0,1.0)
+    # plt.ylim(0,1.0)
+    # plt.legend(prop={'size': 20})
+    # plt.savefig('mimic-random-total-ROC-curves.pdf', dpi=100)
+    # plt.show()
     pass
 
 
@@ -98,17 +99,17 @@ def repeat_predict(template_count):
             count+=1
             sess = tf.Session(config=config)
             KTF.set_session(sess)
-            # model_path = 'O:/evaluation2/reference-model/20/model-{}.hdf5'.format(j+1)
-            model = get_model('1.hdf5')
+            model_path = 'O:/evaluation2/reference-model/10/model-{}.hdf5'.format(j+1)
+            model = get_model(model_path)
             dataset = np.load('O:/evaluation2/test-dataset/{}/dataset-{}.pkl'.format(template_count,i+1),allow_pickle=True)
             test_data_set = dataset['test_data_set']
-            test_data_set=np.asarray(test_data_set)[:,:25,:]
+            test_data_set=np.asarray(test_data_set)[:,:10,:]
             test_label_set = dataset['test_label_set']
             # 'deep_test_label_set': deep_test_label_set}
             deep_test_label_set = np.asarray(dataset['deep_test_label_set'])
 
             mimic_indices = np.where(deep_test_label_set != 2)[0]
-            result = model.predict(test_data_set[mimic_indices],batch_size=len(mimic_indices)).ravel()
+            result = model.predict(test_data_set[mimic_indices]).ravel()
             result = np.vstack((result, np.asarray(test_label_set)[mimic_indices])).T
             fpr_random, tpr_random, thresholds_random = roc_curve(result[:, 1].astype(np.int), result[:, 0])
             AUC = auc(fpr_random, tpr_random)
@@ -117,7 +118,7 @@ def repeat_predict(template_count):
             total_eer_random+=eer
             # print('random forger AUC {} eer {}'.format(AUC,eer))
             random_indices = np.where(deep_test_label_set != 3)[0]
-            result = model.predict(test_data_set[random_indices],batch_size=len(random_indices)).ravel()
+            result = model.predict(test_data_set[random_indices]).ravel()
             result = np.vstack((result, np.asarray(test_label_set)[random_indices])).T
             fpr_mimic, tpr_mimic, thresholds_mimic = roc_curve(result[:, 1].astype(np.int), result[:, 0])
             AUC = auc(fpr_mimic, tpr_mimic)
@@ -126,7 +127,7 @@ def repeat_predict(template_count):
             total_eer_mimic+=eer
             # print('mimic forger AUC {} eer {}'.format(AUC,eer))
 
-            result = model.predict(test_data_set,batch_size=test_data_set.shape[0]).ravel()
+            result = model.predict(test_data_set).ravel()
             result = np.vstack((result, np.asarray(test_label_set))).T
             fpr_total, tpr_total, thresholds_total = roc_curve(result[:, 1].astype(np.int), result[:, 0])
             AUC = auc(fpr_total, tpr_total)
@@ -142,7 +143,7 @@ def repeat_predict(template_count):
     mean_auc_random = total_auc_random / 200
     mean_auc_mimic = total_auc_mimic / 200
     mean_auc_all = total_auc_all / 200
-    print('mean_auc_random={} mean_auc_mimic={} mean_auc_all={}'.format(mean_auc_random,mean_auc_mimic,mean_auc_all))
+    # print('mean_auc_random={} mean_auc_mimic={} mean_auc_all={}'.format(mean_auc_random,mean_auc_mimic,mean_auc_all))
     # plt.figure(figsize=(5, 5))
     # plt.bar('skilled', mean_auc_mimic,ec='r', ls='--', lw=2,color='C0')
     # plt.bar('random', mean_auc_random,ec='r', ls='--', lw=2,color='C1')
@@ -158,8 +159,8 @@ def repeat_predict(template_count):
     mean_eer_random=total_eer_random/200
     mean_eer_mimic=total_eer_mimic/200
     mean_eer_all=total_eer_all/200
-    print('mean_eer_random={} mean_eer_mimic={} mean_eer_all={}'.format(mean_eer_random, mean_eer_mimic,
-                                                                        mean_eer_all))
+    # print('mean_eer_random={} mean_eer_mimic={} mean_eer_all={}'.format(mean_eer_random, mean_eer_mimic,
+    #                                                                     mean_eer_all))
     # plt.figure(figsize=(5, 5))
     # plt.bar('skilled', mean_eer_mimic, ec='r', ls='--', lw=2, color='C0')
     # plt.bar('random', mean_eer_random, ec='r', ls='--', lw=2, color='C1')
@@ -176,7 +177,7 @@ def repeat_predict(template_count):
 
 def get_model(model_path):
     model = Sequential()
-    model.add(Conv2D(128, 3, padding='same', activation='relu', input_shape=(25, 8, 6)))
+    model.add(Conv2D(128, 3, padding='same', activation='relu', input_shape=(10, 8, 6)))
     model.add(MaxPooling2D(2))
     model.add(Conv2D(128, 3, activation='relu'))
     model.add(MaxPooling2D(2))
@@ -197,11 +198,11 @@ def get_model(model_path):
 
 
 if __name__ == '__main__':
-    # main()
-    for i in [12]:
-        result=repeat_predict(i)
+    main()
+    # for i in [10]:
+    #     result=repeat_predict(i)
         # pickle.dump(result,open('./predict-result2/template-{}-result.pkl'.format(i),'wb'))
-        print('mean_auc_random={} mean_auc_mimic={} mean_auc_all={} mean_eer_random={} mean_eer_mimic={} mean_eer_all={}'.format(result[0],result[1],result[2],result[3],result[4],result[5]))
+        # print('mean_auc_random={} mean_auc_mimic={} mean_auc_all={} mean_eer_random={} mean_eer_mimic={} mean_eer_all={}'.format(result[0],result[1],result[2],result[3],result[4],result[5]))
     # template_count_evaluation()
     # for i in [6,8,10,12]:
     #     data=np.load(open('./predict-result2/template-{}-result.pkl'.format(i),'rb'),allow_pickle=True)

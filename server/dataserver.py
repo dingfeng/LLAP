@@ -40,7 +40,7 @@ class CommandServer(socketserver.BaseRequestHandler):
 
         while (True):
             try:
-                command = input("input command ( start 0, stop dingfeng, next 2, send 3, remove 4, info 5): ")
+                command = input("input command ( start 0, stop 1, next 2, send 3, remove 4, info 5): ")
                 self.request.sendall((commands[int(command)] + "\n").encode())
             except Exception:
                 print()

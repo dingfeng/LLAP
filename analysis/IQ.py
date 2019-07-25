@@ -5,7 +5,6 @@ import numpy as np
 import pylab
 import scipy.fftpack as fftp
 import matplotlib.pyplot as plt
-from analysis.CIC import *
 from scipy.signal import butter, lfilter, find_peaks_cwt
 from statsmodels.tsa.seasonal import seasonal_decompose
 from scipy.signal import find_peaks
@@ -19,7 +18,7 @@ def main():
 
 
 def getData():
-    filepath = '../server/2018-12-25-20-41-21/temp/dingfeng/dingfeng-forged-forged/1.pcm'
+    filepath = 'F:/rfid实验室/新研究点/超声波/论文实现/llap/server/2019-05-04-11-24-21/temp/zhangqian/g/1.pcm'
     data = np.memmap(filepath, dtype=np.float32, mode='r')
     # data = butter_bandpass_filter(data, 18000, 22000, fs)
     # data = data[130000:]

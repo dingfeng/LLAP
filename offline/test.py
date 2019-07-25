@@ -6,8 +6,8 @@ import numpy as np
 
 def main():
     filepath='./testdata/results/result.npz'
-    result=np.load(open(filepath,'rb'))
-    print(result)
+    result=np.load(open(filepath,'rb'),allow_pickle=True)
+    print(str(result)[:2000])
 
 
 

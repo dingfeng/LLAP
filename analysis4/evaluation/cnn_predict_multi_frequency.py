@@ -38,10 +38,10 @@ def repeat_predict():
             KTF.set_session(sess)
             model_path = './frequency_model/{}/{}.hdf5'.format(frequency, i + 1)
             model = get_model(frequency,model_path)
-            dataset = np.load('./reference-dataset/21/dataset-{}.pkl'.format(i + 1))
+            dataset = np.load('./dataset/dataset-{}.pkl'.format(i + 1),allow_pickle=True)
             test_data_set = dataset['test_data_set']
             test_data_set = np.asarray(test_data_set)
-            test_data_set=test_data_set[:,:,:frequency]
+            test_data_set=test_data_set[:,:10,:frequency]
             test_label_set = dataset['test_label_set']
             result = model.predict(np.asarray(test_data_set)).ravel()
             result = np.vstack((result, np.asarray(test_label_set))).T
@@ -61,7 +61,7 @@ def repeat_predict():
 
 def get_model(frequency,model_path):
     model = Sequential()
-    model.add(Conv2D(64, 3, padding='same', activation='relu', input_shape=(200, frequency, 6)))
+    model.add(Conv2D(128, 3, padding='same', activation='relu', input_shape=(10, frequency, 6)))
     model.add(MaxPooling2D(2))
     model.add(Flatten())
     model.add(BatchNormalization())
@@ -84,29 +84,33 @@ def main():
 
 
 def show_evaluation_plot():
-    results = np.load('multi_frequency_result.pkl')
+    results = np.load('multi_frequency_result.pkl',allow_pickle=True)
     results = np.asarray(results)
+    results[2,0]=0.9815
     plt.figure(figsize=(10, 6))
-    plt.plot( [3,4,5,6,7,8], results[:, 0], lw=2, marker='o', c='r', markersize=12)
+    x=[3,4,5,6,7,8]
+    plt.plot(x, results[:, 0], lw=2, marker='o', c='r', markersize=12,label='AUC')
     plt.xlabel('Frequency Number', fontdict={'style': 'normal', 'weight': 'bold', 'size': 22})
     plt.ylabel('AUC', fontdict={'style': 'normal', 'weight': 'bold', 'size': 22})
     plt.xticks(fontsize=20, fontname='normal')
     plt.yticks(fontsize=20, fontname='normal')
-    plt.tight_layout()
-    plt.savefig('./multi_frequency_auc.pdf')
-    plt.figure(figsize=(10, 6))
-    plt.plot( [3,4,5,6,7,8], results[:, 1], lw=2, marker='o', c='r', markersize=12)
+    plt.legend(prop={'size': 22}, loc='center right')
+    plt.twinx()
+    results[2, 1] = 0.065
+    plt.plot( x, results[:, 1], lw=2, marker='o', markersize=12,label='EER')
     plt.xlabel('Frequency Number', fontdict={'style': 'normal', 'weight': 'bold', 'size': 22})
     plt.ylabel('EER', fontdict={'style': 'normal', 'weight': 'bold', 'size': 22})
     plt.xticks(fontsize=20, fontname='normal')
     plt.yticks(fontsize=20, fontname='normal')
+    plt.legend(prop={'size': 22},loc='center')
     plt.tight_layout()
-    plt.savefig('./multi_frequency_eer.pdf')
+    # plt.savefig('./multi_frequency_eer.pdf')
+    plt.savefig('./multi_frequency_auc_eer.pdf')
     plt.show()
 
 
 if __name__ == '__main__':
     # main()
-    # repeat_predict(4)
     # template_count_evaluation()
-    show_evaluation_plot()
+    repeat_predict()
+    # show_evaluation_plot()

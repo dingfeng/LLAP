@@ -28,8 +28,8 @@ config.gpu_options.allow_growth = True  # 不全部占满显存, 按需分配
 
 
 def main():
-    dct_coefficients = [8,10,12,15,20]
-    for dct_coefficient in [20]:
+    dct_coefficients = [8,9,10,15,20,25,30,35,40]
+    for dct_coefficient in dct_coefficients:
         dir_path = './only_velocity/' + str(dct_coefficient)
         if not os.path.isdir(dir_path):
             os.mkdir(dir_path)
@@ -51,7 +51,7 @@ def main():
                 filepath=model_filepath, verbose=1,
                 save_best_only=True)
             history = LossHistory()
-            result = model.fit(train_data_set, np.asarray(train_label_set), batch_size=10,
+            result = model.fit(train_data_set, np.asarray(train_label_set), batch_size=32,
                                epochs=60, verbose=1,
                                validation_data=(test_data_set, np.asarray(test_label_set)),
                                callbacks=[checkpointer, history])
@@ -62,9 +62,9 @@ def get_model(dct_coefficient):
     sess = tf.Session(config=config)
     KTF.set_session(sess)
     model = Sequential()
-    model.add(Conv2D(64, 3, padding='same', activation='relu', input_shape=(dct_coefficient, 8, 3)))
+    model.add(Conv2D(128, 3, padding='same', activation='relu', input_shape=(dct_coefficient, 8, 3)))
     model.add(MaxPooling2D(2))
-    model.add(Conv2D(64, 3, activation='relu'))
+    model.add(Conv2D(128, 3, activation='relu'))
     model.add(MaxPooling2D(2))
     model.add(Flatten())
     model.add(BatchNormalization())
@@ -81,7 +81,7 @@ def get_model(dct_coefficient):
 
 
 def repeat_predict():
-    dct_coefficients = [40]
+    dct_coefficients = [8,9,10,15,20,25,30,35,40]
     results = []
     for dct_coefficient in dct_coefficients:
         total_auc_all = 0
@@ -91,12 +91,12 @@ def repeat_predict():
             KTF.set_session(sess)
             model_path = './only_velocity/{}/{}.hdf5'.format(dct_coefficient, i + 1)
             model = get_predict_model(dct_coefficient,model_path)
-            dataset = np.load('./reference-dataset/21/dataset-{}.pkl'.format(i + 1))
+            dataset = np.load('./dataset/dataset-{}.pkl'.format(i + 1),allow_pickle=True)
             test_data_set = dataset['test_data_set']
             test_data_set = np.asarray(test_data_set)
             test_data_set=test_data_set[:,:dct_coefficient,:,[0,2,4]]
             test_label_set = dataset['test_label_set']
-            result = model.predict(np.asarray(test_data_set)).ravel()
+            result = model.predict(test_data_set).ravel()
             result = np.vstack((result, np.asarray(test_label_set))).T
             fpr_total, tpr_total, thresholds_total = roc_curve(result[:, 1].astype(np.int), result[:, 0])
             AUC = auc(fpr_total, tpr_total)
@@ -109,13 +109,13 @@ def repeat_predict():
         mean_eer_all = total_eer_all / 20
         print('mean_auc_all {} mean_eer_all {}'.format(mean_auc_all, mean_eer_all))
         results.append([mean_auc_all, mean_eer_all])
-    print(np.asarray(results))
+    return results
 
 def get_predict_model(dct_coefficient,model_path):
     model = Sequential()
-    model.add(Conv2D(64, 3, padding='same', activation='relu', input_shape=(dct_coefficient, 8, 3)))
+    model.add(Conv2D(128, 3, padding='same', activation='relu', input_shape=(dct_coefficient, 8, 3)))
     model.add(MaxPooling2D(2))
-    model.add(Conv2D(64, 3, activation='relu'))
+    model.add(Conv2D(128, 3, activation='relu'))
     model.add(MaxPooling2D(2))
     model.add(Flatten())
     model.add(BatchNormalization())
@@ -131,7 +131,10 @@ def get_predict_model(dct_coefficient,model_path):
     return model
 
 if __name__ == '__main__':
-    main()
+    # main()
     # repeat_predict(4)
     # template_count_evaluation()
     # repeat_predict()
+    results=repeat_predict()
+    print(results)
+    pickle.dump(results,open('only_velocity_result.pkl','wb'))

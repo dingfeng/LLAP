@@ -22,12 +22,14 @@ filter_half_width = 100  # +-100Hz
 
 def main():
     init_IQ_multipliers()
-    dataset_dir = '../dataset2'
+    dataset_dir = '../replay-attack-dataset'
     names = os.listdir(dataset_dir)
     for name in names:
-        if name == 'zhuyan':
-            dir_path = os.path.join(dataset_dir, name)
-            cut_dir(dir_path)
+        if  name == 'dengyufeng':
+            continue
+        dir_path = os.path.join(dataset_dir, name)
+        cut_dir(dir_path)
+
 
 
 def init_IQ_multipliers():
@@ -52,7 +54,9 @@ def init_IQ_multipliers():
 
 
 def cut_dir(dir_path):
-    sub_dirs = ['music', 'reference', 'walk', '0day','1day','7day']
+    # sub_dirs = ['music', 'reference', 'walk', '0day','1day','7day']
+    # sub_dirs = ['distance0', 'distance1', 'distance2']
+    sub_dirs = ['replayattack', 'replayattack-1']
     to_dump = {}
     dest_filepath = os.path.join(dir_path, 'feature.pkl')
     for sub_dir in sub_dirs:
@@ -101,6 +105,48 @@ def cut_file(source_filepath):
             I = butter_lowpass_filter(I, 100, fs)[200:][::300]
             decompositionI = seasonal_decompose(I, freq=10, two_sided=False)
             I = decompositionI.trend[10:]
+            # I=I[10:]
+            # trend=decompositionI.trend[10:]
+            # seasonal=decompositionI.seasonal[10:]
+            # resid=decompositionI.resid[10:]
+            # plt.figure(figsize=(10, 6))
+            # plt.plot(x, results[:, 0], lw=2, marker='o', c='r', markersize=12, label='AUC')
+            # plt.xlabel('CNN Filter Number', fontdict={'style': 'normal', 'weight': 'bold', 'size': 22})
+            # plt.ylabel('AUC', fontdict={'style': 'normal', 'weight': 'bold', 'size': 22})
+            # plt.xticks(fontsize=20, fontname='normal')
+            # plt.yticks(fontsize=20, fontname='normal')
+            # plt.legend(prop={'size': 22}, loc='center right')
+            # plt.tight_layout()
+            # plt.savefig('./filter_number_auc_eer.pdf')
+            # plt.show()
+            # plt.figure(figsize=(15,20))
+            # x=np.arange(len(I))/160
+            # ax1=plt.subplot(411)
+            # plt.plot(x,I,lw=2)
+            # plt.setp(ax1.get_xticklabels(), visible=False)
+            # plt.ylabel('Original Sequence', fontdict={'style': 'normal', 'weight': 'bold', 'size': 20})
+            # plt.yticks(fontsize=20, fontname='normal')
+            # ax2=plt.subplot(412)
+            # plt.plot(x,trend,lw=2)
+            # plt.setp(ax2.get_xticklabels(), visible=False)
+            # plt.ylabel('Trend Sequence', fontdict={'style': 'normal', 'weight': 'bold', 'size': 20})
+            # plt.yticks(fontsize=20, fontname='normal')
+            # ax3=plt.subplot(413)
+            # plt.plot(x,seasonal,lw=2)
+            # plt.setp(ax3.get_xticklabels(), visible=False)
+            # plt.ylabel('Seasonal Sequence', fontdict={'style': 'normal', 'weight': 'bold', 'size': 20})
+            # plt.yticks(fontsize=20, fontname='normal')
+            # plt.subplot(414)
+            # plt.plot(x,resid,lw=2)
+            # plt.xlabel('Time (Seconds)', fontdict={'style': 'normal', 'weight': 'bold', 'size': 20})
+            # plt.xticks(fontsize=20, fontname='normal')
+            # plt.yticks(fontsize=20, fontname='normal')
+            # plt.ylabel('Residual Sequence', fontdict={'style': 'normal', 'weight': 'bold', 'size': 20})
+            # plt.tight_layout()
+            # plt.savefig('./std-effect.pdf')
+            # plt.show()
+
+
             Q = getQ(freq_data, freq_index, i)
             Q = butter_lowpass_filter(Q, 100, fs)[200:][::300]
             decompositionQ = seasonal_decompose(Q, freq=10, two_sided=False)

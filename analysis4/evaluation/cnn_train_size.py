@@ -15,6 +15,7 @@ import os
 import keras
 import keras_metrics
 import os
+
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 config = tf.ConfigProto()
@@ -22,40 +23,51 @@ config.gpu_options.allow_growth = True  # 不全部占满显存, 按需分配
 
 
 def main():
-    train_sizes=[100,300,500,700,900,1100,1300,1500,1700]
+    train_sizes = [100, 300, 500, 700, 900, 1100, 1300, 1500, 1700]
     for train_size in train_sizes:
-        dir_path='./train_size_model/'+str(train_size)
+        dir_path = './train_size_model/' + str(train_size)
         if not os.path.isdir(dir_path):
             os.mkdir(dir_path)
-        for i in range(1,21):
-            model=get_model()
+        for i in range(1, 21):
+            model = get_model()
             # dataset_filepath='O:/evaluation/reference-dataset/21/dataset-{}.pkl'.format(i)
             dataset_filepath = './dataset/dataset-{}.pkl'.format(i)
-            dataset = np.load(dataset_filepath,allow_pickle=True)
+            dataset = np.load(dataset_filepath, allow_pickle=True)
             train_data_set = dataset['train_data_set']
-            train_data_set=train_data_set[:train_size]
-            train_label_set=train_label_set[:train_size]
+            train_data_set = np.asarray(train_data_set)
+            train_data_set = train_data_set[:, :10, :]
+            train_data_set = train_data_set[:train_size]
+
             train_label_set = dataset['train_label_set']
+            train_label_set = np.asarray(train_label_set)
+            train_label_set = train_label_set[:train_size]
+
             test_data_set = dataset['test_data_set']
+            test_data_set = np.asarray(test_data_set)
+            test_data_set = test_data_set[:, :10, :]
+
             test_label_set = dataset['test_label_set']
-            model_filepath='./train_size_model/{}/{}.hdf5'.format(train_size,i)
+            test_label_set = np.asarray(test_label_set)
+
+            model_filepath = './train_size_model/{}/{}.hdf5'.format(train_size, i)
             checkpointer = ModelCheckpoint(
                 filepath=model_filepath, verbose=1,
                 save_best_only=True)
             history = LossHistory()
-            result = model.fit(np.asarray(train_data_set), np.asarray(train_label_set), batch_size=10,
-                               epochs=60, verbose=1,
-                               validation_data=(np.asarray(test_data_set), np.asarray(test_label_set)),
+            result = model.fit(train_data_set, train_label_set, batch_size=32,
+                               epochs=40, verbose=1,
+                               validation_data=(test_data_set, test_label_set),
                                callbacks=[checkpointer, history])
             KTF.clear_session()
+
 
 def get_model():
     sess = tf.Session(config=config)
     KTF.set_session(sess)
     model = Sequential()
-    model.add(Conv2D(64, 3, padding='same', activation='relu', input_shape=(200, 8, 6)))
+    model.add(Conv2D(128, 3, padding='same', activation='relu', input_shape=(10, 8, 6)))
     model.add(MaxPooling2D(2))
-    model.add(Conv2D(64, 3, activation='relu'))
+    model.add(Conv2D(128, 3, activation='relu'))
     model.add(MaxPooling2D(2))
     model.add(Flatten())
     model.add(BatchNormalization())
@@ -69,6 +81,7 @@ def get_model():
                   metrics=['accuracy', keras_metrics.precision(label=1), keras_metrics.recall(label=1),
                            keras_metrics.f1_score()])
     return model
+
 
 if __name__ == '__main__':
     main()

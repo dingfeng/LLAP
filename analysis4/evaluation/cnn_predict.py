@@ -103,12 +103,14 @@ def repeat_predict(template_count):
         model = get_model(model_path)
         dataset = np.load('O:/evaluation2/reference-dataset/{}/dataset-{}.pkl'.format(template_count, i + 1),allow_pickle=True)
         test_data_set = dataset['test_data_set']
+        test_data_set = np.asarray(test_data_set)
+        test_data_set = test_data_set[:, :10, :]
         test_label_set = dataset['test_label_set']
         # 'deep_test_label_set': deep_test_label_set}
         deep_test_label_set = np.asarray(dataset['deep_test_label_set'])
 
         mimic_indices = np.where(deep_test_label_set != 2)[0]
-        result = model.predict(np.asarray(test_data_set)[mimic_indices]).ravel()
+        result = model.predict(test_data_set[mimic_indices]).ravel()
         result = np.vstack((result, np.asarray(test_label_set)[mimic_indices])).T
         fpr_random, tpr_random, thresholds_random = roc_curve(result[:, 1].astype(np.int), result[:, 0])
         AUC = auc(fpr_random, tpr_random)
@@ -117,7 +119,7 @@ def repeat_predict(template_count):
         total_eer_random += eer
         print('random forger AUC {} EER {}'.format(AUC,eer))
         random_indices = np.where(deep_test_label_set != 3)[0]
-        result = model.predict(np.asarray(test_data_set)[random_indices]).ravel()
+        result = model.predict(test_data_set[random_indices]).ravel()
         result = np.vstack((result, np.asarray(test_label_set)[random_indices])).T
         fpr_mimic, tpr_mimic, thresholds_mimic = roc_curve(result[:, 1].astype(np.int), result[:, 0])
         AUC = auc(fpr_mimic, tpr_mimic)
@@ -125,7 +127,7 @@ def repeat_predict(template_count):
         eer = brentq(lambda x: 1. - x - interp1d(fpr_mimic, tpr_mimic)(x), 0., 1.)
         total_eer_mimic += eer
         # print('mimic forger AUC {} EER {}'.format(AUC,eer))
-        result = model.predict(np.asarray(test_data_set)).ravel()
+        result = model.predict(test_data_set).ravel()
         result = np.vstack((result, np.asarray(test_label_set))).T
         fpr_total, tpr_total, thresholds_total = roc_curve(result[:, 1].astype(np.int), result[:, 0])
         AUC = auc(fpr_total, tpr_total)
@@ -174,9 +176,9 @@ def repeat_predict(template_count):
 
 def get_model(model_path):
     model = Sequential()
-    model.add(Conv2D(64, 3, padding='same', activation='relu', input_shape=(200, 8, 6)))
+    model.add(Conv2D(128, 3, padding='same', activation='relu', input_shape=(10, 8, 6)))
     model.add(MaxPooling2D(2))
-    model.add(Conv2D(64, 3, activation='relu'))
+    model.add(Conv2D(128, 3, activation='relu'))
     model.add(MaxPooling2D(2))
     model.add(Flatten())
     model.add(BatchNormalization())
@@ -210,7 +212,7 @@ def test_repeat_predict(template_count):
         model_path = 'O:/evaluation/reference-model/{}/model-{}.hdf5'.format(template_count, i + 1)
         model = get_model(model_path)
         test_label_set = dataset['test_label_set']
-        dataset = np.load('O:/evaluation/reference-dataset/{}/dataset-{}.pkl'.format(template_count, i + 1))
+        dataset = np.load('O:/evaluation/reference-dataset/{}/dataset-{}.pkl'.format(template_count, i + 1),allow_pickle=True)
         test_data_set = dataset['test_data_set']
         predicted_data = np.asarray(test_data_set)
         start_time = time.time()
@@ -225,6 +227,7 @@ def test_repeat_predict(template_count):
 
 if __name__ == '__main__':
     # main()
-    repeat_predict(20)
+    result=repeat_predict(10)
+    print(result)
     # template_count_evaluation()
     # test_repeat_predict(4)

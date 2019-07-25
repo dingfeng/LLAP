@@ -28,9 +28,9 @@ config.gpu_options.allow_growth = True  # 不全部占满显存, 按需分配
 
 
 def repeat_predict():
-    dct_coefficients = [8,10,12,15,20,40,60,80,100, 120, 140, 160, 180, 200]
+    dct_coefficients = [8,9,10, 15, 20, 25, 30, 35, 40]
     results = []
-    for dct_coefficient in [20]:
+    for dct_coefficient in dct_coefficients:
         total_auc_all = 0
         total_eer_all = 0
         for i in range(20):
@@ -61,9 +61,9 @@ def repeat_predict():
 
 def get_model(dct_coefficient,model_path):
     model = Sequential()
-    model.add(Conv2D(64, 3, padding='same', activation='relu', input_shape=(dct_coefficient, 8, 3)))
+    model.add(Conv2D(128, 3, padding='same', activation='relu', input_shape=(dct_coefficient, 8, 3)))
     model.add(MaxPooling2D(2))
-    model.add(Conv2D(64, 3, activation='relu'))
+    model.add(Conv2D(128, 3, activation='relu'))
     model.add(MaxPooling2D(2))
     model.add(Flatten())
     model.add(BatchNormalization())
@@ -86,10 +86,11 @@ def main():
 
 
 def show_evaluation_plot():
-    results = np.load('dct_acce_result.pkl')
+    results = np.load('dct_acce_result.pkl',allow_pickle=True)
     results = np.asarray(results)
+    x= [8,9,10, 15, 20, 25, 30, 35, 40]
     plt.figure(figsize=(10, 6))
-    plt.plot([8,10,12,15,20,40,60,80,100, 120, 140, 160, 180, 200], results[:, 0], lw=2, marker='o', c='r', markersize=12)
+    plt.plot(x, results[:, 0], lw=2, marker='o', c='r', markersize=12)
     plt.xlabel('Dct Coefficient Number', fontdict={'style': 'normal', 'weight': 'bold', 'size': 22})
     plt.ylabel('AUC', fontdict={'style': 'normal', 'weight': 'bold', 'size': 22})
     plt.xticks(fontsize=20, fontname='normal')
@@ -97,7 +98,7 @@ def show_evaluation_plot():
     plt.tight_layout()
     plt.savefig('./dct_acce_auc.pdf')
     plt.figure(figsize=(10, 6))
-    plt.plot([8,10,12,15,20,40,60,80,100, 120, 140, 160, 180, 200], results[:, 1], lw=2, marker='o', c='r', markersize=12)
+    plt.plot(x, results[:, 1], lw=2, marker='o', c='r', markersize=12)
     plt.xlabel('Dct Coefficient Number', fontdict={'style': 'normal', 'weight': 'bold', 'size': 22})
     plt.ylabel('EER', fontdict={'style': 'normal', 'weight': 'bold', 'size': 22})
     plt.xticks(fontsize=20, fontname='normal')
@@ -108,8 +109,8 @@ def show_evaluation_plot():
 
 
 if __name__ == '__main__':
-    # main()
+    main()
     # repeat_predict(4)
     # template_count_evaluation()
     # show_evaluation_plot()
-    repeat_predict()
+    # repeat_predict()

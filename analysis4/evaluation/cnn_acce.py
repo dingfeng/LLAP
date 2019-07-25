@@ -28,8 +28,8 @@ config.gpu_options.allow_growth = True  # 不全部占满显存, 按需分配
 
 
 def main():
-    dct_coefficients = [#8,10,12,15,20,40,60,80,100, 120, 140, 160, 180,
-                        20]
+    dct_coefficients = [#8,9,10,15,20,
+                        25,30,35,40]
     for dct_coefficient in dct_coefficients:
         dir_path = './only_acce/' + str(dct_coefficient)
         if not os.path.isdir(dir_path):
@@ -52,7 +52,7 @@ def main():
                 filepath=model_filepath, verbose=1,
                 save_best_only=True)
             history = LossHistory()
-            result = model.fit(train_data_set, np.asarray(train_label_set), batch_size=10,
+            result = model.fit(train_data_set, np.asarray(train_label_set), batch_size=32,
                                epochs=60, verbose=1,
                                validation_data=(test_data_set, np.asarray(test_label_set)),
                                callbacks=[checkpointer, history])
@@ -63,9 +63,9 @@ def get_model(dct_coefficient):
     sess = tf.Session(config=config)
     KTF.set_session(sess)
     model = Sequential()
-    model.add(Conv2D(64, 3, padding='same', activation='relu', input_shape=(dct_coefficient, 8, 3)))
+    model.add(Conv2D(128, 3, padding='same', activation='relu', input_shape=(dct_coefficient, 8, 3)))
     model.add(MaxPooling2D(2))
-    model.add(Conv2D(64, 3, activation='relu'))
+    model.add(Conv2D(128, 3, activation='relu'))
     model.add(MaxPooling2D(2))
     model.add(Flatten())
     model.add(BatchNormalization())
@@ -115,9 +115,9 @@ def repeat_predict():
 
 def get_predict_model(dct_coefficient,model_path):
     model = Sequential()
-    model.add(Conv2D(64, 3, padding='same', activation='relu', input_shape=(dct_coefficient, 8, 3)))
+    model.add(Conv2D(128, 3, padding='same', activation='relu', input_shape=(dct_coefficient, 8, 3)))
     model.add(MaxPooling2D(2))
-    model.add(Conv2D(64, 3, activation='relu'))
+    model.add(Conv2D(128, 3, activation='relu'))
     model.add(MaxPooling2D(2))
     model.add(Flatten())
     model.add(BatchNormalization())
